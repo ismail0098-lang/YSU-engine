@@ -83,7 +83,14 @@ YSU is not meant to be a clone of existing engines — it is a personal laborato
 
 ismail0098-lang
 15-year-old developer exploring graphics, physics, and neural rendering through passion-driven experimentation.
+YSU is a long-term project.
+It will grow from a simple path tracer into a hybrid neural + Vulkan real-time engine — one commit at a time.
+```txt
+# Example scene.txt
 
+camera 0 1 5   0 0 0    90
+sphere 0 0 0   1    1.0 0.2 0.2   diffuse
+sphere 2 0 0   0.5  0.2 0.2 1.0   metal
 
 
 ## 🛠 Build & Run
@@ -99,6 +106,5 @@ gcc ysu_360_engine_integration.c -o ysu360
 
 Open-source under the MIT License.
 
-YSU is a long-term project.
-It will grow from a simple path tracer into a hybrid neural + Vulkan real-time engine — one commit at a time.
+
 
