@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>YSU Engine – Mini Scene Editor</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #0b0b0f;
+      color: #f9fafb;
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      height: 100vh;
+      overflow: hidden;
+    }
+    #sidebar {
+      background: #111827;
+      padding: 12px;
+      border-right: 1px solid #1f2937;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    #viewport {
+      width: 100%;
+      height: 100%;
+    }
+    button {
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: none;
+      background: #2563eb;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    button.secondary { background: #374151; }
+    button.danger    { background: #b91c1c; }
+    button:active    { transform: translateY(1px); }
+
+    h2 { font-size: 16px; margin: 0 0 4px 0; }
+
+    .panel {
+      padding: 8px;
+      border-radius: 10px;
+      background: #020617;
+      border: 1px solid #1f2937;
+    }
+
+    label {
+      font-size: 12px;
+      color: #9ca3af;
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    input[type="number"] {
+      width: 72px;
+      background: #020617;
+      border-radius: 6px;
+      border: 1px solid #374151;
+      padding: 4px 6px;
+      color: #e5e7eb;
+      font-size: 12px;
+      margin-right: 4px;
+    }
+
+    #sphere-list {
+      max-height: 220px;
+      overflow-y: auto;
+      font-size: 12px;
+    }
+    .sphere-item {
+      padding: 4px 6px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .sphere-item.active { background: #1d4ed8; }
+
+    #exportText {
+      width: 100%;
+      height: 120px;
+      resize: none;
+      background: #020617;
+      color: #e5e7eb;
+      border-radius: 8px;
+      border: 1px solid #374151;
+      padding: 6px;
+      font-size: 11px;
+      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+
+    small { font-size: 11px; color: #9ca3af; }
+  </style>
+</head>
+<body>
+  <div id="sidebar">
+    <div class="panel">
+      <h2>YSU Mini Editor</h2>
+      <small>Sol fare: rotate · Orta: pan · Scroll: zoom</small>
+    </div>
+
+    <div class="panel">
+      <h2>Objects</h2>
+      <button id="addSphereBtn">+ Add Sphere</button>
+      <button id="removeSphereBtn" class="danger" style="margin-top:6px;">– Remove Selected</button>
+      <div id="sphere-list"></div>
+    </div>
+
+    <div class="panel">
+      <h2>Selected Sphere</h2>
+      <small>Seçmek için listeden tıkla.</small>
+      <div style="margin-top:6px;">
+        <label>Position (X, Y, Z)</label>
+        <input type="number" step="0.1" id="posX" />
+        <input type="number" step="0.1" id="posY" />
+        <input type="number" step="0.1" id="posZ" />
+      </div>
+      <div style="margin-top:6px;">
+        <label>Radius</label>
+        <input type="number" step="0.05" id="radius" />
+      </div>
+      <div style="margin-top:6px;">
+        <label>Color (R, G, B · 0–1)</label>
+        <input type="number" step="0.05" id="colR" />
+        <input type="number" step="0.05" id="colG" />
+        <input type="number" step="0.05" id="colB" />
+      </div>
+      <small style="display:block;margin-top:6px;">
+        Not: Değerleri değiştirdiğinde sahne hemen güncellenir.
+      </small>
+    </div>
+
+    <div class="panel">
+      <h2>Export for C Ray Tracer</h2>
+      <button id="exportBtn" class="secondary">Export Scene Text</button>
+      <textarea id="exportText" spellcheck="false"></textarea>
+      <small>
+        Format (her satır bir küre):<br/>
+        <code>sphere center_x center_y center_z radius r g b</code><br/>
+        Bunu C tarafında <code>sphere</code> oluşturan bir loader ile okuyabilirsin.
+      </small>
+    </div>
+  </div>
+
+  <div id="viewport"></div>
+
+  <!-- KLASİK (module olmayan) sürümler -->
+  <script src="https://unpkg.com/three@0.146.0/build/three.min.js"></script>
+  <script src="https://unpkg.com/three@0.146.0/examples/js/controls/OrbitControls.js"></script>
+
+  <script>
+    const viewport = document.getElementById('viewport');
+
+    // === Three.js temel sahne ===
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color('#020617');
+
+    const camera = new THREE.PerspectiveCamera(
+      45,
+      viewport.clientWidth / viewport.clientHeight,
+      0.1,
+      100
+    );
+    camera.position.set(4, 3, 5);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(viewport.clientWidth, viewport.clientHeight);
+    viewport.appendChild(renderer.domElement);
+
+    // Klasik OrbitControls (global THREE.OrbitControls)
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+
+    // ışıklar
+    const hemi = new THREE.HemisphereLight(0xffffff, 0x111322, 0.6);
+    scene.add(hemi);
+    const dir = new THREE.DirectionalLight(0xffffff, 0.8);
+    dir.position.set(5, 10, 7);
+    scene.add(dir);
+
+    // yer grid’i
+    const grid = new THREE.GridHelper(20, 20, 0x374151, 0x1f2937);
+    scene.add(grid);
+
+    // === Küre listesi ===
+    const spheres = []; // {mesh, data}
+    let selectedIndex = -1;
+
+    const sphereListDiv   = document.getElementById('sphere-list');
+    const addSphereBtn    = document.getElementById('addSphereBtn');
+    const removeSphereBtn = document.getElementById('removeSphereBtn');
+    const exportBtn       = document.getElementById('exportBtn');
+    const exportText      = document.getElementById('exportText');
+
+    const posX   = document.getElementById('posX');
+    const posY   = document.getElementById('posY');
+    const posZ   = document.getElementById('posZ');
+    const radius = document.getElementById('radius');
+    const colR   = document.getElementById('colR');
+    const colG   = document.getElementById('colG');
+    const colB   = document.getElementById('colB');
+
+    function createSphereData() {
+      return {
+        position: new THREE.Vector3(
+          (Math.random() - 0.5) * 4,
+          Math.random() * 2 + 0.5,
+          (Math.random() - 0.5) * 4
+        ),
+        radius: 0.5,
+        color: new THREE.Color(0.8, 0.3, 0.3),
+      };
+    }
+
+    function addSphere() {
+      const data = createSphereData();
+      const geom = new THREE.SphereGeometry(data.radius, 32, 16);
+      const mat  = new THREE.MeshStandardMaterial({
+        color: data.color,
+        roughness: 0.3,
+        metalness: 0.0,
+      });
+      const mesh = new THREE.Mesh(geom, mat);
+      mesh.position.copy(data.position);
+
+      scene.add(mesh);
+      spheres.push({ mesh, data });
+      selectedIndex = spheres.length - 1;
+      rebuildSphereList();
+      syncUIFromSelection();
+    }
+
+    function removeSelectedSphere() {
+      if (selectedIndex < 0) return;
+      const obj = spheres[selectedIndex];
+      scene.remove(obj.mesh);
+      spheres.splice(selectedIndex, 1);
+      selectedIndex = spheres.length > 0 ? spheres.length - 1 : -1;
+      rebuildSphereList();
+      syncUIFromSelection();
+    }
+
+    function rebuildSphereList() {
+      sphereListDiv.innerHTML = '';
+      spheres.forEach((s, i) => {
+        const div = document.createElement('div');
+        div.className = 'sphere-item' + (i === selectedIndex ? ' active' : '');
+        const p = s.data.position;
+        div.textContent = `Sphere ${i}  (${p.x.toFixed(2)}, ${p.y.toFixed(2)}, ${p.z.toFixed(2)})`;
+        div.onclick = () => {
+          selectedIndex = i;
+          rebuildSphereList();
+          syncUIFromSelection();
+        };
+        sphereListDiv.appendChild(div);
+      });
+    }
+
+    function syncUIFromSelection() {
+      if (selectedIndex < 0) {
+        [posX, posY, posZ, radius, colR, colG, colB].forEach(i => i.value = '');
+        return;
+      }
+      const { data } = spheres[selectedIndex];
+      posX.value   = data.position.x.toFixed(2);
+      posY.value   = data.position.y.toFixed(2);
+      posZ.value   = data.position.z.toFixed(2);
+      radius.value = data.radius.toFixed(2);
+      colR.value   = data.color.r.toFixed(2);
+      colG.value   = data.color.g.toFixed(2);
+      colB.value   = data.color.b.toFixed(2);
+    }
+
+    function syncSelectionFromUI() {
+      if (selectedIndex < 0) return;
+      const obj = spheres[selectedIndex];
+      const d   = obj.data;
+
+      const px = parseFloat(posX.value.replace(',', '.'));
+      const py = parseFloat(posY.value.replace(',', '.'));
+      const pz = parseFloat(posZ.value.replace(',', '.'));
+      const r  = parseFloat(radius.value.replace(',', '.'));
+      const cr = parseFloat(colR.value.replace(',', '.'));
+      const cg = parseFloat(colG.value.replace(',', '.'));
+      const cb = parseFloat(colB.value.replace(',', '.'));
+
+      if (!Number.isNaN(px)) d.position.x = px;
+      if (!Number.isNaN(py)) d.position.y = py;
+      if (!Number.isNaN(pz)) d.position.z = pz;
+      if (!Number.isNaN(r)  && r > 0.01) d.radius = r;
+      if (!Number.isNaN(cr)) d.color.r = THREE.MathUtils.clamp(cr, 0, 1);
+      if (!Number.isNaN(cg)) d.color.g = THREE.MathUtils.clamp(cg, 0, 1);
+      if (!Number.isNaN(cb)) d.color.b = THREE.MathUtils.clamp(cb, 0, 1);
+
+      obj.mesh.position.copy(d.position);
+      obj.mesh.geometry.dispose();
+      obj.mesh.geometry = new THREE.SphereGeometry(d.radius, 32, 16);
+      obj.mesh.material.color.copy(d.color);
+
+      rebuildSphereList();
+    }
+
+    [posX, posY, posZ, radius, colR, colG, colB].forEach(input => {
+      input?.addEventListener('change', syncSelectionFromUI);
+    });
+
+    function exportScene() {
+      let lines = [];
+      spheres.forEach((s) => {
+        const d = s.data;
+        lines.push(
+          `sphere ${d.position.x.toFixed(4)} ${d.position.y.toFixed(4)} ${d.position.z.toFixed(4)} ` +
+          `${d.radius.toFixed(4)} ${d.color.r.toFixed(4)} ${d.color.g.toFixed(4)} ${d.color.b.toFixed(4)}`
+        );
+      });
+      exportText.value = lines.join('\n');
+    }
+
+    addSphereBtn.onclick    = addSphere;
+    removeSphereBtn.onclick = removeSelectedSphere;
+    exportBtn.onclick       = exportScene;
+
+    // başlangıç için 2 küre
+    addSphere();
+    addSphere();
+
+    window.addEventListener('resize', () => {
+      renderer.setSize(viewport.clientWidth, viewport.clientHeight);
+      camera.aspect = viewport.clientWidth / viewport.clientHeight;
+      camera.updateProjectionMatrix();
+    });
+
+    function animate() {
+      requestAnimationFrame(animate);
+      controls.update();
+      renderer.render(scene, camera);
+    }
+    animate();
+  </script>
+</body>
+</html>
