@@ -3,22 +3,22 @@ A hybrid rendering engine exploring the frontier between classical ray tracing, 
 
 ---
 
-## 🚀 Overview
+##  Overview
 
 **YSU (Your Simulated Universe)** is an experimental rendering engine built entirely from scratch in C.  
 It began as a simple CPU path tracer and is evolving into a long-term research project that unifies:
 
-- 📌 Physically-based ray tracing  
-- 📌 Neural Radiance Fields (NeRF)  (in future)
-- 📌 Vulkan compute acceleration  (in the future)
-- 📌 360° & VR rendering  (exists right now)
-- 📌 Scene editing and experimental tools  
+-  Physically-based ray tracing  
+-  Neural Radiance Fields (NeRF)  (in future)
+-  Vulkan compute acceleration  (in the future)
+-  360° & VR rendering  (exists right now)
+-  Scene editing and experimental tools  
 
 YSU aims to understand light, geometry, and simulation at the deepest possible level — not by using existing engines, but by building one from first principles.
 
 ---
 
-## 🌌 Vision
+##  Vision
 
 YSU is designed as a *hybrid renderer*:  
 classical geometry + neural radiance fields + real-time GPU pipelines.
@@ -34,18 +34,18 @@ YSU is not meant to be a clone of existing engines — it is a personal laborato
 
 ---
 
-## 🧠 Current Features (v0.3)
+##  Current Features (v0.3)
 
-- ✅ Fully custom C-based ray tracer  
-- ✅ Vector math, rays, spheres, camera, materials  
-- ✅ 360° equirectangular rendering  
-- ✅ VR-ready dual-camera output  
-- ✅ Basic scene loader  
-- ✅ Clean, modular code for future expansion  
+-  Fully custom C-based ray tracer  
+-  Vector math, rays, spheres, camera, materials  
+-  360° equirectangular rendering  
+-  VR-ready dual-camera output  
+-  Basic scene loader  
+-  Clean, modular code for future expansion  
 
 ---
 
-## 🔧 Upcoming Milestones
+##  Upcoming Milestones
 
 ### **v0.4 — Scene System Upgrade**
 - Scene graph  
