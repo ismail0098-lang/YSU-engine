@@ -92,23 +92,78 @@ Some key modules included in the repository:
 
 YSU is built using standard C toolchains.  
 Exact file lists may change as the engine evolves.
-
-⭐ Author
-
-ismail0098-lang
-15-year-old developer exploring graphics, physics, and neural rendering through passion-driven experimentation.
-YSU is a long-term project.
-It will grow from a simple path tracer into a hybrid neural + Vulkan real-time engine — one commit at a time.
-```txt
-# Example scene.txt
-
-camera 0 1 5   0 0 0    90
-sphere 0 0 0   1    1.0 0.2 0.2   diffuse
-sphere 2 0 0   0.5  0.2 0.2 1.0   metal
-
-### Basic Build
-```bash
-gcc -O2 -std=c11 ysu_main.c vec3.c ray.c color.c material.c sphere.c triangle.c primitives.c render.c image.c sceneloader.c camera.c -o ysuengine
+gcc -O2 -std=c11 ysu_360_engine_integration.c vec3.c ray.c color.c material.c sphere.c triangle.c primitives.c render.c image.c sceneloader.c camera.c image.c -o ysu360
+./ysu360
+gcc -O2 -mavx2 -std=c11 ysu_main.c vec3.c ray.c color.c material.c sphere.c triangle.c primitives.c bvh.c render.c sceneloader.c denoise.c ysu_360_engine_integration.c camera.c image.c triangle_hit_asm.S triangle_hit_avx2.S -o ysuengine
 ./ysuengine
 
+Roadmap
+v0.5 — CPU Acceleration & Structure
 
+Stabilize multithreading
+
+Improve BVH traversal performance
+
+Refine SIMD-friendly intersection kernels
+
+v0.6 — Interactive Tools
+
+Expand HTML/JS scene editor
+
+Real-time parameter control
+
+Improved mesh editing workflow
+
+v0.7 — Vulkan Backend (Experimental)
+
+Compute-shader-based ray generation
+
+GPU traversal experiments
+
+GPU denoising
+
+v0.8 — Neural Rendering
+
+Neural Radiance Field (NeRF) loading
+
+Neural sampling experiments
+
+Hybrid neural + geometric rendering
+
+v1.0 — Hybrid Research Renderer
+
+Stable Vulkan backend
+
+Unified geometry + neural pipeline
+
+Interactive real-time viewport
+
+VR-ready exploration
+
+Status
+
+YSU is an active long-term research project.
+
+Expect:
+
+Rapid iteration
+
+Breaking changes
+
+Experimental systems
+
+Incomplete features
+
+This is intentional.
+
+Author
+
+ismail0098-lang
+
+A developer exploring graphics, simulation, performance engineering, and neural rendering through hands-on experimentation.
+
+YSU grows one commit at a time.
+
+License
+
+MIT License
