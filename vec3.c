@@ -1,61 +1,94 @@
 #include <math.h>
+#include <stdlib.h>
 #include "vec3.h"
 
-// Constructor
-Vec3 vec3(float x, float y, float z) {
-    Vec3 v = { x, y, z };
+Vec3 vec3(float x, float y, float z)
+{
+    Vec3 v;
+    v.x = x;
+    v.y = y;
+    v.z = z;
     return v;
 }
 
-// Add
-Vec3 vec3_add(Vec3 a, Vec3 b) {
+Vec3 vec3_add(Vec3 a, Vec3 b)
+{
     return vec3(a.x + b.x, a.y + b.y, a.z + b.z);
 }
 
-// Subtract
-Vec3 vec3_sub(Vec3 a, Vec3 b) {
+Vec3 vec3_sub(Vec3 a, Vec3 b)
+{
     return vec3(a.x - b.x, a.y - b.y, a.z - b.z);
 }
 
-// Component-wise multiply
-Vec3 vec3_mul(Vec3 a, Vec3 b) {
+Vec3 vec3_mul(Vec3 a, Vec3 b)
+{
     return vec3(a.x * b.x, a.y * b.y, a.z * b.z);
 }
 
-// Scale
-Vec3 vec3_scale(Vec3 v, float s) {
-    return vec3(v.x * s, v.y * s, v.z * s);
+Vec3 vec3_scale(Vec3 a, float s)
+{
+    return vec3(a.x * s, a.y * s, a.z * s);
 }
 
-// Dot product
-float vec3_dot(Vec3 a, Vec3 b) {
-    return a.x*b.x + a.y*b.y + a.z*b.z;
+float vec3_dot(Vec3 a, Vec3 b)
+{
+    return a.x * b.x + a.y * b.y + a.z * b.z;
 }
 
-// Cross product
-Vec3 vec3_cross(Vec3 a, Vec3 b) {
+Vec3 vec3_cross(Vec3 a, Vec3 b)
+{
     return vec3(
-        a.y*b.z - a.z*b.y,
-        a.z*b.x - a.x*b.z,
-        a.x*b.y - a.y*b.x
+        a.y * b.z - a.z * b.y,
+        a.z * b.x - a.x * b.z,
+        a.x * b.y - a.y * b.x
     );
 }
 
-// Length
-float vec3_length(Vec3 v) {
-    return sqrtf(vec3_dot(v, v));
+float vec3_length_squared(Vec3 a)
+{
+    return a.x * a.x + a.y * a.y + a.z * a.z;
 }
 
-// Normalize
-Vec3 vec3_normalize(Vec3 v) {
-    float len = vec3_length(v);
-    if (len == 0.0f) return vec3(0,0,0);
-    return vec3_scale(v, 1.0f / len);
+float vec3_length(Vec3 a)
+{
+    return sqrtf(vec3_length_squared(a));
 }
 
-// Reflection: reflect v across normal n
-Vec3 vec3_reflect(Vec3 v, Vec3 n) {
-    // r = v - 2*(v•n)*n
+Vec3 vec3_normalize(Vec3 a)
+{
+    float len = vec3_length(a);
+    if (len <= 0.0f) {
+        return vec3(0.0f, 0.0f, 0.0f);
+    }
+    float inv = 1.0f / len;
+    return vec3(a.x * inv, a.y * inv, a.z * inv);
+}
+
+Vec3 vec3_reflect(Vec3 v, Vec3 n)
+{
+    // v - 2 * dot(v, n) * n
     float d = vec3_dot(v, n);
     return vec3_sub(v, vec3_scale(n, 2.0f * d));
+}
+
+// Eski kodun kullandığı isim: unit(v) = normalize(v)
+Vec3 vec3_unit(Vec3 a)
+{
+    return vec3_normalize(a);
+}
+
+// [min,max] aralığında rastgele vektör
+static float rand_float01(void)
+{
+    return (float)rand() / (float)RAND_MAX;
+}
+
+Vec3 vec3_random(float min, float max)
+{
+    float range = max - min;
+    float rx = min + range * rand_float01();
+    float ry = min + range * rand_float01();
+    float rz = min + range * rand_float01();
+    return vec3(rx, ry, rz);
 }

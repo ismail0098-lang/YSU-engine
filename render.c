@@ -1,175 +1,343 @@
-#include <stdio.h>
-#include <math.h>
-#include <stdlib.h>
-#include <time.h>
-#include "sceneloader.h"
-
-#include "vec3.h"
-#include "ray.h"
-#include "sphere.h"
-#include "material.h"
-#include "camera.h"
-#include "image.h"
-#include "color.h"
+// render.c (FULL) - pthread threadpool + chunked jobs + tile renderer + RNG + stub
 #include "render.h"
 
-// 360 panorama fonksiyonunu başka dosyadan kullanacağız
-// (ysu_360_engine_integration.c içinde tanımlı olmalı)
-extern void ysu_render_360(const Camera *cam, const char *out_ppm);
+#include <stdlib.h>
+#include <stdint.h>
+#include <time.h>
 
-// Varsayılan ayarlar (header'da da tanımlı)
-#define IMAGE_WIDTH       IMAGE_WIDTH_DEFAULT
-#define ASPECT_RATIO      ASPECT_RATIO_DEFAULT
-#define SAMPLES_PER_PIXEL SAMPLES_PER_PIXEL_DEFAULT
-#define MAX_DEPTH         MAX_DEPTH_DEFAULT
+#if __STDC_VERSION__ >= 201112L
+  #include <stdatomic.h>
+#else
+  #error "C11 gerekiyor (stdatomic). GCC'de -std=c11 kullan."
+#endif
 
-#define MAX_SPHERES   16
-#define MAX_MATERIALS 16
+#include <pthread.h>
 
-static Sphere   g_spheres[MAX_SPHERES];
-static int      g_num_spheres   = 0;
-static Material g_materials[MAX_MATERIALS];
-static int      g_num_materials = 0;
+#if defined(_WIN32)
+  #include <windows.h>
+#endif
 
-// Basit rastgele sayı [0,1)
-static float rand_float(void) {
-    return (float)rand() / (float)RAND_MAX;
+#include "material.h"
+#include "sphere.h"
+#include "triangle.h"
+#include "bvh.h"
+#include "primitives.h"
+#include "vec3.h"
+#include "ray.h"
+#include "camera.h"
+
+// ------------------------- RNG (xorshift32) -------------------------
+typedef struct { uint32_t state; } YSU_Rng;
+
+static inline uint32_t ysu_rng_u32(YSU_Rng *r) {
+    uint32_t x = r->state;
+    x ^= x << 13;
+    x ^= x >> 17;
+    x ^= x << 5;
+    r->state = x;
+    return x;
 }
 
-// Dünya ile çarpışma kontrolü
-static int hit_world(Ray r, float t_min, float t_max, HitRecord *out_rec) {
-    HitRecord temp_rec;
-    int   hit_anything   = 0;
-    float closest_so_far = t_max;
+static inline float ysu_rng_f01(YSU_Rng *r) {
+    return (ysu_rng_u32(r) >> 8) * (1.0f / 16777216.0f);
+}
 
-    for (int i = 0; i < g_num_spheres; i++) {
-        temp_rec = sphere_intersect(g_spheres[i], r, t_min, closest_so_far);
-        if (temp_rec.hit) {
-            hit_anything   = 1;
-            closest_so_far = temp_rec.t;
-            *out_rec       = temp_rec;
-        }
+static int ysu_suggest_threads(void) {
+    const char *env = getenv("YSU_THREADS");
+    if (env && env[0]) {
+        int v = atoi(env);
+        if (v > 0) return v;
     }
-
-    return hit_anything;
+#if defined(_WIN32)
+    SYSTEM_INFO sys;
+    GetSystemInfo(&sys);
+    int n = (int)sys.dwNumberOfProcessors;
+    return (n > 0) ? n : 8;
+#else
+    return 8;
+#endif
 }
 
-// Işının rengi (360 rendering için de kullanacağız)
+// ------------------------- ray_color_internal STUB -------------------------
+#define YSU_STUB_RAY_COLOR_INTERNAL 1
+
+#if YSU_STUB_RAY_COLOR_INTERNAL
+static Vec3 ysu_sky(Ray r) {
+    Vec3 u = vec3_unit(r.direction);
+    float t = 0.5f * (u.y + 1.0f);
+    Vec3 a = vec3(1.0f, 1.0f, 1.0f);
+    Vec3 b = vec3(0.5f, 0.7f, 1.0f);
+    return vec3_add(vec3_scale(a, 1.0f - t), vec3_scale(b, t));
+}
 Vec3 ray_color_internal(Ray r, int depth) {
-    if (depth <= 0) {
-        return vec3(0, 0, 0);
-    }
+    (void)depth;
+    return ysu_sky(r);
+}
+#endif
 
-    HitRecord rec;
-    if (hit_world(r, 0.001f, 1000.0f, &rec)) {
-        if (rec.material_index < 0 || rec.material_index >= g_num_materials) {
-            return vec3(1, 0, 1); // hata ayıklama için mor
+// ------------------------- Single-thread render -------------------------
+void render_scene_st(Vec3 *pixels,
+                     int image_width,
+                     int image_height,
+                     Camera cam,
+                     int samples_per_pixel,
+                     int max_depth)
+{
+    if (!pixels || image_width <= 0 || image_height <= 0) return;
+    if (samples_per_pixel < 1) samples_per_pixel = 1;
+    if (max_depth < 1) max_depth = 1;
+
+    YSU_Rng rng;
+    rng.state = ((uint32_t)time(NULL) ^ 0xA511E9B3u);
+    if (rng.state == 0) rng.state = 1;
+
+    for (int j = 0; j < image_height; ++j) {
+        for (int i = 0; i < image_width; ++i) {
+            Vec3 acc = vec3(0.0f, 0.0f, 0.0f);
+
+            for (int s = 0; s < samples_per_pixel; ++s) {
+                float u = ((float)i + ysu_rng_f01(&rng)) / (float)(image_width - 1);
+                float v = ((float)j + ysu_rng_f01(&rng)) / (float)(image_height - 1);
+
+                Ray r = camera_get_ray(cam, u, v);
+                acc = vec3_add(acc, ray_color_internal(r, max_depth));
+            }
+
+            acc = vec3_scale(acc, 1.0f / (float)samples_per_pixel);
+            pixels[(image_height - 1 - j) * image_width + i] = acc;
+        }
+    }
+}
+
+// =====================================================================
+// THREAD POOL (persistent)
+// =====================================================================
+
+// Atomic job counter + “job chunk” ile contention azaltıyoruz
+#define JOB_CHUNK 8
+
+typedef struct {
+    // render target
+    Vec3 *pixels;
+    Camera cam;
+    int width, height;
+    int spp, depth;
+    int tile_size;
+
+    int tiles_x;
+    int tiles_y;
+    atomic_int next_job;
+
+    uint32_t seed_base;
+
+    // sync
+    pthread_mutex_t mtx;
+    pthread_cond_t  cv_start;
+    pthread_cond_t  cv_done;
+
+    int work_id;        // new render starts => ++work_id
+    int active_workers; // how many workers should participate
+    int done_workers;   // workers finished this work_id
+    int shutdown;
+
+    int pool_threads;   // created thread count
+    pthread_t *threads;
+} RenderPool;
+
+static RenderPool g_pool = {0};
+
+typedef struct {
+    int tid;
+} WorkerLocal;
+
+static void render_tile_chunk(RenderPool *p, int tid, int job) {
+    int tx = job % p->tiles_x;
+    int ty = job / p->tiles_x;
+
+    int x0 = tx * p->tile_size;
+    int y0 = ty * p->tile_size;
+    int x1 = x0 + p->tile_size;
+    int y1 = y0 + p->tile_size;
+    if (x1 > p->width)  x1 = p->width;
+    if (y1 > p->height) y1 = p->height;
+
+    // thread-local RNG seed
+    YSU_Rng rng;
+    rng.state = p->seed_base
+              ^ (uint32_t)(tid * 0x9E3779B9u)
+              ^ (uint32_t)(x0 * 73856093u)
+              ^ (uint32_t)(y0 * 19349663u);
+    if (rng.state == 0) rng.state = 1;
+
+    for (int j = y0; j < y1; ++j) {
+        for (int i = x0; i < x1; ++i) {
+            Vec3 acc = vec3(0.0f, 0.0f, 0.0f);
+            for (int s = 0; s < p->spp; ++s) {
+                float u = ((float)i + ysu_rng_f01(&rng)) / (float)(p->width - 1);
+                float v = ((float)j + ysu_rng_f01(&rng)) / (float)(p->height - 1);
+                Ray r = camera_get_ray(p->cam, u, v);
+                acc = vec3_add(acc, ray_color_internal(r, p->depth));
+            }
+            acc = vec3_scale(acc, 1.0f / (float)p->spp);
+            p->pixels[(p->height - 1 - j) * p->width + i] = acc;
+        }
+    }
+}
+
+static void *pool_worker(void *arg) {
+    WorkerLocal *wl = (WorkerLocal*)arg;
+    int tid = wl->tid;
+
+    int last_work = 0;
+
+    for (;;) {
+        pthread_mutex_lock(&g_pool.mtx);
+        while (!g_pool.shutdown && g_pool.work_id == last_work) {
+            pthread_cond_wait(&g_pool.cv_start, &g_pool.mtx);
+        }
+        if (g_pool.shutdown) {
+            pthread_mutex_unlock(&g_pool.mtx);
+            return NULL;
+        }
+        last_work = g_pool.work_id;
+
+        // Bu work’te aktif değilse “done” sayılır
+        int active = (tid < g_pool.active_workers);
+        pthread_mutex_unlock(&g_pool.mtx);
+
+        if (active) {
+            int total = g_pool.tiles_x * g_pool.tiles_y;
+            for (;;) {
+                int base = atomic_fetch_add(&g_pool.next_job, JOB_CHUNK);
+                if (base >= total) break;
+                int end = base + JOB_CHUNK;
+                if (end > total) end = total;
+                for (int job = base; job < end; ++job) {
+                    render_tile_chunk(&g_pool, tid, job);
+                }
+            }
         }
 
-        const Material *mat = &g_materials[rec.material_index];
-        Ray  scattered;
-        Vec3 attenuation;
-
-        if (material_scatter(mat, r, rec.point, rec.normal, &scattered, &attenuation)) {
-            Vec3 col = ray_color_internal(scattered, depth - 1);  // recursive call
-            return vec3_mul(attenuation, col);
-        } else {
-            return vec3(0, 0, 0);
+        pthread_mutex_lock(&g_pool.mtx);
+        g_pool.done_workers++;
+        if (g_pool.done_workers >= g_pool.active_workers) {
+            pthread_cond_signal(&g_pool.cv_done);
         }
-    }
-
-    // Arka plan (sky gradient)
-    Vec3 unit_dir = vec3_normalize(r.direction);
-    float t = 0.5f * (unit_dir.y + 1.0f);
-    Vec3 c1 = vec3(1.0f, 1.0f, 1.0f);
-    Vec3 c2 = vec3(0.5f, 0.7f, 1.0f);
-    return vec3_add(vec3_scale(c1, (1.0f - t)), vec3_scale(c2, t));
-}
-
-// HEADER ile uyumlu dış fonksiyon (eski kodun çağırdığı)
-Vec3 ray_color(Ray r, int depth) {
-    return ray_color_internal(r, depth);
-}
-
-// Materyal ekle, index döndür
-static int add_material(MaterialType type, Vec3 albedo, float fuzz) {
-    if (g_num_materials >= MAX_MATERIALS) return -1;
-    Material m;
-    m.type   = type;
-    m.albedo = albedo;
-    m.fuzz   = fuzz;
-    g_materials[g_num_materials] = m;
-    return g_num_materials++;
-}
-
-// Küre ekle
-static void add_sphere(Vec3 center, float radius, int material_index) {
-    if (g_num_spheres >= MAX_SPHERES) return;
-    g_spheres[g_num_spheres++] = sphere_create(center, radius, material_index);
-}
-
-// -----------------------------------------------------------------------------
-//  SCENE LOADER ENTEGRASYONU
-// -----------------------------------------------------------------------------
-
-// scene.txt'den sahne kurmayı dener.
-// Başarılıysa 1, başarısızsa 0 döner.
-static int setup_scene_from_file(const char *path) {
-    SceneSphere temp[MAX_SPHERES];
-    int count = load_scene(path, temp, MAX_SPHERES);
-    if (count <= 0) {
-        return 0; // hiçbir şey yüklenemediyse fallback kullan
-    }
-
-    g_num_spheres   = 0;
-    g_num_materials = 0;
-
-    for (int i = 0; i < count; ++i) {
-        // Her küreye kendi albedosuyla lambertian materyal veriyoruz
-        int mat = add_material(MAT_LAMBERTIAN, temp[i].albedo, 0.0f);
-        if (mat < 0) break;
-        add_sphere(temp[i].center, temp[i].radius, mat);
-    }
-
-    printf("Scene loaded from '%s' with %d spheres.\n", path, g_num_spheres);
-    return 1;
-}
-
-// Eski hard-coded sahne (fallback)
-static void setup_default_scene(void) {
-    g_num_spheres   = 0;
-    g_num_materials = 0;
-
-    // Zemin
-    int ground_mat = add_material(MAT_LAMBERTIAN, vec3(0.8f, 0.8f, 0.0f), 0.0f);
-    add_sphere(vec3(0.0f, -100.5f, -1.0f), 100.0f, ground_mat);
-
-    // Ortadaki diffuse küre
-    int center_mat = add_material(MAT_LAMBERTIAN, vec3(0.1f, 0.2f, 0.5f), 0.0f);
-    add_sphere(vec3(0.0f, 0.0f, -1.0f), 0.5f, center_mat);
-
-    // Sağda metal küre
-    int metal_mat = add_material(MAT_METAL, vec3(0.8f, 0.6f, 0.2f), 0.1f);
-    add_sphere(vec3(1.0f, 0.0f, -1.0f), 0.5f, metal_mat);
-
-    // Solda biraz daha karanlık diffuse küre
-    int left_mat = add_material(MAT_LAMBERTIAN, vec3(0.8f, 0.1f, 0.1f), 0.0f);
-    add_sphere(vec3(-1.0f, 0.0f, -1.0f), 0.5f, left_mat);
-
-    printf("Default hard-coded scene loaded.\n");
-}
-
-// Dışarıdan çağrılan sahne kurma fonksiyonu (render.h'la uyumlu)
-void setup_scene(void) {
-   
-    if (!setup_scene_from_file("scene.txt")) {
-        
-        setup_default_scene();
+        pthread_mutex_unlock(&g_pool.mtx);
     }
 }
 
-// 🔹 ANA RENDER FONKSİYONU 🔹
-// pixels: image_width * image_height uzunlukta Vec3 dizisi
+static void pool_shutdown(void) {
+    if (!g_pool.threads) return;
+    pthread_mutex_lock(&g_pool.mtx);
+    g_pool.shutdown = 1;
+    pthread_cond_broadcast(&g_pool.cv_start);
+    pthread_mutex_unlock(&g_pool.mtx);
+
+    for (int i = 0; i < g_pool.pool_threads; ++i) {
+        pthread_join(g_pool.threads[i], NULL);
+    }
+    free(g_pool.threads);
+    g_pool.threads = NULL;
+
+    pthread_mutex_destroy(&g_pool.mtx);
+    pthread_cond_destroy(&g_pool.cv_start);
+    pthread_cond_destroy(&g_pool.cv_done);
+}
+
+static void pool_init_if_needed(int create_threads) {
+    if (g_pool.threads) return;
+
+    g_pool.pool_threads = (create_threads > 0) ? create_threads : ysu_suggest_threads();
+    if (g_pool.pool_threads < 1) g_pool.pool_threads = 1;
+
+    pthread_mutex_init(&g_pool.mtx, NULL);
+    pthread_cond_init(&g_pool.cv_start, NULL);
+    pthread_cond_init(&g_pool.cv_done, NULL);
+
+    g_pool.work_id = 0;
+    g_pool.shutdown = 0;
+
+    g_pool.threads = (pthread_t*)malloc(sizeof(pthread_t) * (size_t)g_pool.pool_threads);
+
+    // worker local ids
+    WorkerLocal *locals = (WorkerLocal*)malloc(sizeof(WorkerLocal) * (size_t)g_pool.pool_threads);
+    for (int i = 0; i < g_pool.pool_threads; ++i) {
+        locals[i].tid = i;
+        pthread_create(&g_pool.threads[i], NULL, pool_worker, &locals[i]);
+    }
+
+    // locals'ı free edemeyiz çünkü worker arg pointer’ı kullanıyor.
+    // Basit çözüm: locals'ı intentionally leak (küçük ve tek sefer).
+    // İstersen locals'ı static array yaparız.
+    (void)locals;
+
+    atexit(pool_shutdown);
+}
+
+// =====================================================================
+// Public MT render using threadpool
+// =====================================================================
+void render_scene_mt(Vec3 *pixels,
+                     int image_width,
+                     int image_height,
+                     Camera cam,
+                     int samples_per_pixel,
+                     int max_depth,
+                     int thread_count,
+                     int tile_size)
+{
+    if (!pixels || image_width <= 0 || image_height <= 0) return;
+    if (samples_per_pixel < 1) samples_per_pixel = 1;
+    if (max_depth < 1) max_depth = 1;
+
+    if (thread_count <= 0) thread_count = ysu_suggest_threads();
+    if (thread_count < 1) thread_count = 1;
+
+    // Default tile daha büyük: atomic daha az, cache daha iyi
+    if (tile_size <= 0) tile_size = 64;
+    if (tile_size < 16) tile_size = 16;
+
+    // pool en az thread_count kadar thread açsın (ilk render’da)
+    pool_init_if_needed(thread_count);
+
+    int tiles_x = (image_width  + tile_size - 1) / tile_size;
+    int tiles_y = (image_height + tile_size - 1) / tile_size;
+
+    pthread_mutex_lock(&g_pool.mtx);
+
+    g_pool.pixels = pixels;
+    g_pool.cam = cam;
+    g_pool.width = image_width;
+    g_pool.height = image_height;
+    g_pool.spp = samples_per_pixel;
+    g_pool.depth = max_depth;
+    g_pool.tile_size = tile_size;
+
+    g_pool.tiles_x = tiles_x;
+    g_pool.tiles_y = tiles_y;
+
+    atomic_store(&g_pool.next_job, 0);
+
+    g_pool.seed_base = ((uint32_t)time(NULL) ^ 0xD1B54A35u);
+    if (g_pool.seed_base == 0) g_pool.seed_base = 1;
+
+    // aktif worker sayısını sınırla
+    if (thread_count > g_pool.pool_threads) thread_count = g_pool.pool_threads;
+    g_pool.active_workers = thread_count;
+    g_pool.done_workers = 0;
+
+    g_pool.work_id++;
+    pthread_cond_broadcast(&g_pool.cv_start);
+
+    // work bitene kadar bekle
+    while (g_pool.done_workers < g_pool.active_workers) {
+        pthread_cond_wait(&g_pool.cv_done, &g_pool.mtx);
+    }
+
+    pthread_mutex_unlock(&g_pool.mtx);
+}
+
 void render_scene(Vec3 *pixels,
                   int image_width,
                   int image_height,
@@ -177,73 +345,5 @@ void render_scene(Vec3 *pixels,
                   int samples_per_pixel,
                   int max_depth)
 {
-    for (int j = 0; j < image_height; j++) {
-        printf("Scanline %d / %d\r", j + 1, image_height);
-        fflush(stdout);
-
-        for (int i = 0; i < image_width; i++) {
-            Vec3 col = vec3(0, 0, 0);
-
-            for (int s = 0; s < samples_per_pixel; s++) {
-                float u = ((float)i + rand_float()) / (float)(image_width  - 1);
-                float v = ((float)j + rand_float()) / (float)(image_height - 1);
-
-                Ray r = camera_get_ray(cam, u, v);
-                Vec3 sample = ray_color(r, max_depth);
-                col = vec3_add(col, sample);
-            }
-
-            // Ortalama al
-            float scale = 1.0f / (float)samples_per_pixel;
-            col = vec3_scale(col, scale);
-
-            // Basit gamma düzeltme (gamma=2)
-            col.x = sqrtf(col.x);
-            col.y = sqrtf(col.y);
-            col.z = sqrtf(col.z);
-
-            pixels[j * image_width + i] = col;
-        }
-    }
-}
-
-
-int main(void) {
-    srand((unsigned int)time(NULL));
-
-    const int image_width  = IMAGE_WIDTH;
-    const int image_height = (int)(image_width / ASPECT_RATIO);
-
-    printf("Image size: %d x %d\n", image_width, image_height);
-
-    // Sahne kur (scene.txt varsa oradan, yoksa default)
-    setup_scene();
-
-    // Kamera
-    float viewport_height = 2.0f;
-    float focal_length    = 1.0f;
-    Camera cam = camera_create(ASPECT_RATIO, viewport_height, focal_length);
-
-    // Pixel buffer
-    Vec3 *pixels = (Vec3 *)malloc(sizeof(Vec3) * image_width * image_height);
-    if (!pixels) {
-        printf("Memory allocation failed\n");
-        return 1;
-    }
-
-    // Normal render (output.ppm)
-    render_scene(pixels, image_width, image_height,
-                 cam, SAMPLES_PER_PIXEL, MAX_DEPTH);
-
-    printf("\nWriting image (output.ppm)...\n");
-    image_write_ppm("output.ppm", image_width, image_height, pixels);
-
-    // Aynı sahne ve kamerayla 360 panorama
-    printf("Rendering 360 panorama (ysu_360.ppm)...\n");
-    ysu_render_360(&cam, "ysu_360.ppm");
-
-    free(pixels);
-
-    printf("Done. Images: output.ppm + ysu_360.ppm\n");
-    return 0;
+    render_scene_mt(pixels, image_width, image_height, cam, samples_per_pixel, max_depth, 0, 64);
 }
