@@ -1,0 +1,73 @@
+#version 450
+layout(local_size_x=16, local_size_y=16) in;
+
+// Binding 0: output image (display/readback)
+layout(set=0,binding=0, rgba32f) uniform writeonly image2D outImg;
+
+// Binding 1: accumulation image (RGB = running mean, A = sample count)
+layout(set=0,binding=1, rgba32f) uniform image2D accumImg;
+
+layout(push_constant) uniform PC {
+    int W;
+    int H;
+    int frame;   // 0..N-1
+    int seed;    // any number
+} pc;
+
+const float PI = 3.14159265358979323846;
+
+// tiny hash RNG (deterministic)
+uint hash_u32(uint x){
+    x ^= x >> 16;
+    x *= 0x7feb352dU;
+    x ^= x >> 15;
+    x *= 0x846ca68bU;
+    x ^= x >> 16;
+    return x;
+}
+float rng01(inout uint s){
+    s = hash_u32(s);
+    return float(s & 0x00FFFFFFu) * (1.0 / 16777216.0);
+}
+
+vec3 dir_from_equirect(float u, float v){
+    float phi   = (u * 2.0 - 1.0) * PI;   // [-pi, +pi]
+    float theta = (0.5 - v) * PI;         // [+pi/2 .. -pi/2]
+    float c = cos(theta);
+    return vec3(c * sin(phi), sin(theta), c * cos(phi));
+}
+
+vec3 sky(vec3 d){
+    d = normalize(d);
+    float t = clamp(0.5*(d.y + 1.0), 0.0, 1.0);
+    vec3 top = vec3(0.50, 0.72, 1.00);
+    vec3 bot = vec3(1.00, 1.00, 1.00);
+    return mix(bot, top, t);
+}
+
+void main(){
+    ivec2 p = ivec2(gl_GlobalInvocationID.xy);
+    if(p.x >= pc.W || p.y >= pc.H) return;
+
+    // per-pixel RNG seed
+    uint s = uint(pc.seed) ^ uint(p.x*1973 + p.y*9277) ^ uint(pc.frame*26699);
+
+    // jitter for progressive sampling
+    float ju = rng01(s) - 0.5;
+    float jv = rng01(s) - 0.5;
+
+    float u = (float(p.x) + 0.5 + ju) / float(pc.W);
+    float v = (float(p.y) + 0.5 + jv) / float(pc.H);
+
+    vec3 d = dir_from_equirect(u, v);
+    vec3 samp = sky(d);   // <-- "sample" değil, "samp"
+
+    vec4 prev = imageLoad(accumImg, p);
+    float count = prev.w;
+    float newCount = count + 1.0;
+
+    vec3 mean = (prev.rgb * count + samp) / newCount;
+
+    imageStore(accumImg, p, vec4(mean, newCount));
+    imageStore(outImg,   p, vec4(mean, 1.0));
+}
