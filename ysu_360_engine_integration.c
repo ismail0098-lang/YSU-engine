@@ -28,8 +28,8 @@
 #endif
 
 // ===================== 360 Output Settings =====================
-#define YSU_360_WIDTH      2048
-#define YSU_360_HEIGHT     1024
+#define YSU_360_WIDTH      4096
+#define YSU_360_HEIGHT     2048
 
 // Adaptive sampling defaults (override via env if you want)
 #define YSU_360_SPP_MIN_DEFAULT    16

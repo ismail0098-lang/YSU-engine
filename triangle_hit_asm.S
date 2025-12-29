@@ -2,6 +2,8 @@
 .text
 .globl ysu_hit_triangle_asm
 
+ysu_hit_triangle_asm:
+
 # int ysu_hit_triangle_asm(
 #   RCX = Triangle* tri
 #   RDX = Ray* r
@@ -12,7 +14,7 @@
 #   [rsp+40] = float* out_v
 # )
 
-ysu_hit_triangle_asm:
+ysu_hit_triangle_avx2:
     push rbp
     mov rbp, rsp
     sub rsp, 32
@@ -22,7 +24,7 @@ ysu_hit_triangle_asm:
     # load p0,p1,p2 (Vec3 are assumed 16B: x,y,z,pad)
     movups xmm2, [rcx]         # p0
     movups xmm3, [rcx+16]      # p1
-    movups xmm4, [rcx+32]      # p2
+    movups xmm4, [rcx+32]      # p23
 
     # e1 = p1 - p0
     movaps xmm5, xmm3

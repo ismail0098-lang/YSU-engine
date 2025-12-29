@@ -5,17 +5,24 @@
 extern "C" {
 #endif
 
+#include <stdint.h>
 #include "vec3.h"
 #include "ray.h"
 #include "camera.h"
 
-void render_scene(Vec3 *pixels,
-                  int image_width,
-                  int image_height,
-                  Camera cam,
-                  int samples_per_pixel,
-                  int max_depth);
+/**
+ * Single-thread render (simple loop). If you want MT, use render_scene_mt().
+ */
+void render_scene_st(Vec3 *pixels,
+                     int image_width,
+                     int image_height,
+                     Camera cam,
+                     int samples_per_pixel,
+                     int max_depth);
 
+/**
+ * Multi-thread render using internal pthread threadpool + tiled jobs.
+ */
 void render_scene_mt(Vec3 *pixels,
                      int image_width,
                      int image_height,
@@ -25,17 +32,35 @@ void render_scene_mt(Vec3 *pixels,
                      int thread_count,
                      int tile_size);
 
-void render_scene_st(Vec3 *pixels,
-                     int image_width,
-                     int image_height,
-                     Camera cam,
-                     int samples_per_pixel,
-                     int max_depth);
+/**
+ * Convenience wrapper: chooses ST/MT internally (currently calls ST).
+ */
+void render_scene(Vec3 *pixels,
+                  int image_width,
+                  int image_height,
+                  Camera cam,
+                  int samples_per_pixel,
+                  int max_depth);
 
+/**
+ * Integrator entry used by renderer.
+ */
 Vec3 ray_color_internal(Ray r, int depth);
+
+/**
+ * Portable RNG helper for integrator code.
+ * Uses a simple xorshift32 on the given state.
+ */
+float ysu_rng_next01(uint32_t *state);
+
+/**
+ * Russian roulette helper: returns 1 to continue, 0 to terminate.
+ * p_survive is clamped to [0,1].
+ */
+int   ysu_russian_roulette(uint32_t *state, float p_survive);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif
+#endif // RENDER_H

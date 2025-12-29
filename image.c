@@ -1,33 +1,55 @@
-#include <stdio.h>
-#include "image.h"
+// image.c - PPM writer (P6 binary)
 
-// Clamp helper
-static int clamp_color(float x) {
-    if (x < 0.0f) return 0;
-    if (x > 0.999f) return 255;
-    return (int)(x * 255.999f);
+#include <stdio.h>
+#include <math.h>
+
+#include "image.h"
+#include "vec3.h"
+
+static float clamp01f(float x) {
+    if (x < 0.0f) return 0.0f;
+    if (x > 1.0f) return 1.0f;
+    return x;
 }
 
-void image_write_ppm(const char *filename, int width, int height, Vec3 *pixels) {
-    FILE *f = fopen(filename, "w");
-    if (!f) {
-        printf("Could not open file %s\n", filename);
+static unsigned char to_u8_gamma22(float x) {
+    x = clamp01f(x);
+    // Gamma correction for display
+    x = powf(x, 1.0f / 2.2f);
+
+    int v = (int)(x * 255.0f + 0.5f);
+    if (v < 0) v = 0;
+    if (v > 255) v = 255;
+    return (unsigned char)v;
+}
+
+void image_write_ppm(const char *filename, int width, int height, Vec3 *pixels)
+{
+    if (!filename || !pixels || width <= 0 || height <= 0) {
+        printf("image_write_ppm: invalid args\n");
         return;
     }
 
-    // PPM header
-    fprintf(f, "P3\n%d %d\n255\n", width, height);
+    FILE *f = fopen(filename, "wb");
+    if (!f) {
+        printf("PPM write: cannot open %s\n", filename);
+        return;
+    }
 
-    // Write pixels row by row
-    for (int j = height - 1; j >= 0; j--) {
-        for (int i = 0; i < width; i++) {
-            Vec3 c = pixels[j * width + i];
+    // P6 = binary PPM
+    fprintf(f, "P6\n%d %d\n255\n", width, height);
 
-            int r = clamp_color(c.x);
-            int g = clamp_color(c.y);
-            int b = clamp_color(c.z);
+    // Write RGB bytes
+    for (int y = 0; y < height; ++y) {
+        for (int x = 0; x < width; ++x) {
+            int i = y * width + x;
 
-            fprintf(f, "%d %d %d\n", r, g, b);
+            unsigned char rgb[3];
+            rgb[0] = to_u8_gamma22(pixels[i].x);
+            rgb[1] = to_u8_gamma22(pixels[i].y);
+            rgb[2] = to_u8_gamma22(pixels[i].z);
+
+            fwrite(rgb, 1, 3, f);
         }
     }
 
