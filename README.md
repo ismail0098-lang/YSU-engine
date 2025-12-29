@@ -6,7 +6,7 @@ The project focuses on **systems-level graphics engineering**: memory layout, pa
 
 ---
 
-## ✨ Key Features
+##  Key Features
 
 - **From-scratch ray tracing core** (no external rendering engines)
 - **BVH acceleration structure** for efficient ray–geometry intersection
@@ -20,7 +20,7 @@ The project focuses on **systems-level graphics engineering**: memory layout, pa
 
 ---
 
-## 🧠 What Makes This Project Different
+##  What Makes This Project Different
 
 YSU Engine is not a wrapper around existing libraries.  
 It is an exploration of **how rendering engines actually work at a low level**.
