@@ -1,169 +1,106 @@
-# YSU Engine — Your Simulated Universe (v0.4+)
+# YSU Engine — Your Simulated Universe
 
-A from-scratch experimental rendering engine written in C, exploring rendering as a physical, mathematical, and computational problem — not a black box.
+**YSU Engine** is a high-performance experimental rendering engine built **entirely from scratch in C**, exploring the intersection of classical ray tracing, low-level optimization, and emerging neural rendering techniques.
 
-YSU investigates the boundary between classical ray tracing, low-level CPU optimization, future GPU compute pipelines, and neural scene representations.
-
----
-
-## Overview
-
-YSU (Your Simulated Universe) is a long-term experimental rendering engine built entirely from scratch in C.
-
-What began as a simple CPU ray tracer has evolved into a research-driven project focused on understanding how images emerge from simulation — by explicitly implementing every component rather than relying on existing engines or frameworks.
-
-YSU is not designed for production use.
-It is designed to **learn, experiment, break, rebuild, and understand**.
+The project focuses on **systems-level graphics engineering**: memory layout, parallelism, SIMD acceleration, and custom rendering pipelines — without relying on existing engines or frameworks.
 
 ---
 
-## Philosophy
+## ✨ Key Features
 
-YSU treats rendering as an experiment.
-
-Instead of abstracting complexity away, YSU exposes it:
-- Rays are explicit
-- Geometry is explicit
-- Acceleration structures are explicit
-- Performance trade-offs are intentional and visible
-
-Stability is secondary.
-Clarity, control, and understanding come first.
-
----
-
-## Current Features (v0.4+)
-
-### Core Rendering
-- Fully custom CPU ray tracer written entirely in C
-- Explicit vector math, ray, camera, material, and primitive systems
-- Triangle and mesh-based geometry support
-- Modular rendering pipeline designed for experimentation and extension
-
-### Performance & Acceleration
-- Bounding Volume Hierarchy (BVH) acceleration structure (integrated module)
-- Experimental multithreading infrastructure
-- Low-level triangle intersection optimizations:
-  - Hand-written x86 Assembly
-  - AVX2 SIMD implementation
-- Performance-oriented data layout and traversal design
-
-### 360° & VR Rendering
-- Full 360° equirectangular rendering pipeline
-- Dual-camera stereo rendering path for VR workflows
-- Dedicated 360° engine integration module
-
-### Scene System
-- Custom scene loader and scene description format
-- Support for multiple objects and materials
-- Scene-level experimentation hooks for future graph-based systems
-
-### Tools & Experimental Systems
-- Experimental denoising module
-- Mesh editing and topology utilities
-- OBJ export functionality
-- Viewport and edit-mode experiments
-- Early-stage HTML/JS scene editor prototype
-
-> **Note:**  
-> Many systems are intentionally experimental or incomplete.  
-> YSU prioritizes research iteration speed over polish or stability.
+- **From-scratch ray tracing core** (no external rendering engines)
+- **BVH acceleration structure** for efficient ray–geometry intersection
+- **Multithreaded CPU renderer** with adaptive workload distribution
+- **SIMD optimization (AVX2 + x86 assembly)** for hot paths
+- **360° equirectangular rendering** (VR / panoramic pipelines)
+- **Custom camera, material, and geometry system**
+- **Denoising pipeline** for high-SPP renders
+- **Experimental GPU compute path** (Vulkan-based)
+- Modular architecture designed for **future neural / hybrid rendering**
 
 ---
 
-## Repository Structure Highlights
+## 🧠 What Makes This Project Different
 
-Some key modules included in the repository:
+YSU Engine is not a wrapper around existing libraries.  
+It is an exploration of **how rendering engines actually work at a low level**.
 
-- `bvh.*` — Bounding Volume Hierarchy acceleration
-- `ysu_mt.*` — Multithreading infrastructure
-- `denoise.*` — Denoising experiments
-- `triangle_hit_asm.S` — Assembly triangle intersection
-- `triangle_hit_avx2.S` — AVX2 SIMD triangle intersection
-- `ysu_mesh_edit.*` — Mesh editing utilities
-- `ysu_mesh_topology.*` — Topology experiments
-- `ysu_obj_exporter.*` — OBJ export module
-- `ysu_viewport.c` — Viewport experimentation
-- `ysu_scene_editor.html` — HTML-based scene editor prototype
+The project involves:
+- Designing math and geometry primitives manually
+- Solving real performance bottlenecks (cache, threading, SIMD)
+- Debugging architecture-level issues (ABI, linker, instruction sets)
+- Iterating through multiple engine versions and design decisions
 
----
+This makes YSU Engine closer to a **research + systems engineering project** than a typical graphics demo.
 
-## Build & Run
+------- Project Structure (Simplified) -------
 
-YSU is built using standard C toolchains.  
-Exact file lists may change as the engine evolves.
-gcc -O2 -std=c11 ysu_360_engine_integration.c vec3.c ray.c color.c material.c sphere.c triangle.c primitives.c render.c image.c sceneloader.c camera.c image.c -o ysu360
-./ysu360
-gcc -O2 -mavx2 -std=c11 ysu_main.c vec3.c ray.c color.c material.c sphere.c triangle.c primitives.c bvh.c render.c sceneloader.c denoise.c ysu_360_engine_integration.c camera.c image.c triangle_hit_asm.S triangle_hit_avx2.S -o ysuengine
-./ysuengine
+vec3.c / .h — vector math
 
-Roadmap
-v0.5 — CPU Acceleration & Structure
+ray.c — ray representation
 
-Stabilize multithreading
+triangle.c, sphere.c — geometry primitives
 
-Improve BVH traversal performance
+bvh.c — acceleration structure
 
-Refine SIMD-friendly intersection kernels
+render.c — core rendering loop
 
-v0.6 — Interactive Tools
+denoise.c — post-processing
 
-Expand HTML/JS scene editor
+ysu_360_engine_integration.c — panoramic pipeline
 
-Real-time parameter control
+experimental/ — SIMD, wavefront, GPU experiments
 
-Improved mesh editing workflow
+YSU Engine is actively evolving.
+Some modules are experimental and may change frequently as new architectures are tested.
 
-v0.7 — Vulkan Backend (Experimental)
+------- The project prioritizes: -------
 
-Compute-shader-based ray generation
+learning through implementation
 
-GPU traversal experiments
+correctness before abstraction
 
-GPU denoising
+performance-driven design decisions
 
-v0.8 — Neural Rendering
+------- Roadmap -------
 
-Neural Radiance Field (NeRF) loading
+Improved wavefront / packet-based rendering
 
-Neural sampling experiments
+Expanded GPU compute backend
 
-Hybrid neural + geometric rendering
+Neural denoising / NeRF-style experiments
 
-v1.0 — Hybrid Research Renderer
+Better scene description format
 
-Stable Vulkan backend
+Cross-platform build support
 
-Unified geometry + neural pipeline
-
-Interactive real-time viewport
-
-VR-ready exploration
-
-Status
-
-YSU is an active long-term research project.
-
-Expect:
-
-Rapid iteration
-
-Breaking changes
-
-Experimental systems
-
-Incomplete features
-
-This is intentional.
-
-Author
-
-ismail0098-lang
-
-A developer exploring graphics, simulation, performance engineering, and neural rendering through hands-on experimentation.
-
-YSU grows one commit at a time.
-
-License
+📄 License
 
 MIT License
+
+---
+
+## 🛠️ Build & Run (Windows / MSYS2)
+
+### Standard build
+```bash
+gcc -O3 -std=c11 -pthread \
+ysu_main.c vec3.c ray.c color.c material.c camera.c sphere.c triangle.c \
+primitives.c bvh.c render.c sceneloader.c image.c denoise.c \
+ysu_360_engine_integration.c \
+-o ysuengine
+
+
+## **AVX2 + Assembly Optimized Build**
+
+
+gcc -O3 -std=c11 -mavx2 -pthread \
+ysu_main.c vec3.c ray.c color.c material.c camera.c sphere.c triangle.c \
+primitives.c bvh.c render.c sceneloader.c image.c denoise.c \
+ysu_360_engine_integration.c \
+triangle_hit_asm.S aabb_hit_asm.S \
+-o ysuengine
+
+
+
+
