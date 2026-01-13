@@ -2,9 +2,12 @@
 #define BVH_H
 
 #include <stdbool.h>
+#include <stdint.h>
+
 #include "vec3.h"
 #include "ray.h"
 #include "sphere.h"
+#include "primitives.h"   // HitRecord
 
 // -----------------------------
 //   Axis-Aligned Bounding Box
@@ -18,12 +21,27 @@ typedef struct {
 //        BVH Node Yapısı
 // -----------------------------
 typedef struct bvh_node {
-    aabb box;              // Bu node'un kapsayan AABB'si
-    int start;             // spheres[start ... start+count-1]
-    int count;             // Leaf ise >0, iç node ise 0
-    struct bvh_node* left; // İç node
-    struct bvh_node* right;// İç node
+    aabb box;
+    int start;              // spheres[start ... start+count-1]
+    int count;              // Leaf ise >0, iç node ise 0
+    struct bvh_node* left;
+    struct bvh_node* right;
+
+    // ===== HEDEF-0 ÖLÇÜM =====
+    uint32_t visit_count;
+    uint32_t useful_count;
+    uint32_t depth;
+
+    // ===== PASS-2 (policy) =====
+    uint32_t id;            // preorder node id (CSV policy için)
+    uint8_t  prune;         // 1 => bu subtree prune edilecek
 } bvh_node;
+
+// -----------------------------
+//      Global ölçüm sayaçları
+// -----------------------------
+extern uint64_t g_bvh_node_visits;
+extern uint64_t g_bvh_aabb_tests;
 
 // -----------------------------
 //      AABB Yardımcı Fonksiyonları
@@ -45,6 +63,26 @@ bool bvh_hit(
     double t_max,
     HitRecord* rec
 );
+
+// -----------------------------
+//      CSV dump (HEDEF-0)
+//  (PASS-2 için öneri: dump'a node_id ekleyeceğiz)
+// -----------------------------
+void bvh_dump_stats(const char* path, const bvh_node* root);
+
+// -----------------------------
+//      PASS-2 Helpers
+// -----------------------------
+// Root'a preorder id atar (policy dosyasındaki node_id bununla eşleşir)
+void bvh_assign_ids(bvh_node* root);
+
+// CSV formatı:
+// node_id,prune
+// 12,1
+// 19,0
+// ...
+// Return: işaretlenen prune node sayısı
+int bvh_load_policy_csv(const char* path, bvh_node* root);
 
 // -----------------------------
 //         Bellek Temizleme

@@ -11,6 +11,21 @@ extern "C" {
 #include "camera.h"
 
 /**
+ * Debug view modes (env: YSU_DEBUG)
+ *  - "albedo"
+ *  - "normal"
+ *  - "depth"
+ *  - "luma"
+ */
+typedef enum {
+    DEBUG_NONE = 0,
+    DEBUG_ALBEDO,
+    DEBUG_NORMAL,
+    DEBUG_DEPTH,
+    DEBUG_LUMINANCE
+} DebugView;
+
+/**
  * Single-thread render (simple loop). If you want MT, use render_scene_mt().
  */
 void render_scene_st(Vec3 *pixels,
@@ -33,7 +48,7 @@ void render_scene_mt(Vec3 *pixels,
                      int tile_size);
 
 /**
- * Convenience wrapper: chooses ST/MT internally (currently calls ST).
+ * Convenience wrapper: chooses ST/MT internally (currently calls MT auto).
  */
 void render_scene(Vec3 *pixels,
                   int image_width,

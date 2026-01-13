@@ -5,6 +5,13 @@
 #include "raylib.h"
 #include "raymath.h"
 
+/*
+ * CHECKPOINT: See .github/CHECKPOINTS.md for editor-related checkpoints.
+ * - `ysu_mesh_edit.c` is a single-file immediate-mode editor with fixed limits:
+ *   `MAX_VERTS` and `MAX_TRIS` (respect these caps when modifying topology logic).
+ * - The file expects `raylib`/`raymath` at build/link time on the platform.
+ */
+
 #include <stdio.h>
 #include <math.h>
 #include <stdbool.h>

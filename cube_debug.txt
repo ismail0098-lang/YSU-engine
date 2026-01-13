@@ -1,0 +1,4 @@
+output_gpu.ppm: 128x96
+  Noise: 0.132521
+  Colors: 45
+  Min/Max: 0/213
