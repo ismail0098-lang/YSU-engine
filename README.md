@@ -1,4 +1,4 @@
-# YSU Engine — Your Simulated Universe
+  # YSU Engine — Your Simulated Universe
 
 **YSU Engine** is an experimental hybrid rendering engine developed from scratch in C, aimed at exploring core rendering algorithms, acceleration structures, and intelligent light simulation. The project emphasizes deep understanding over black-box usage — bypassing existing engines to experiment directly with rendering mathematics, data structures, and estimator designs.
 
@@ -45,7 +45,6 @@ rapid refactoring, and algorithm-level research.
 | `camera.c / camera.h` | Camera models including perspective and panoramic projections |
 | `triangle.c / sphere.c / mesh.c` | Geometry primitives and mesh handling |
 | `material.c / material.h` | Material definitions and light interaction models |
-| `texture.c / texture.h` | Texture loading, sampling, and mapping |
 | `scene.c / scene.h` | Scene graph, object management, and world representation |
 | `bvh.c / bvh.h` | Bounding Volume Hierarchy construction and traversal |
 | `lbvh.c / lbvh.h` | Linear BVH (LBVH) experiments and spatial ordering |
@@ -57,7 +56,7 @@ rapid refactoring, and algorithm-level research.
 | `denoise.c / denoise.h` | Post-processing and experimental denoising algorithms |
 | `image.c` | Image buffer management and output |
 | `postprocess.c` | Tone mapping and image-space operations |
-| `gpu/` or `vulkan/` | Vulkan compute experiments and GPU acceleration paths |
+| `vulkan/` | Vulkan compute experiments and GPU acceleration paths |
 | `experimental/` | Prototypes, SIMD tests, and algorithmic experiments |
 | `scripts/` | Data analysis, benchmarking, and validation scripts |
 | `assets/` | Test scenes and reference models |
