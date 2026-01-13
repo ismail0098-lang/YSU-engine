@@ -34,18 +34,34 @@ YSU Engine is built as a **platform for experimentation**, not merely as a demo 
 
 ##  Project Structure
 
-The source code is organized into clear modules:
+The source code is organized into modular subsystems to support experimentation,
+rapid refactoring, and algorithm-level research.
 
-| Module | Description |
-|--------|-------------|
-| `vec3.c / vec3.h` | Vector math foundation |
-| `ray.c / ray.h` | Ray representation and operations |
-| `triangle.c / sphere.c` | Geometry primitives |
-| `bvh.c / bvh.h` | Acceleration structure implementation |
-| `render.c / render.h` | Core rendering loop |
-| `denoise.c / denoise.h` | Post-processing / denoising |
-| `experimental/` | SIMD & GPU experiments |
-| `scripts/` | Data analysis and test scripts |
+| Module / Directory | Description |
+|--------------------|-------------|
+| `vec2.c / vec3.c / vec4.c` | Low-level vector and math utilities used throughout the engine |
+| `mat3.c / mat4.c` | Matrix math for transformations and camera systems |
+| `ray.c / ray.h` | Ray representation, generation, and utility operations |
+| `camera.c / camera.h` | Camera models including perspective and panoramic projections |
+| `triangle.c / sphere.c / mesh.c` | Geometry primitives and mesh handling |
+| `material.c / material.h` | Material definitions and light interaction models |
+| `texture.c / texture.h` | Texture loading, sampling, and mapping |
+| `scene.c / scene.h` | Scene graph, object management, and world representation |
+| `bvh.c / bvh.h` | Bounding Volume Hierarchy construction and traversal |
+| `lbvh.c / lbvh.h` | Linear BVH (LBVH) experiments and spatial ordering |
+| `intersection.c` | Ray-geometry intersection routines |
+| `sampling.c` | Random sampling utilities and Monte Carlo helpers |
+| `integrator.c` | Light transport integrators (experimental) |
+| `render.c / render.h` | Core rendering loop and scheduling |
+| `threadpool.c` | Multithreaded task execution |
+| `denoise.c / denoise.h` | Post-processing and experimental denoising algorithms |
+| `image.c` | Image buffer management and output |
+| `postprocess.c` | Tone mapping and image-space operations |
+| `gpu/` or `vulkan/` | Vulkan compute experiments and GPU acceleration paths |
+| `experimental/` | Prototypes, SIMD tests, and algorithmic experiments |
+| `scripts/` | Data analysis, benchmarking, and validation scripts |
+| `assets/` | Test scenes and reference models |
+
 
 ---
 
@@ -100,6 +116,8 @@ ready-made rendering frameworks
 content creation tool add-ons
 
 Instead, it speaks to systems-level graphics engineering and research readiness — a signal that matters in academic and advanced engineering discussions.
+
+Author: Umut Korkmaz, a 15-year-old student :)
 
 ##  Usage & Development
 
