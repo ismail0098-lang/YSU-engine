@@ -1,0 +1,4 @@
+Build tonemap shader (once):
+  C:\VulkanSDK\1.4.335.0\Bin\glslangValidator.exe -V shaders\tonemap.comp -o shaders\tonemap.comp.spv
+
+Then build gpu_demo.exe with your existing gcc command.

@@ -1,0 +1,259 @@
+#version 450
+layout(local_size_x=16, local_size_y=16) in;
+
+layout(set=0,binding=0, rgba32f) uniform writeonly image2D outImg;
+layout(set=0,binding=1, rgba32f) uniform image2D accumImg;
+
+layout(std430, set=0, binding=2) readonly buffer TriBuf { vec4 data[]; } tris;
+
+struct BVHNode {
+    vec4 bmin;
+    vec4 bmax;
+    int left;
+    int right;
+    int triOffset;
+    int triCount;
+};
+
+layout(std430, set=0, binding=3) readonly buffer BVHBuf { BVHNode nodes[]; } bvh;
+layout(std430, set=0, binding=4) readonly buffer IdxBuf { int idx[]; } bvhIdx;
+
+// uint counters[0]=nodeVisits, counters[1]=triTests
+layout(std430, set=0, binding=5) buffer CounterBuf { uint counters[]; } cnt;
+
+// roots for multi-bvh chunks
+layout(std430, set=0, binding=6) readonly buffer RootBuf { int roots[]; } bvhRoots;
+
+layout(push_constant) uniform Push {
+    int W;
+    int H;
+    int frame;
+    int seed;
+    int triCount;
+    int nodeCount;
+    int useBVH;
+    int cullBackface; // pc[7] from C
+    int rootCount;    // pc[8] from C
+    int enableCounters; // pc[9] from C (0 disables atomic counters)
+
+    float alpha;      // EMA alpha; 0 => running average
+    int resetAccum;   // if !=0 and frame==0, clears accumulation
+} pc;
+
+// ----------------- RNG -----------------
+uint wang_hash(uint s){
+    s = (s ^ 61u) ^ (s >> 16u);
+    s *= 9u;
+    s = s ^ (s >> 4u);
+    s *= 0x27d4eb2du;
+    s = s ^ (s >> 15u);
+    return s;
+}
+float rand01(inout uint state){
+    state = wang_hash(state);
+    return float(state) * (1.0 / 4294967296.0);
+}
+
+// ----------------- Math -----------------
+vec3 safe_normalize(vec3 v){
+    float l2 = dot(v,v);
+    if(l2 <= 1e-20) return vec3(0,0,1);
+    return v * inversesqrt(l2);
+}
+
+bool hit_aabb(vec3 ro, vec3 invD, vec3 bmin, vec3 bmax, float tMax){
+    vec3 t0 = (bmin - ro) * invD;
+    vec3 t1 = (bmax - ro) * invD;
+    vec3 tmin3 = min(t0, t1);
+    vec3 tmax3 = max(t0, t1);
+    float tmin = max(max(tmin3.x, tmin3.y), max(tmin3.z, 0.0));
+    float tmax = min(min(tmax3.x, tmax3.y), min(tmax3.z, tMax));
+    return tmax >= tmin;
+}
+
+bool hit_tri(vec3 ro, vec3 rd, vec3 p0, vec3 p1, vec3 p2, out float t, out vec3 n){
+    vec3 e1 = p1 - p0;
+    vec3 e2 = p2 - p0;
+    vec3 h = cross(rd, e2);
+    float a = dot(e1, h);
+    if(abs(a) < 1e-8) return false;
+    float f = 1.0 / a;
+    vec3 s = ro - p0;
+    float u = f * dot(s, h);
+    if(u < 0.0 || u > 1.0) return false;
+    vec3 q = cross(s, e1);
+    float v = f * dot(rd, q);
+    if(v < 0.0 || u + v > 1.0) return false;
+    float tt = f * dot(e2, q);
+    if(tt <= 1e-6) return false;
+    t = tt;
+    n = safe_normalize(cross(e1, e2));
+    return true;
+}
+
+// Brute-force (optionally counts only a sparse subset)
+void brute_force(vec3 ro, vec3 rd, out float tHit, out vec3 nHit, bool countIt){
+    tHit = 1e30;
+    nHit = vec3(0,0,1);
+
+    for(int i=0;i<pc.triCount;i++){
+        int base = i * 3;
+        vec3 p0 = tris.data[base+0].xyz;
+        vec3 p1 = tris.data[base+1].xyz;
+        vec3 p2 = tris.data[base+2].xyz;
+
+        float t; vec3 n;
+        if(hit_tri(ro, rd, p0, p1, p2, t, n)){
+            if(pc.cullBackface != 0){
+                // backface cull: require facing camera
+                if(dot(n, rd) > 0.0) {
+                    // still count tri test if enabled
+                    if(countIt && pc.enableCounters!=0) atomicAdd(cnt.counters[1], 1u);
+                    continue;
+                }
+            }
+            if(t < tHit){
+                tHit = t;
+                nHit = n;
+            }
+        }
+        if(countIt && pc.enableCounters!=0) atomicAdd(cnt.counters[1], 1u);
+    }
+}
+
+// BVH traverse for one root
+void bvh_traverse_single(int rootIndex, vec3 ro, vec3 rd, inout float tHit, inout vec3 nHit){
+    vec3 invD = 1.0 / rd;
+
+    int stack[64];
+    int sp = 0;
+    stack[sp++] = rootIndex;
+
+    while(sp > 0){
+        int ni = stack[--sp];
+        if(ni < 0 || ni >= pc.nodeCount) continue;
+
+        if(pc.enableCounters!=0) atomicAdd(cnt.counters[0], 1u);
+
+        BVHNode nd = bvh.nodes[ni];
+        if(!hit_aabb(ro, invD, nd.bmin.xyz, nd.bmax.xyz, tHit)) continue;
+
+        if(nd.left < 0 && nd.right < 0){
+            // leaf
+            int off = nd.triOffset;
+            int cntLeaf = nd.triCount;
+            for(int k=0;k<cntLeaf;k++){
+                int triId = bvhIdx.idx[off + k];
+                int base = triId * 3;
+
+                vec3 p0 = tris.data[base+0].xyz;
+                vec3 p1 = tris.data[base+1].xyz;
+                vec3 p2 = tris.data[base+2].xyz;
+
+                float t; vec3 n;
+                if(hit_tri(ro, rd, p0, p1, p2, t, n)){
+                    if(pc.cullBackface != 0){
+                        if(dot(n, rd) > 0.0){
+                            if(pc.enableCounters!=0) atomicAdd(cnt.counters[1], 1u);
+                            continue;
+                        }
+                    }
+                    if(t < tHit){
+                        tHit = t;
+                        nHit = n;
+                    }
+                }
+                if(pc.enableCounters!=0) atomicAdd(cnt.counters[1], 1u);
+            }
+        } else {
+            // internal
+            if(nd.left  >= 0) stack[sp++] = nd.left;
+            if(nd.right >= 0) stack[sp++] = nd.right;
+
+            // avoid overflow
+            if(sp > 60) sp = 60;
+        }
+    }
+}
+
+// Multi-root traverse (chunked BVH)
+void bvh_traverse_multi(vec3 ro, vec3 rd, out float tHit, out vec3 nHit){
+    tHit = 1e30;
+    nHit = vec3(0,0,1);
+
+    int rc = pc.rootCount;
+    if(rc <= 0) rc = 1;
+
+    for(int r=0; r<rc; r++){
+        int rootNode = bvhRoots.roots[r];
+        bvh_traverse_single(rootNode, ro, rd, tHit, nHit);
+    }
+}
+
+// Simple equirect direction from (u,v) in [0..1]
+vec3 dir_from_equirect(float u, float v){
+    float phi = (u * 2.0 - 1.0) * 3.1415926535;       // -pi..pi
+    float th  = (0.5 - v) * 3.1415926535;            //  pi/2..-pi/2
+    float cth = cos(th);
+    return safe_normalize(vec3(cth * sin(phi), sin(th), -cth * cos(phi)));  // negate Z to point toward cube at (0,0,-3)
+}
+
+// ---------- Progressive accumulation + temporal denoise ----------
+// Strategy:
+//  - curr = current sample (SPP=1 style)
+//  - hist = previous accumulated value in accumImg
+//  - clamp hist to neighborhood to reduce trails
+//  - if pc.alpha > 0: EMA (realtime-friendly)
+//    else: running average using pc.frame
+float ysu_luma(vec3 c){ return dot(c, vec3(0.2126, 0.7152, 0.0722)); }
+
+vec3 ysu_clamp_history(vec3 hist, vec3 curr, ivec2 p){
+    // 3x3 neighborhood clamp using history buffer (cheap & stable)
+    vec3 mn = curr;
+    vec3 mx = curr;
+    for(int oy=-1; oy<=1; oy++){
+        for(int ox=-1; ox<=1; ox++){
+            ivec2 q = ivec2(clamp(p.x+ox, 0, pc.W-1),
+                           clamp(p.y+oy, 0, pc.H-1));
+            vec3 h = imageLoad(accumImg, q).rgb;
+            mn = min(mn, h);
+            mx = max(mx, h);
+        }
+    }
+    // pad a bit to avoid over-clamping (reduces flicker)
+    vec3 pad = 0.05 * (mx - mn) + vec3(1e-4);
+    return clamp(hist, mn - pad, mx + pad);
+}
+
+void main(){
+    ivec2 pix = ivec2(gl_GlobalInvocationID.xy);
+    if(pix.x >= pc.W || pix.y >= pc.H) return;
+
+    float u = (float(pix.x) + 0.5) / float(pc.W);
+    float v = (float(pix.y) + 0.5) / float(pc.H);
+
+    vec3 ro = vec3(0.0);
+    vec3 rd = dir_from_equirect(u, v);
+
+    float tHit = 1e30;
+    vec3 nHit = vec3(0, 0, 1);
+    
+    if(pc.useBVH != 0){
+        bvh_traverse_multi(ro, rd, tHit, nHit);
+    } else {
+        bool countIt = (((pix.x & 15) == 0) && ((pix.y & 15) == 0));
+        brute_force(ro, rd, tHit, nHit, countIt);
+    }
+    
+    // Color: grayscale distance
+    vec3 col;
+    if(tHit < 1e29){
+        float d = clamp(tHit / 10.0, 0.0, 1.0);
+        col = vec3(d);
+    } else {
+        col = vec3(0.0);
+    }
+
+    imageStore(outImg, pix, vec4(col, 1.0));
+    imageStore(accumImg, pix, vec4(col, 1.0));
+}

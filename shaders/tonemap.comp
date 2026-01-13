@@ -1,0 +1,40 @@
+#version 450
+layout(local_size_x=16, local_size_y=16, local_size_z=1) in;
+
+layout(push_constant) uniform Push {
+    int W;
+    int H;
+    float exposure;
+    float gamma;
+    int dummy;
+} pc;
+
+layout(set=0, binding=0, rgba32f) readonly uniform image2D hdrImg;
+
+#if defined(YSU_BGRA)
+layout(set=0, binding=1, bgra8) writeonly uniform image2D outLDR;
+#else
+layout(set=0, binding=1, rgba8) writeonly uniform image2D outLDR;
+#endif
+
+vec3 tonemap_filmic(vec3 x){
+    // basit filmic
+    x = max(x, vec3(0.0));
+    x = (x*(2.51*x + 0.03)) / (x*(2.43*x + 0.59) + 0.14);
+    return clamp(x, 0.0, 1.0);
+}
+
+void main(){
+    uvec2 gid = gl_GlobalInvocationID.xy;
+    if(int(gid.x) >= pc.W || int(gid.y) >= pc.H) return;
+
+    vec4 hdr = imageLoad(hdrImg, ivec2(gid));
+    vec3 c = hdr.rgb * pc.exposure;
+
+    c = tonemap_filmic(c);
+
+    float invg = 1.0 / max(pc.gamma, 1e-6);
+    c = pow(c, vec3(invg));
+
+    imageStore(outLDR, ivec2(gid), vec4(c, 1.0));
+}
