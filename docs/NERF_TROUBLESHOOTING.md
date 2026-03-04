@@ -228,10 +228,10 @@ If you need to retrain or export a new NeRF model:
 
 ```bash
 python nerf_train_export.py \
-  --data data/fox \
-  --out_hashgrid models/nerf_hashgrid.bin \
-  --out_occ models/nerf_occ.bin \
-  --epochs 100
+ --data data/fox \
+ --out_hashgrid models/nerf_hashgrid.bin \
+ --out_occ models/nerf_occ.bin \
+ --epochs 100
 ```
 
 The exporter creates binary files with this structure:

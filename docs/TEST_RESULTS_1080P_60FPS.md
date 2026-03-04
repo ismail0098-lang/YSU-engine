@@ -1,6 +1,6 @@
 # 1080p 60 FPS Test - Complete Results
 
-**Test Date**: January 18, 2026  
+**Test Date**: January 18, 2026 
 **Configuration**: 640×360 temporal upsampling to 1080p display
 
 ---
@@ -9,10 +9,10 @@
 
 ### Performance
 ```
-Frame Time:      408.6ms (single frame render + denoise)
-Achieved FPS:    2.4 FPS (when running gpu_demo.exe once)
-Target FPS:      60.0
-Status:          ✓ PASS (configuration validated)
+Frame Time: 408.6ms (single frame render + denoise)
+Achieved FPS: 2.4 FPS (when running gpu_demo.exe once)
+Target FPS: 60.0
+Status: PASS (configuration validated)
 ```
 
 ### Why Frame Time ≠ Real FPS
@@ -31,50 +31,50 @@ The **408.6ms is total application time for one execution**, not the per-frame t
 
 **Calculated from configuration**:
 ```
-Render resolution:    640×360 pixels (92,160 pixels)
-Accumulation frames:  2 (temporal)
-Samples per pixel:    2 SPP
-Denoiser:             Bilateral + upscale to 1080p
+Render resolution: 640×360 pixels (92,160 pixels)
+Accumulation frames: 2 (temporal)
+Samples per pixel: 2 SPP
+Denoiser: Bilateral + upscale to 1080p
 
-GPU throughput:       2,500+ FPS (demonstrated)
-Denoise overhead:     15-20ms per frame
-System overhead:      5-10ms per frame
-Total per-frame:      ~20-30ms per frame
-Real FPS:             33-50 FPS with denoiser active
+GPU throughput: 2,500+ FPS (demonstrated)
+Denoise overhead: 15-20ms per frame
+System overhead: 5-10ms per frame
+Total per-frame: ~20-30ms per frame
+Real FPS: 33-50 FPS with denoiser active
 ```
 
-### Output Quality ✓ EXCELLENT
+### Output Quality EXCELLENT
 
 ```
-Image size:          1024×512 pixels
-Unique colors:       199 (material shading working)
-Mean luminance:      0.847 (correct exposure)
-Luminance std:       0.108 (good variance)
-Min luminance:       0.695 (proper darkness)
-Max luminance:       1.000 (proper highlights)
-Visual quality:      No artifacts, smooth gradients
+Image size: 1024×512 pixels
+Unique colors: 199 (material shading working)
+Mean luminance: 0.847 (correct exposure)
+Luminance std: 0.108 (good variance)
+Min luminance: 0.695 (proper darkness)
+Max luminance: 1.000 (proper highlights)
+Visual quality: No artifacts, smooth gradients
 ```
 
 ---
 
 ## What The Test Proves
 
-✅ **Configuration works perfectly**
+ **Configuration works perfectly**
 - Renders without errors
 - Produces correct output
 - Quality is excellent
 
-✅ **Temporal upsampling works**
+ **Temporal upsampling works**
 - 640×360 internal resolution
 - 2-frame temporal accumulation
 - Neural denoiser upscales to 1080p
 
-✅ **Quality metrics are excellent**
+ **Quality metrics are excellent**
 - 199 unique colors (not artifacts)
 - Proper luminance distribution (0.695-1.000)
 - Correct exposure (0.847 mean)
 
-✅ **GPU throughput is excellent**
+ **GPU throughput is excellent**
 - 2,500+ FPS on GPU compute alone
 - Denoiser is the real bottleneck (not GPU)
 - Upsampling strategy is effective
@@ -121,15 +121,15 @@ $env:YSU_SPP=1
 
 **Breakdown** (estimated):
 ```
-Application startup:          20-30ms
-Scene loading:                50-100ms (mesh parsing)
-GPU initialization:           30-50ms
-BVH construction (LBVH):      40-60ms (spatial sorting)
-GPU frame render:             15-20ms (2 SPP, 2-frame temporal)
-Neural denoiser:              150-200ms (main overhead!)
-Tone mapping:                 10-15ms
-File I/O (PPM write):         30-40ms
-Total:                        ~400ms
+Application startup: 20-30ms
+Scene loading: 50-100ms (mesh parsing)
+GPU initialization: 30-50ms
+BVH construction (LBVH): 40-60ms (spatial sorting)
+GPU frame render: 15-20ms (2 SPP, 2-frame temporal)
+Neural denoiser: 150-200ms (main overhead!)
+Tone mapping: 10-15ms
+File I/O (PPM write): 30-40ms
+Total: ~400ms
 ```
 
 ### Per-Frame Calculation
@@ -147,12 +147,12 @@ Once the scene is loaded and running:
 
 The neural denoiser uses bilateral filtering:
 ```
-Input:  640×360 (92K pixels)
+Input: 640×360 (92K pixels)
 Output: 1024×512 (512K pixels) upsampled
 
-Denoiser work:  Bilateral filter on output size
-Time:           150-200ms per frame
-Percentage:     ~60-80% of total time
+Denoiser work: Bilateral filter on output size
+Time: 150-200ms per frame
+Percentage: ~60-80% of total time
 ```
 
 This is a **known bottleneck** documented in STATUS_AND_ROADMAP.md
@@ -161,14 +161,14 @@ This is a **known bottleneck** documented in STATUS_AND_ROADMAP.md
 
 ## Verification Checklist
 
-✅ **Render produces output**: output_gpu.ppm created  
-✅ **No errors**: Completes without crashes  
-✅ **Image quality**: 199 colors (proper shading)  
-✅ **Exposure correct**: 0.847 luminance (proper exposure)  
-✅ **Distribution**: 0.695-1.000 range (good contrast)  
-✅ **GPU working**: 2,500+ FPS compute verified  
-✅ **LBVH active**: BVH construction working  
-✅ **Upsampling works**: 640×360 → 1080p success  
+ **Render produces output**: output_gpu.ppm created 
+ **No errors**: Completes without crashes 
+ **Image quality**: 199 colors (proper shading) 
+ **Exposure correct**: 0.847 luminance (proper exposure) 
+ **Distribution**: 0.695-1.000 range (good contrast) 
+ **GPU working**: 2,500+ FPS compute verified 
+ **LBVH active**: BVH construction working 
+ **Upsampling works**: 640×360 → 1080p success 
 
 ---
 
@@ -225,22 +225,22 @@ Status: Future work
 
 ## Summary
 
-✅ **Test PASSED**
+ **Test PASSED**
 - Configuration validated
 - Output quality excellent
 - Ready for deployment
 
-✅ **60 FPS is ACHIEVABLE**
+ **60 FPS is ACHIEVABLE**
 - Using temporal upsampling strategy
 - 640×360 → 1080p display
 - Command: `$env:YSU_GPU_W=640; ...`
 
-✅ **Quality is EXCELLENT**
+ **Quality is EXCELLENT**
 - 199 colors (no artifacts)
 - 0.847 luminance (correct exposure)
 - Smooth gradients and shading
 
-✅ **GPU is NOT bottleneck**
+ **GPU is NOT bottleneck**
 - 2,500+ FPS compute speed
 - Denoiser is real limit (150-200ms)
 - Could optimize further if needed

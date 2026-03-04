@@ -8,19 +8,19 @@
 
 Implemented two major optimizations from the 7-item optimization roadmap:
 
-1. **Option 1: Denoise Skip** ✅ COMPLETE
-   - Code: 5 lines added to gpu_vulkan_demo.c
-   - Environment variable: `YSU_GPU_DENOISE_SKIP` (default=1)
-   - Expected gain: +50-100% FPS (100→150-200 FPS)
-   - Quality impact: Minimal (temporal mask via accumulation)
-   - Status: Ready for build and test
+1. **Option 1: Denoise Skip** COMPLETE
+ - Code: 5 lines added to gpu_vulkan_demo.c
+ - Environment variable: `YSU_GPU_DENOISE_SKIP` (default=1)
+ - Expected gain: +50-100% FPS (100→150-200 FPS)
+ - Quality impact: Minimal (temporal mask via accumulation)
+ - Status: Ready for build and test
 
-2. **Option 2: Temporal Denoising** 🔄 60% COMPLETE
-   - Shader: blend.comp created
-   - C code: Infrastructure setup complete
-   - Remaining: Shader loading, pipeline creation, dispatch logic
-   - Expected gain: +20-30% quality, same FPS
-   - Status: Core framework in place, final dispatch ~50 lines needed
+2. **Option 2: Temporal Denoising** 60% COMPLETE
+ - Shader: blend.comp created
+ - C code: Infrastructure setup complete
+ - Remaining: Shader loading, pipeline creation, dispatch logic
+ - Expected gain: +20-30% quality, same FPS
+ - Status: Core framework in place, final dispatch ~50 lines needed
 
 ## Option 1: Denoise Skip (COMPLETE)
 
@@ -29,30 +29,30 @@ Implemented two major optimizations from the 7-item optimization roadmap:
 **File Changes**: gpu_vulkan_demo.c (3 locations)
 
 1. **Parameter Declaration** (Line 1650)
-   ```c
-   int denoise_skip = ysu_env_int("YSU_GPU_DENOISE_SKIP", 1);
-   ```
+ ```c
+ int denoise_skip = ysu_env_int("YSU_GPU_DENOISE_SKIP", 1);
+ ```
 
 2. **Enhanced Logging** (Line 1663)
-   ```c
-   fprintf(stderr, "[GPU] GPU denoiser: ENABLED (...skip=%d)\n", denoise_skip);
-   ```
+ ```c
+ fprintf(stderr, "[GPU] GPU denoiser: ENABLED (...skip=%d)\n", denoise_skip);
+ ```
 
 3. **Denoiser Skip Conditional** (Lines 1968-1970)
-   ```c
-   int should_denoise = (denoise_skip <= 1) || ((frame_id % denoise_skip) == 0);
-   if(gpu_denoise_enabled && pipe_denoise != VK_NULL_HANDLE && should_denoise) {
-       // denoiser dispatch
-   }
-   ```
+ ```c
+ int should_denoise = (denoise_skip <= 1) || ((frame_id % denoise_skip) == 0);
+ if(gpu_denoise_enabled && pipe_denoise != VK_NULL_HANDLE && should_denoise) {
+ // denoiser dispatch
+ }
+ ```
 
 ### How It Works
 
 Skips the 4-5ms bilateral filter on intermediate frames:
-- Frame 0: Denoise ✓
-- Frame 1: Skip ✗
-- Frame 2: Skip ✗
-- Frame 3: Denoise ✓
+- Frame 0: Denoise 
+- Frame 1: Skip 
+- Frame 2: Skip 
+- Frame 3: Denoise 
 - (Pattern repeats every denoise_skip frames)
 
 ### Performance Impact
@@ -94,23 +94,23 @@ YSU_GPU_DENOISE=1 YSU_GPU_DENOISE_SKIP=8 YSU_GPU_RENDER_SCALE=0.5 ./gpu_demo.exe
 **Code Additions**:
 
 1. **Parameters** (2 lines)
-   ```c
-   int temporal_denoise_enabled = ysu_env_bool("YSU_GPU_TEMPORAL_DENOISE", 1);
-   float temporal_denoise_weight = ysu_env_float("YSU_GPU_TEMPORAL_DENOISE_WEIGHT", 0.7f);
-   ```
+ ```c
+ int temporal_denoise_enabled = ysu_env_bool("YSU_GPU_TEMPORAL_DENOISE", 1);
+ float temporal_denoise_weight = ysu_env_float("YSU_GPU_TEMPORAL_DENOISE_WEIGHT", 0.7f);
+ ```
 
 2. **Variables** (3 image + 5 Vulkan object variables)
-   - denoise_history (image, memory, view)
-   - sm_blend (shader module)
-   - pipe_blend (compute pipeline)
-   - ds_blend, dp_blend (descriptor set/pool)
+ - denoise_history (image, memory, view)
+ - sm_blend (shader module)
+ - pipe_blend (compute pipeline)
+ - ds_blend, dp_blend (descriptor set/pool)
 
 3. **Image Creation** (~50 lines)
-   - Full history buffer setup with error checking
+ - Full history buffer setup with error checking
 
 4. **Shader** (blend.comp - ~40 lines)
-   - Temporal exponential moving average blending
-   - First-frame handling
+ - Temporal exponential moving average blending
+ - First-frame handling
 
 ### How It Works
 
@@ -118,12 +118,12 @@ Blends denoised frames temporally:
 
 ```
 Frame N:
-  Ray trace → Denoise → [70% History + 30% Current] → Tonemap
-                                          ↓
-                                    Save as history
+ Ray trace → Denoise → [70% History + 30% Current] → Tonemap
+ ↓
+ Save as history
 
 Frame N+1:
-  Ray trace → Denoise → [70% Frame N Result + 30% Current] → Tonemap
+ Ray trace → Denoise → [70% Frame N Result + 30% Current] → Tonemap
 ```
 
 This creates temporal coherence, reducing noise perception without additional compute cost.
@@ -133,25 +133,25 @@ This creates temporal coherence, reducing noise perception without additional co
 ~150 lines of C code in gpu_vulkan_demo.c:
 
 1. **Blend Shader Loading** (~40 lines)
-   - Load blend.comp.spv
-   - Create VkShaderModule
-   
+ - Load blend.comp.spv
+ - Create VkShaderModule
+ 
 2. **Pipeline Creation** (~50 lines)
-   - Descriptor set layout (3 bindings)
-   - Pipeline layout with push constants
-   - Compute pipeline creation
-   
+ - Descriptor set layout (3 bindings)
+ - Pipeline layout with push constants
+ - Compute pipeline creation
+ 
 3. **Descriptor Management** (~20 lines)
-   - Descriptor pool creation
-   - Write descriptors (current, history, output images)
-   
+ - Descriptor pool creation
+ - Write descriptors (current, history, output images)
+ 
 4. **Blend Dispatch** (~30 lines)
-   - Barriers for image layout transitions
-   - Bind pipeline and descriptor set
-   - Push constants and dispatch
-   
+ - Barriers for image layout transitions
+ - Bind pipeline and descriptor set
+ - Push constants and dispatch
+ 
 5. **History Swap** (~10 lines)
-   - Copy denoised output → history for next frame
+ - Copy denoised output → history for next frame
 
 ### Performance Impact
 
@@ -163,9 +163,9 @@ This creates temporal coherence, reducing noise perception without additional co
 ### Combined with Option 1
 
 ```
-Denoise Skip (Option 1):      100 FPS, good quality
-Temporal Denoise (Option 2):   97 FPS, better quality
-Both together (skip=2):       110 FPS, excellent quality
+Denoise Skip (Option 1): 100 FPS, good quality
+Temporal Denoise (Option 2): 97 FPS, better quality
+Both together (skip=2): 110 FPS, excellent quality
 ```
 
 ## Integration with Previous Work
@@ -182,12 +182,12 @@ Both together (skip=2):       110 FPS, excellent quality
 
 ### Current Stack
 ```
-Render Scale (0.5)     → 6.3ms compute
-Denoise (skip=4)       → 1.25ms (25% of normal)
-Temporal Denoise       → 0.3ms (blend)
-Temporal Accumulation  → Amortized readback
+Render Scale (0.5) → 6.3ms compute
+Denoise (skip=4) → 1.25ms (25% of normal)
+Temporal Denoise → 0.3ms (blend)
+Temporal Accumulation → Amortized readback
 ─────────────────────
-Total                  → 7.85ms = 127 FPS
+Total → 7.85ms = 127 FPS
 ```
 
 ## Documentation Created
@@ -222,9 +222,9 @@ Total                  → 7.85ms = 127 FPS
 
 | Optimization | Status | FPS | Quality | Effort |
 |---|---|---|---|---|
-| Session 13 (Render Scale) | ✅ Ready | 100 | Good | Easy |
-| **Option 1 (Denoise Skip)** | ✅ Complete | 150-200 | Good | Easy |
-| **Option 2 (Temporal Denoise)** | 🔄 60% | 127 | Excellent | Medium |
+| Session 13 (Render Scale) | Ready | 100 | Good | Easy |
+| **Option 1 (Denoise Skip)** | Complete | 150-200 | Good | Easy |
+| **Option 2 (Temporal Denoise)** | 60% | 127 | Excellent | Medium |
 | Option 3 (Half-Precision) | ⏳ Pending | 180+ | Good | Easy |
 | Option 4 (Async Compute) | ⏳ Pending | 190+ | Good | Medium |
 | Options 5-7 | ⏳ Future | 200-300+ | Excellent | Hard |
@@ -234,26 +234,26 @@ Total                  → 7.85ms = 127 FPS
 ### Option 1
 - Lines added: 5
 - Lines modified: 3
-- Backward compatible: ✅ (default=1 no change)
-- Breaking changes: ❌ None
-- Compilation impact: ✅ None
+- Backward compatible: (default=1 no change)
+- Breaking changes: None
+- Compilation impact: None
 
 ### Option 2
 - Lines added: 150 total
 - Lines modified: 6
 - New files: 1 (blend.comp)
-- Backward compatible: ✅ (default enabled, can disable)
-- Breaking changes: ❌ None
+- Backward compatible: (default enabled, can disable)
+- Breaking changes: None
 - Compilation impact: ⏳ Pending (needs blend.comp.spv)
 
 ## Technical Achievements
 
-✅ Implemented deterministic denoise skip pattern
-✅ Added temporal exponential moving average blending
-✅ Preserved image layout transitions (Vulkan correctness)
-✅ Maintained backward compatibility
-✅ Integrated with previous Session 12-13 work
-✅ Documented all changes comprehensively
+ Implemented deterministic denoise skip pattern
+ Added temporal exponential moving average blending
+ Preserved image layout transitions (Vulkan correctness)
+ Maintained backward compatibility
+ Integrated with previous Session 12-13 work
+ Documented all changes comprehensively
 
 ## Known Limitations
 
@@ -273,11 +273,11 @@ Post-Session 15:
 ## Summary
 
 **Session 15 achieved**:
-- ✅ Option 1 fully implemented and documented
-- 🔄 Option 2 core infrastructure complete (final dispatch pending)
-- 📈 Technical foundation for 200+ FPS systems
-- 📚 Comprehensive documentation for 7-option optimization roadmap
-- 🎯 Clear path to 60 FPS at 1080p with quality
+- Option 1 fully implemented and documented
+- Option 2 core infrastructure complete (final dispatch pending)
+- Technical foundation for 200+ FPS systems
+- Comprehensive documentation for 7-option optimization roadmap
+- Clear path to 60 FPS at 1080p with quality
 
 **Ready for**:
 - Vulkan SDK build and testing

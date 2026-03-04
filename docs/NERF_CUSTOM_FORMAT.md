@@ -19,47 +19,47 @@ All values are **little‑endian**.
 
 ```
 struct NerfHashGridHeader {
-    uint32_t magic;            // 'NHG1' = 0x3147484E
-   uint32_t version;          // 1 or 2
-    uint32_t levels;           // L (e.g., 16)
-    uint32_t features;         // F (e.g., 2 or 4)
-    uint32_t hashmap_size;      // H per level (power of two)
-    uint32_t base_resolution;   // R0 (e.g., 16)
-    float    per_level_scale;   // s (e.g., 1.3819)
-    uint32_t mlp_in;            // MLP input dim (L*F + 3 for dir)
-    uint32_t mlp_hidden;        // hidden width
-    uint32_t mlp_layers;        // number of hidden layers
-    uint32_t mlp_out;           // output dim (4: rgb + density)
-   uint32_t flags;             // v2: float bits of scene scale
-   uint32_t reserved[3];       // v2: float bits of scene center (x,y,z)
+ uint32_t magic; // 'NHG1' = 0x3147484E
+ uint32_t version; // 1 or 2
+ uint32_t levels; // L (e.g., 16)
+ uint32_t features; // F (e.g., 2 or 4)
+ uint32_t hashmap_size; // H per level (power of two)
+ uint32_t base_resolution; // R0 (e.g., 16)
+ float per_level_scale; // s (e.g., 1.3819)
+ uint32_t mlp_in; // MLP input dim (L*F + 3 for dir)
+ uint32_t mlp_hidden; // hidden width
+ uint32_t mlp_layers; // number of hidden layers
+ uint32_t mlp_out; // output dim (4: rgb + density)
+ uint32_t flags; // v2: float bits of scene scale
+ uint32_t reserved[3]; // v2: float bits of scene center (x,y,z)
 };
 ```
 
 ### Payload (contiguous, no padding)
 1. **Hash‑grid table** (float16 or float32; choose one and set a flag):
-   - For each level `l` in `[0..L-1]`:
-     - `hashmap_size` entries
-     - each entry has `features` floats
+ - For each level `l` in `[0..L-1]`:
+ - `hashmap_size` entries
+ - each entry has `features` floats
 
 2. **MLP weights** (float16 recommended)
-   - Layer 0: `[mlp_in x mlp_hidden]` weights + `[mlp_hidden]` bias
-   - Hidden layers: `[mlp_hidden x mlp_hidden]` weights + `[mlp_hidden]` bias
-   - Output layer: `[mlp_hidden x mlp_out]` weights + `[mlp_out]` bias
+ - Layer 0: `[mlp_in x mlp_hidden]` weights + `[mlp_hidden]` bias
+ - Hidden layers: `[mlp_hidden x mlp_hidden]` weights + `[mlp_hidden]` bias
+ - Output layer: `[mlp_hidden x mlp_out]` weights + `[mlp_out]` bias
 
 3. **Activation**
-   - ReLU for hidden
-   - Density = ReLU
-   - Color = Sigmoid
+ - ReLU for hidden
+ - Density = ReLU
+ - Color = Sigmoid
 
 ## 3) Occupancy Grid (occupancy_grid.bin)
 
 ### Header (16 bytes)
 ```
 struct NerfOccHeader {
-    uint32_t magic;      // 'NOG1' = 0x31474F4E
-    uint32_t dim;        // grid dimension N (cube: N x N x N)
-    float    scale;      // world units per grid cell
-    float    threshold;  // occupancy threshold used during training
+ uint32_t magic; // 'NOG1' = 0x31474F4E
+ uint32_t dim; // grid dimension N (cube: N x N x N)
+ float scale; // world units per grid cell
+ float threshold; // occupancy threshold used during training
 };
 ```
 

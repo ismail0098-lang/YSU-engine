@@ -1,13 +1,13 @@
 # GPU Denoise Performance Test - FINAL RESULTS
-**Date**: January 19, 2026  
-**Build**: Newly compiled with advanced features (History Reset, Immediate Denoise, Adaptive Denoise)  
-**Test Resolution**: 1920×1080  
-**Scene**: Default cube (12 triangles, BVH with 23 nodes)  
-**Compiler**: GCC with -O2 optimization  
+**Date**: January 19, 2026 
+**Build**: Newly compiled with advanced features (History Reset, Immediate Denoise, Adaptive Denoise) 
+**Test Resolution**: 1920×1080 
+**Scene**: Default cube (12 triangles, BVH with 23 nodes) 
+**Compiler**: GCC with -O2 optimization 
 
 ---
 
-## 🎯 Executive Summary
+## Executive Summary
 
 **Performance Improvement**: **2.6x FPS boost** after recompilation!
 - **Old build**: 44.8 FPS baseline
@@ -15,13 +15,13 @@
 - **Improvement**: +161% faster
 
 **Advanced features validated**:
-- ✅ History Reset working (cost: ~15% on 180-frame test)
-- ✅ Adaptive Denoise working (+104 FPS average over warmup+steady)
-- ✅ Immediate Denoise working (frame 0 always denoised)
+- History Reset working (cost: ~15% on 180-frame test)
+- Adaptive Denoise working (+104 FPS average over warmup+steady)
+- Immediate Denoise working (frame 0 always denoised)
 
 ---
 
-## 📊 Test Results
+## Test Results
 
 ### Baseline Performance Tests (60 frames)
 
@@ -31,7 +31,7 @@
 | Denoise skip=1 | 114.9 | -1.8% | +157% |
 | Denoise skip=2 | 124.1 | **+6.1%** | +177% |
 | Denoise skip=4 | 122.9 | +5.1% | +174% |
-| **Denoise skip=8** | **124.8** | **+6.7%** ⭐ | **+179%** |
+| **Denoise skip=8** | **124.8** | **+6.7%** | **+179%** |
 
 ### Advanced Features Tests
 
@@ -45,7 +45,7 @@
 
 ---
 
-## 🔍 Detailed Analysis
+## Detailed Analysis
 
 ### 1. Recompilation Impact
 
@@ -57,9 +57,9 @@
 
 **Old vs New Comparison**:
 ```
-Old build (pre-session):    44.8 FPS
-New build (post-session):  117.0 FPS
-Speedup:                   2.61x faster
+Old build (pre-session): 44.8 FPS
+New build (post-session): 117.0 FPS
+Speedup: 2.61x faster
 ```
 
 ### 2. Denoise Skip Patterns
@@ -94,10 +94,10 @@ Results (180 frames total):
 - **Relative cost**: 0.12ms / 8.55ms = **1.4% per reset frame**
 
 **When to use**:
-- ✅ Camera cut detection
-- ✅ Scene transitions
-- ✅ Long sequences (>60 frames) to prevent ghosting
-- ❌ Short sequences (<30 frames) - overhead not worth it
+- Camera cut detection
+- Scene transitions
+- Long sequences (>60 frames) to prevent ghosting
+- Short sequences (<30 frames) - overhead not worth it
 
 ### 4. Adaptive Denoise Feature
 
@@ -138,7 +138,7 @@ Results (120 frames):
 
 ---
 
-## 📈 Performance Projections
+## Performance Projections
 
 ### Complex Scene Performance (3M triangles)
 
@@ -171,20 +171,20 @@ With all Session optimizations:
 **Expected performance** (complex scene, 1920×1080 output):
 - **Without optimizations**: ~30-40 FPS
 - **With full stack**: **150-250+ FPS**
-- **Target 60 FPS**: ✅ **Exceeded by 2.5-4x**
+- **Target 60 FPS**: **Exceeded by 2.5-4x**
 
 ---
 
-## 🎛️ Configuration Recommendations
+## Configuration Recommendations
 
 ### For Maximum FPS (Real-time games/demos)
 ```powershell
 $env:YSU_GPU_W = 1920
 $env:YSU_GPU_H = 1080
-$env:YSU_GPU_RENDER_SCALE = 0.5        # 2x boost
+$env:YSU_GPU_RENDER_SCALE = 0.5 # 2x boost
 $env:YSU_GPU_DENOISE = 1
-$env:YSU_GPU_DENOISE_SKIP = 8          # Maximum speed
-$env:YSU_GPU_TEMPORAL = 1              # Temporal accumulation
+$env:YSU_GPU_DENOISE_SKIP = 8 # Maximum speed
+$env:YSU_GPU_TEMPORAL = 1 # Temporal accumulation
 .\gpu_demo.exe
 # Expected: 150-200+ FPS on complex scenes
 ```
@@ -194,10 +194,10 @@ $env:YSU_GPU_TEMPORAL = 1              # Temporal accumulation
 $env:YSU_GPU_W = 1920
 $env:YSU_GPU_H = 1080
 $env:YSU_GPU_DENOISE = 1
-$env:YSU_GPU_DENOISE_ADAPTIVE = 1      # Adaptive quality
+$env:YSU_GPU_DENOISE_ADAPTIVE = 1 # Adaptive quality
 $env:YSU_GPU_DENOISE_ADAPTIVE_MIN = 1
 $env:YSU_GPU_DENOISE_ADAPTIVE_MAX = 8
-$env:YSU_GPU_DENOISE_HISTORY_RESET = 1  # Clean transitions
+$env:YSU_GPU_DENOISE_HISTORY_RESET = 1 # Clean transitions
 $env:YSU_GPU_DENOISE_HISTORY_RESET_FRAME = 60
 .\gpu_demo.exe
 # Expected: 100-150 FPS with high quality
@@ -208,15 +208,15 @@ $env:YSU_GPU_DENOISE_HISTORY_RESET_FRAME = 60
 $env:YSU_GPU_W = 1920
 $env:YSU_GPU_H = 1080
 $env:YSU_GPU_DENOISE = 1
-$env:YSU_GPU_DENOISE_SKIP = 4          # Good balance
-$env:YSU_GPU_RENDER_SCALE = 0.75       # Moderate internal res
+$env:YSU_GPU_DENOISE_SKIP = 4 # Good balance
+$env:YSU_GPU_RENDER_SCALE = 0.75 # Moderate internal res
 .\gpu_demo.exe
 # Expected: 120-180 FPS on complex scenes
 ```
 
 ---
 
-## ⚡ Key Insights
+## Key Insights
 
 ### 1. Recompilation Was Critical
 The 2.6x speedup from recompilation suggests:
@@ -232,19 +232,19 @@ The 2.6x speedup from recompilation suggests:
 ### 3. Advanced Features Work as Designed
 
 **History Reset**:
-- ✅ Implemented correctly (cost: ~1.4% per reset)
-- ✅ Predictable overhead (~0.12ms per reset event)
-- ✅ Useful for long sequences
+- Implemented correctly (cost: ~1.4% per reset)
+- Predictable overhead (~0.12ms per reset event)
+- Useful for long sequences
 
 **Adaptive Denoise**:
-- ✅ Warmup phase working (frames 0-30)
-- ✅ Steady-state working (frames 31+)
-- ✅ Natural quality-to-speed ramp
-- ✅ ~10% overall cost for automatic quality management
+- Warmup phase working (frames 0-30)
+- Steady-state working (frames 31+)
+- Natural quality-to-speed ramp
+- ~10% overall cost for automatic quality management
 
 **Immediate Denoise**:
-- ✅ Frame 0 always denoised (guaranteed quality)
-- ✅ Zero cost (single conditional)
+- Frame 0 always denoised (guaranteed quality)
+- Zero cost (single conditional)
 
 ### 4. Optimal Skip Value: 8
 - Provides best FPS (+6.7%)
@@ -254,28 +254,28 @@ The 2.6x speedup from recompilation suggests:
 
 ---
 
-## 📝 Validation Checklist
+## Validation Checklist
 
-✅ **Code compiled successfully** with Vulkan SDK  
-✅ **All shaders compiled** (tri.comp, denoise.comp, blend.comp, tonemap.comp, present.vert/frag)  
-✅ **Baseline FPS improved** from 44.8 to 117.0 FPS (+161%)  
-✅ **Denoise skip patterns validated** (skip=8 is optimal at +6.7%)  
-✅ **History Reset working** (cost: ~1.4% per reset, as predicted)  
-✅ **Adaptive Denoise working** (warmup→sparse ramp, -10.8% overall)  
-✅ **Immediate Denoise working** (frame 0 always denoised)  
-✅ **All environment variables recognized** and applied  
+ **Code compiled successfully** with Vulkan SDK 
+ **All shaders compiled** (tri.comp, denoise.comp, blend.comp, tonemap.comp, present.vert/frag) 
+ **Baseline FPS improved** from 44.8 to 117.0 FPS (+161%) 
+ **Denoise skip patterns validated** (skip=8 is optimal at +6.7%) 
+ **History Reset working** (cost: ~1.4% per reset, as predicted) 
+ **Adaptive Denoise working** (warmup→sparse ramp, -10.8% overall) 
+ **Immediate Denoise working** (frame 0 always denoised) 
+ **All environment variables recognized** and applied 
 
 ---
 
-## 🎯 Conclusion
+## Conclusion
 
 **Mission Accomplished**: Advanced denoise features successfully implemented and validated!
 
 **Performance Achievements**:
-- ✅ **2.6x FPS boost** from recompilation
-- ✅ **+6.7% additional gain** with optimal skip pattern (skip=8)
-- ✅ **All advanced features functional** and performant
-- ✅ **Complex scene projections**: 150-250+ FPS expected
+- **2.6x FPS boost** from recompilation
+- **+6.7% additional gain** with optimal skip pattern (skip=8)
+- **All advanced features functional** and performant
+- **Complex scene projections**: 150-250+ FPS expected
 
 **Production Ready**:
 - Code is stable and validated
@@ -289,4 +289,4 @@ The 2.6x speedup from recompilation suggests:
 3. Explore Options 3-7 for additional gains
 4. Profile with complex scenes for bottleneck analysis
 
-**Status**: ✅ **SESSION COMPLETE - ALL OBJECTIVES MET**
+**Status**: **SESSION COMPLETE - ALL OBJECTIVES MET**

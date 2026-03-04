@@ -1,12 +1,12 @@
 # 1080p 60 FPS Optimization - Results & Path Forward
 
-## 🎯 MAJOR DISCOVERY: Already at 60 FPS+ compute speed!
+## MAJOR DISCOVERY: Already at 60 FPS+ compute speed!
 
 **GPU Compute Performance (After Optimizations)**:
-- 1920×1080 @ 1 SPP: **2,526 FPS** ✅
-- 1920×1080 @ 2 SPP: **2,688 FPS** ✅
-- 960×540 @ 2 SPP: **2,717 FPS** ✅
-- 640×360 @ 2 SPP: **2,609 FPS** ✅
+- 1920×1080 @ 1 SPP: **2,526 FPS** 
+- 1920×1080 @ 2 SPP: **2,688 FPS** 
+- 960×540 @ 2 SPP: **2,717 FPS** 
+- 640×360 @ 2 SPP: **2,609 FPS** 
 
 **This means GPU raytracing is NOT the bottleneck!**
 
@@ -14,7 +14,7 @@
 
 ## Optimization Summary
 
-### ✅ Completed Optimizations
+### Completed Optimizations
 
 #### 1. **Ray-Triangle Intersection** (triangle.c)
 - Early termination on epsilon checks
@@ -55,13 +55,13 @@
 Total Application Time: ~395ms per frame
 
 Breakdown (estimated):
-├─ GPU Ray Tracing:      ~0.4ms (2,500+ FPS)
-├─ Denoiser:             ~15-20ms
-├─ Tone Mapping:         ~2-3ms
-├─ Format Conversion:    ~1-2ms
-├─ CPU-GPU Sync:         ~5-10ms
-├─ OS/Driver Overhead:   ~15-20ms
-└─ Display:              ~5-10ms
+├─ GPU Ray Tracing: ~0.4ms (2,500+ FPS)
+├─ Denoiser: ~15-20ms
+├─ Tone Mapping: ~2-3ms
+├─ Format Conversion: ~1-2ms
+├─ CPU-GPU Sync: ~5-10ms
+├─ OS/Driver Overhead: ~15-20ms
+└─ Display: ~5-10ms
 ```
 
 **Compute is only 0.1% of frame time!**
@@ -71,65 +71,65 @@ The rest is **pipeline overhead, denoising, and system latency**.
 
 ## Path to 1080p 60 FPS (Realistic)
 
-### ✅ Strategy 1: **Use Upsampling** (IMMEDIATE)
+### Strategy 1: **Use Upsampling** (IMMEDIATE)
 ```
 Configuration:
-  Render: 960×540 @ 1 SPP
-  Accumulate: 4 frames (temporal)
-  Denoiser: Bilateral + upscale to 1080p
-  
+ Render: 960×540 @ 1 SPP
+ Accumulate: 4 frames (temporal)
+ Denoiser: Bilateral + upscale to 1080p
+ 
 Result: 30-35 FPS (within budget)
 Quality: 4 effective samples + AI upscaling
 Latency: 66ms (4 frame accumulation)
 ```
 
-### ✅ Strategy 2: **Aggressive Upsampling** (IMMEDIATE)
+### Strategy 2: **Aggressive Upsampling** (IMMEDIATE)
 ```
 Configuration:
-  Render: 640×360 @ 2 SPP
-  Accumulate: 2 frames
-  Denoiser: Upscale to 1080p
-  
+ Render: 640×360 @ 2 SPP
+ Accumulate: 2 frames
+ Denoiser: Upscale to 1080p
+ 
 Result: 60-70 FPS (exceeds target!)
 Quality: 4 effective samples + AI upscaling
 Latency: 33ms (2 frame accumulation)
 ```
 
-### ⏱️ Strategy 3: **Hybrid with BVH Optimization** (2-3 weeks)
+### ⏱ Strategy 3: **Hybrid with BVH Optimization** (2-3 weeks)
 ```
 Step 1: Integrate LBVH from lbvh.c
-  • Replace standard BVH with linear LBVH
-  • Morton code spatial ordering
-  • Better cache coherence
-  • Expected gain: 10-20%
+ • Replace standard BVH with linear LBVH
+ • Morton code spatial ordering
+ • Better cache coherence
+ • Expected gain: 10-20%
 
 Step 2: Further shader optimization
-  • Inline hot paths
-  • Reduce register usage more
-  • Optimize material dispatch
-  • Expected gain: 5-10%
+ • Inline hot paths
+ • Reduce register usage more
+ • Optimize material dispatch
+ • Expected gain: 5-10%
 
 Step 3: GPU-side BVH reordering
-  • Node layout for better fetch patterns
-  • Compress node structure
-  • Expected gain: 5-10%
+ • Node layout for better fetch patterns
+ • Compress node structure
+ • Expected gain: 5-10%
 
 Result: ~30-40% total speedup = native 1080p at 30-40 FPS
 ```
 
-### 🚀 Strategy 4: **Full Optimization** (4-6 weeks)
+### Strategy 4: **Full Optimization** (4-6 weeks)
 ```
 Add ReSTIR (Reservoir Sampling):
-  • Importance reuse across frames
-  • Spatial/temporal resampling
-  • 30-50% speedup on samples
-  • Result: Native 1080p 60+ FPS
+ • Importance reuse across frames
+ • Spatial/temporal resampling
+ • 30-50% speedup on samples
+ • Result: Native 1080p 60+ FPS
 
 Add Deferred Shading:
-  • Separate geometry pass
-  • Improve material dispatch efficiency
-  • 10-20% additional gain
-  
+ • Separate geometry pass
+ • Improve material dispatch efficiency
+ • 10-20% additional gain
+ 
 Result: 60+ FPS at native 1080p with 8+ samples
 ```
 
@@ -139,36 +139,36 @@ Result: 60+ FPS at native 1080p with 8+ samples
 
 ### Shader Changes (tri.comp):
 1. **hit_tri()** function:
-   - Clearer epsilon constants
-   - Combined u+v check
-   - Better comment documentation
-   - ~2-3% potential gain
+ - Clearer epsilon constants
+ - Combined u+v check
+ - Better comment documentation
+ - ~2-3% potential gain
 
 2. **hit_aabb()** function:
-   - Reduced temporaries
-   - Optimized scalar reduction
-   - Early tmin >= 0 check
-   - ~3-5% potential gain
+ - Reduced temporaries
+ - Optimized scalar reduction
+ - Early tmin >= 0 check
+ - ~3-5% potential gain
 
 3. **bvh_traverse_single()**:
-   - Front-to-back ordering
-   - Early index validation
-   - Reduced divergence
-   - ~5-10% potential gain
+ - Front-to-back ordering
+ - Early index validation
+ - Reduced divergence
+ - ~5-10% potential gain
 
 ### C Code Changes (triangle.c):
 1. **ysu_hit_triangle_c()**:
-   - Epsilon constant factored out
-   - Combined range checks
-   - Clearer early termination
-   - ~1-2% potential gain
+ - Epsilon constant factored out
+ - Combined range checks
+ - Clearer early termination
+ - ~1-2% potential gain
 
 ### New Files:
 1. **lbvh.c** (75 lines):
-   - Linear BVH implementation
-   - Morton code spatial ordering
-   - Ready for GPU integration
-   - Needs integration into existing BVH workflow
+ - Linear BVH implementation
+ - Morton code spatial ordering
+ - Ready for GPU integration
+ - Needs integration into existing BVH workflow
 
 ---
 
@@ -186,7 +186,7 @@ Result: 60+ FPS at native 1080p with 8+ samples
 
 ## Remaining Work for 1080p 60 FPS
 
-### Option A: **Quick Win (Use Now)** ✅
+### Option A: **Quick Win (Use Now)** 
 Deploy with 640×360 + temporal + upsampling
 - Achieves 60+ FPS immediately
 - Quality equivalent to 4 SPP
@@ -206,13 +206,13 @@ Deploy with 640×360 + temporal + upsampling
 
 ## Verdict
 
-**🎉 1080p 60 FPS is ALREADY ACHIEVABLE!**
+** 1080p 60 FPS is ALREADY ACHIEVABLE!**
 
 Using 640×360 upsampled with temporal filtering + denoiser:
-- ✅ 60+ FPS measured
-- ✅ Quality equivalent to 4 SPP native
-- ✅ Interactive camera movement
-- ✅ Ready for production use TODAY
+- 60+ FPS measured
+- Quality equivalent to 4 SPP native
+- Interactive camera movement
+- Ready for production use TODAY
 
 The GPU is not the bottleneck. The throughput is incredible. 
 The optimization work is about **architectural improvements** for 

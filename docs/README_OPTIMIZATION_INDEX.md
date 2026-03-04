@@ -7,10 +7,10 @@
 - **[SESSION15_OPTION1_SUMMARY.md](SESSION15_OPTION1_SUMMARY.md)** - Option 1 implementation details
 - **[SESSION15_COMPLETE_CHANGELIST.md](SESSION15_COMPLETE_CHANGELIST.md)** - Full list of changes
 
-### Option 1: Denoise Skip (COMPLETE ✅)
+### Option 1: Denoise Skip (COMPLETE )
 - **[OPTION1_DENOISE_SKIP.md](OPTION1_DENOISE_SKIP.md)** - Complete user guide and technical details
 
-### Option 2: Temporal Denoising (60% COMPLETE 🔄)
+### Option 2: Temporal Denoising (60% COMPLETE )
 - **[OPTION2_TEMPORAL_DENOISE_PLAN.md](OPTION2_TEMPORAL_DENOISE_PLAN.md)** - Architecture and algorithm
 - **[OPTION2_PROGRESS.md](OPTION2_PROGRESS.md)** - Implementation progress tracking
 
@@ -26,15 +26,15 @@
 
 ### Current Stack Performance
 ```
-Session 13 (Render Scale 0.5)     → 960×540 render
-+ Session 12 (Temporal 16-frame)   → Amortized overhead
-+ Option 1 (Denoise Skip=4)        → Skip 75% of denoising
-= Expected FPS                     → 150-200 FPS
+Session 13 (Render Scale 0.5) → 960×540 render
++ Session 12 (Temporal 16-frame) → Amortized overhead
++ Option 1 (Denoise Skip=4) → Skip 75% of denoising
+= Expected FPS → 150-200 FPS
 
-With Option 2 (Temporal Denoise)   → Blended output
-+ Option 3 (Half-Precision)        → 1.5x memory speedup
-+ Option 4 (Async Compute)         → Overlapped denoiser
-= Final Stack Target               → 200-250+ FPS
+With Option 2 (Temporal Denoise) → Blended output
++ Option 3 (Half-Precision) → 1.5x memory speedup
++ Option 4 (Async Compute) → Overlapped denoiser
+= Final Stack Target → 200-250+ FPS
 ```
 
 ### FPS Progression Chart
@@ -57,8 +57,8 @@ With Option 2 (Temporal Denoise)   → Blended output
 
 | Feature | Status | Code | Test | Doc | Notes |
 |---|---|---|---|---|---|
-| **Option 1: Denoise Skip** | ✅ Complete | ✅ | ⏳ Build | ✅ | 5 lines, easy |
-| **Option 2: Temporal Denoise** | 🔄 60% | 🔄 | ⏳ Build | ✅ | Infrastructure done |
+| **Option 1: Denoise Skip** | Complete | | ⏳ Build | | 5 lines, easy |
+| **Option 2: Temporal Denoise** | 60% | | ⏳ Build | | Infrastructure done |
 | **Option 3: Half-Precision** | ⏳ Pending | ⏳ | ⏳ | ⏳ | Shader mod easy |
 | **Option 4: Async Compute** | ⏳ Pending | ⏳ | ⏳ | ⏳ | Medium complexity |
 | **Option 5: Motion-Aware** | ⏳ Pending | ⏳ | ⏳ | ⏳ | Hard, future |
@@ -71,31 +71,31 @@ With Option 2 (Temporal Denoise)   → Blended output
 
 ### Rendering Core
 ```
-YSU_GPU_W=1920, YSU_GPU_H=1080       Output resolution
-YSU_GPU_SPP=1                         Samples per pixel
-YSU_GPU_RENDER_SCALE=0.5              Render resolution scale (default 0.5)
+YSU_GPU_W=1920, YSU_GPU_H=1080 Output resolution
+YSU_GPU_SPP=1 Samples per pixel
+YSU_GPU_RENDER_SCALE=0.5 Render resolution scale (default 0.5)
 ```
 
 ### Temporal & Batching
 ```
-YSU_GPU_FRAMES=16                     Frame batch count
-YSU_GPU_TEMPORAL=1                    Temporal accumulation (default ON)
-YSU_GPU_READBACK_SKIP=4               Readback every N frames
+YSU_GPU_FRAMES=16 Frame batch count
+YSU_GPU_TEMPORAL=1 Temporal accumulation (default ON)
+YSU_GPU_READBACK_SKIP=4 Readback every N frames
 ```
 
 ### Denoising (NEW)
 ```
-YSU_GPU_DENOISE=1                     GPU denoiser enabled
-YSU_GPU_DENOISE_SKIP=1                Denoise every N frames (Option 1)
-YSU_GPU_TEMPORAL_DENOISE=1            Temporal blend denoise (Option 2)
-YSU_GPU_TEMPORAL_DENOISE_WEIGHT=0.7   Blend weight 0-1 (Option 2)
+YSU_GPU_DENOISE=1 GPU denoiser enabled
+YSU_GPU_DENOISE_SKIP=1 Denoise every N frames (Option 1)
+YSU_GPU_TEMPORAL_DENOISE=1 Temporal blend denoise (Option 2)
+YSU_GPU_TEMPORAL_DENOISE_WEIGHT=0.7 Blend weight 0-1 (Option 2)
 ```
 
 ### IO & Display
 ```
-YSU_GPU_NO_IO=0                       Skip readback/IO
-YSU_GPU_WINDOW=0                      Display window
-YSU_GPU_MINIMAL=0                     Benchmark mode
+YSU_GPU_NO_IO=0 Skip readback/IO
+YSU_GPU_WINDOW=0 Display window
+YSU_GPU_MINIMAL=0 Benchmark mode
 ```
 
 ---
@@ -134,37 +134,37 @@ YSU_GPU_DENOISE=1 YSU_GPU_DENOISE_SKIP=2 YSU_GPU_TEMPORAL_DENOISE=1 YSU_GPU_TEMP
 ### Render Pipeline (Current - Session 15)
 ```
 Input: Scene + Camera
-  ↓
+ ↓
 [Ray Trace] (GPU compute)
-  ↓
+ ↓
 out_img (HDR, noisy)
-  ↓
+ ↓
 [Denoise] (conditional skip) ← Option 1
-  ↓
+ ↓
 temp_denoised (HDR, denoised)
-  ↓
+ ↓
 [Temporal Blend] (optional) ← Option 2
-  ↓
+ ↓
 blend_output (HDR, temporally smooth)
-  ↓
+ ↓
 [Tonemap] (HDR → LDR)
-  ↓
+ ↓
 ldr_img (RGBA8, ready for display)
-  ↓
+ ↓
 [Temporal Accumulation] (frame blending)
-  ↓
+ ↓
 Output: Final image
 ```
 
 ### Frame Timeline (With Temporal Accumulation + Options 1-2)
 ```
-Frame 0:  RT → D ✓ → B ✓ → TM → Save → Readback
-Frame 1:  RT → D ✗ → B ✗ → TM → Save
-Frame 2:  RT → D ✗ → B ✗ → TM → Save
-Frame 3:  RT → D ✗ → B ✗ → TM → Save
-Frame 4:  RT → D ✓ → B ✓ → TM → Save → Readback
-          ↑                    ↑
-       Skip pattern        16-frame blend
+Frame 0: RT → D → B → TM → Save → Readback
+Frame 1: RT → D → B → TM → Save
+Frame 2: RT → D → B → TM → Save
+Frame 3: RT → D → B → TM → Save
+Frame 4: RT → D → B → TM → Save → Readback
+ ↑ ↑
+ Skip pattern 16-frame blend
 
 RT = Ray Trace (6.3ms)
 D = Denoise (conditional: ~1.25ms @ skip=4)
@@ -202,8 +202,8 @@ gcc -std=c11 -O2 -pthread -o gpu_demo gpu_vulkan_demo.c ... [other files]
 ```bash
 # Test all denoise skip values
 for skip in 1 2 4 8; do
-    echo "Testing skip=$skip"
-    YSU_GPU_DENOISE_SKIP=$skip YSU_GPU_FRAMES=16 ./gpu_demo.exe
+ echo "Testing skip=$skip"
+ YSU_GPU_DENOISE_SKIP=$skip YSU_GPU_FRAMES=16 ./gpu_demo.exe
 done
 ```
 
@@ -220,25 +220,25 @@ done
 ```
 Root/
 ├── Core Sources
-│   ├── gpu_vulkan_demo.c          (Main implementation)
-│   ├── render.c, render.h         (CPU rendering)
-│   ├── vec3.c, ray.c, etc.        (Math & geometry)
+│ ├── gpu_vulkan_demo.c (Main implementation)
+│ ├── render.c, render.h (CPU rendering)
+│ ├── vec3.c, ray.c, etc. (Math & geometry)
 │
 ├── Shaders/
-│   ├── denoise.comp.spv           (GPU denoiser)
-│   ├── blend.comp                 (NEW - temporal blend)
-│   ├── blend.comp.spv             (Build output)
+│ ├── denoise.comp.spv (GPU denoiser)
+│ ├── blend.comp (NEW - temporal blend)
+│ ├── blend.comp.spv (Build output)
 │
 ├── Documentation/
-│   ├── SESSION15_COMPREHENSIVE_SUMMARY.md    ← START HERE
-│   ├── OPTION1_DENOISE_SKIP.md
-│   ├── OPTION2_TEMPORAL_DENOISE_PLAN.md
-│   ├── OPTION2_PROGRESS.md
-│   ├── GPU_TEMPORAL_FPS_BOOST.md  (Session 12)
-│   ├── GPU_RENDER_SCALE_2X_BOOST.md (Session 13)
-│   ├── FULL_OPTIMIZATION_GUIDE.md
-│   ├── FPS_TEST_RESULTS.md
-│   └── README_OPTIMIZATION_INDEX.md (THIS FILE)
+│ ├── SESSION15_COMPREHENSIVE_SUMMARY.md ← START HERE
+│ ├── OPTION1_DENOISE_SKIP.md
+│ ├── OPTION2_TEMPORAL_DENOISE_PLAN.md
+│ ├── OPTION2_PROGRESS.md
+│ ├── GPU_TEMPORAL_FPS_BOOST.md (Session 12)
+│ ├── GPU_RENDER_SCALE_2X_BOOST.md (Session 13)
+│ ├── FULL_OPTIMIZATION_GUIDE.md
+│ ├── FPS_TEST_RESULTS.md
+│ └── README_OPTIMIZATION_INDEX.md (THIS FILE)
 ```
 
 ---
@@ -246,10 +246,10 @@ Root/
 ## Contact & Future Work
 
 ### Session 15 Summary
-- ✅ Option 1 fully implemented and tested (code complete)
-- 🔄 Option 2 infrastructure 60% done (pending shader dispatch)
-- 📈 Target: 200+ FPS at 1080p resolution
-- 🎯 Next: Complete Option 2, then Options 3-7
+- Option 1 fully implemented and tested (code complete)
+- Option 2 infrastructure 60% done (pending shader dispatch)
+- Target: 200+ FPS at 1080p resolution
+- Next: Complete Option 2, then Options 3-7
 
 ### Building Next Sessions
 Each following session will:
@@ -291,10 +291,10 @@ Each following session will:
 
 | Session | Focus | Status | FPS | Key Files |
 |---|---|---|---|---|
-| 1-11 | Foundation, GPU denoiser | ✅ | 9.9-10 | gpu_vulkan_demo.c |
-| 12 | Temporal accumulation | ✅ | 39.5 | GPU_TEMPORAL_FPS_BOOST.md |
-| 13 | Render scale 0.5 | ✅ | ~100 | GPU_RENDER_SCALE_2X_BOOST.md |
-| **15** | **Option 1+2** | **🔄** | **150+** | **OPTION1/2 docs** |
+| 1-11 | Foundation, GPU denoiser | | 9.9-10 | gpu_vulkan_demo.c |
+| 12 | Temporal accumulation | | 39.5 | GPU_TEMPORAL_FPS_BOOST.md |
+| 13 | Render scale 0.5 | | ~100 | GPU_RENDER_SCALE_2X_BOOST.md |
+| **15** | **Option 1+2** | **** | **150+** | **OPTION1/2 docs** |
 | 16+ | Options 3-7 | ⏳ | 200+ | Future docs |
 
 ---

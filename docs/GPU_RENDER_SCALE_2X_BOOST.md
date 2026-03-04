@@ -2,7 +2,7 @@
 
 ## Breakthrough: 80 FPS Target
 
-**Previous Achievement**: 39.5 FPS with temporal accumulation (16 frames, NO_IO)  
+**Previous Achievement**: 39.5 FPS with temporal accumulation (16 frames, NO_IO) 
 **New Goal**: 80 FPS with render-scale reduction (1920×1080 output, render at 960×540 internally)
 
 ## Strategy: Render at Lower Resolution
@@ -35,8 +35,8 @@ Action:
 ### 3. Performance Model
 ```
 Base (39.5 FPS, NO_IO): 25.3 ms per frame
-With render_scale=0.5:  ~6-7 ms per frame (4x reduction)
-With 16-frame temporal:  ~100-112 ms per batch = 80-90 FPS average
+With render_scale=0.5: ~6-7 ms per frame (4x reduction)
+With 16-frame temporal: ~100-112 ms per batch = 80-90 FPS average
 ```
 
 ## Implementation
@@ -45,16 +45,16 @@ With 16-frame temporal:  ~100-112 ms per batch = 80-90 FPS average
 
 **Lines 570-600**: Add render scale parameter with default 0.5
 ```c
-float render_scale = 0.5f;  // Default 0.5 = 2x speedup
+float render_scale = 0.5f; // Default 0.5 = 2x speedup
 if(env_render_scale) render_scale = ysu_env_float("YSU_GPU_RENDER_SCALE", 0.5f);
 if(render_scale < 0.1f) render_scale = 0.1f;
 if(render_scale > 1.0f) render_scale = 1.0f;
 
 // Apply render scale BEFORE shader setup
 if(render_scale < 1.0f){
-    W = (int)(W * render_scale);
-    H = (int)(H * render_scale);
-    fprintf(stderr, "[GPU] render scale %.2f -> %dx%d\n", render_scale, W, H);
+ W = (int)(W * render_scale);
+ H = (int)(H * render_scale);
+ fprintf(stderr, "[GPU] render scale %.2f -> %dx%d\n", render_scale, W, H);
 }
 ```
 
@@ -145,10 +145,10 @@ YSU_GPU_SPP=2 YSU_GPU_FRAMES=8 YSU_GPU_TEMPORAL=1 ./gpu_demo.exe
 
 ## Implementation Status
 
-✅ **Code complete**: render_scale parameter added with default=0.5  
-✅ **Compile-ready**: Changes in gpu_vulkan_demo.c lines 570-650  
-⏳ **Build**: Requires Vulkan SDK (not available in current environment)  
-⏳ **Bench**: Test when Vulkan available  
+ **Code complete**: render_scale parameter added with default=0.5 
+ **Compile-ready**: Changes in gpu_vulkan_demo.c lines 570-650 
+⏳ **Build**: Requires Vulkan SDK (not available in current environment) 
+⏳ **Bench**: Test when Vulkan available 
 
 ## Expected Results (Theory)
 
@@ -162,29 +162,29 @@ YSU_GPU_SPP=2 YSU_GPU_FRAMES=8 YSU_GPU_TEMPORAL=1 ./gpu_demo.exe
 ## Next Steps
 
 1. **Build with Vulkan SDK installed**:
-   ```bash
-   gcc -std=c11 -O2 gpu_vulkan_demo.c -o gpu_demo.exe -lvulkan -lm
-   ```
+ ```bash
+ gcc -std=c11 -O2 gpu_vulkan_demo.c -o gpu_demo.exe -lvulkan -lm
+ ```
 
 2. **Test basic speedup**:
-   ```bash
-   YSU_GPU_W=1920 YSU_GPU_H=1080 YSU_GPU_RENDER_SCALE=0.5 \
-   YSU_GPU_FRAMES=16 YSU_GPU_NO_IO=1 ./gpu_demo.exe
-   ```
+ ```bash
+ YSU_GPU_W=1920 YSU_GPU_H=1080 YSU_GPU_RENDER_SCALE=0.5 \
+ YSU_GPU_FRAMES=16 YSU_GPU_NO_IO=1 ./gpu_demo.exe
+ ```
 
 3. **Measure FPS** and adjust scale factor based on quality/speed preference
 
 4. **With window display**:
-   ```bash
-   YSU_GPU_W=1920 YSU_GPU_H=1080 YSU_GPU_RENDER_SCALE=0.5 \
-   YSU_GPU_FRAMES=20 YSU_GPU_WINDOW=1 ./gpu_demo.exe
-   ```
+ ```bash
+ YSU_GPU_W=1920 YSU_GPU_H=1080 YSU_GPU_RENDER_SCALE=0.5 \
+ YSU_GPU_FRAMES=20 YSU_GPU_WINDOW=1 ./gpu_demo.exe
+ ```
 
 ## Conclusion
 
 **Render-scale optimization** achieves 2x-4x speedup by reducing internal compute resolution. Combined with temporal accumulation:
 - **40 FPS**: render_scale=0.5, 16-frame temporal (default)
-- **80 FPS**: render_scale=0.5 with aggressive batching  
+- **80 FPS**: render_scale=0.5 with aggressive batching 
 - **60 FPS quality**: render_scale=0.75, 8-16 frame temporal with 2 SPP
 
 This **surpasses the original 60 FPS goal** while maintaining reasonable visual quality.

@@ -17,8 +17,8 @@
 ```bash
 # 1. Compile & test
 gcc -O3 -march=native -std=c11 \
-    nerf_simd.c vec3.c nerf_simd_test.c \
-    -o nerf_test -lm
+ nerf_simd.c vec3.c nerf_simd_test.c \
+ -o nerf_test -lm
 ./nerf_test
 
 # 2. Expected output
@@ -30,26 +30,26 @@ gcc -O3 -march=native -std=c11 \
 ### Load NeRF Data
 ```c
 NeRFData *nerf = ysu_nerf_data_load(
-    "models/nerf_hashgrid.bin",
-    "models/occupancy_grid.bin"
+ "models/nerf_hashgrid.bin",
+ "models/occupancy_grid.bin"
 );
 ```
 
 ### Render a Batch of Rays
 ```c
 RayBatch batch;
-batch.count = 8;  // 8 rays
+batch.count = 8; // 8 rays
 batch.origin[i], batch.direction[i] = ray data
 batch.pixel_id[i] = output pixel coordinate
 
 ysu_volume_integrate_batch(
-    &batch,
-    &nerf->config,
-    nerf,
-    &framebuffer,
-    num_steps=32,
-    density_scale=1.0f,
-    bounds_max=4.0f
+ &batch,
+ &nerf->config,
+ nerf,
+ &framebuffer,
+ num_steps=32,
+ density_scale=1.0f,
+ bounds_max=4.0f
 );
 ```
 
@@ -62,11 +62,11 @@ free(framebuffer.pixels);
 ## Environment Variables
 
 ```bash
-YSU_NERF_HASHGRID="models/nerf_hashgrid.bin"    # Required
-YSU_NERF_OCC="models/occupancy_grid.bin"        # Required
-YSU_NERF_STEPS=32                                # Ray march steps
-YSU_NERF_DENSITY=1.0                             # Opacity scale
-YSU_NERF_BOUNDS=4.0                              # Volume size
+YSU_NERF_HASHGRID="models/nerf_hashgrid.bin" # Required
+YSU_NERF_OCC="models/occupancy_grid.bin" # Required
+YSU_NERF_STEPS=32 # Ray march steps
+YSU_NERF_DENSITY=1.0 # Opacity scale
+YSU_NERF_BOUNDS=4.0 # Volume size
 ```
 
 ## Performance
@@ -123,14 +123,14 @@ YSU_NERF_STEPS=64 YSU_NERF_DENSITY=2.0 YSU_NERF_BOUNDS=8.0
 // After rendering, verify:
 assert(nerf_pix.rgb.x >= 0.0f && nerf_pix.rgb.x <= 1.0f);
 assert(nerf_pix.alpha >= 0.0f && nerf_pix.alpha <= 1.0f);
-assert(!isnan(nerf_pix.rgb.x));  // No NaN
+assert(!isnan(nerf_pix.rgb.x)); // No NaN
 ```
 
 **Enable per-ray logging**:
 ```c
 // In nerf_simd.c, add printf() in ysu_volume_integrate_batch()
 printf("Ray %u: pos=(%.2f,%.2f,%.2f) rgb=(%.3f,%.3f,%.3f) alpha=%.3f\n",
-       ray_idx, pos.x, pos.y, pos.z, rgb[0], rgb[1], rgb[2], alpha);
+ ray_idx, pos.x, pos.y, pos.z, rgb[0], rgb[1], rgb[2], alpha);
 ```
 
 **Benchmark components**:
@@ -156,31 +156,31 @@ printf("Ray %u: pos=(%.2f,%.2f,%.2f) rgb=(%.3f,%.3f,%.3f) alpha=%.3f\n",
 ### Binary File Structure
 ```
 Header (60 bytes):
-  uint32 magic, version, levels, features, hash_size, base_res
-  float per_level_scale, mlp_in, mlp_hidden, mlp_layers, mlp_out, scale
-  float center[3]
+ uint32 magic, version, levels, features, hash_size, base_res
+ float per_level_scale, mlp_in, mlp_hidden, mlp_layers, mlp_out, scale
+ float center[3]
 
 Hashgrid Table:
-  [levels][hash_size][features] × uint16 (half-float)
+ [levels][hash_size][features] × uint16 (half-float)
 
 MLP Weights:
-  Layer0: [hidden][input] × float
-  Layer1: [hidden][hidden] × float
-  Output: [output][hidden] × float
+ Layer0: [hidden][input] × float
+ Layer1: [hidden][hidden] × float
+ Output: [output][hidden] × float
 
 MLP Biases:
-  [hidden + hidden + output] × float
+ [hidden + hidden + output] × float
 
 Occupancy Grid (separate file):
-  [64][64][64] × uint8
+ [64][64][64] × uint8
 ```
 
 ### Key Offsets
 ```c
-#define HEADER_SIZE        60      // bytes
-#define HASHGRID_OFFSET    60
-#define MLP_WEIGHT_OFFSET  (60 + 12*8192*2*2)  // After hashgrid
-#define OCCUPANCY_SIZE     (64*64*64)
+#define HEADER_SIZE 60 // bytes
+#define HASHGRID_OFFSET 60
+#define MLP_WEIGHT_OFFSET (60 + 12*8192*2*2) // After hashgrid
+#define OCCUPANCY_SIZE (64*64*64)
 ```
 
 ## Testing Commands
@@ -188,18 +188,18 @@ Occupancy Grid (separate file):
 ```bash
 # Compile test
 gcc -O3 -march=native -std=c11 -o nerf_test \
-    nerf_simd.c vec3.c nerf_simd_test.c -lm
+ nerf_simd.c vec3.c nerf_simd_test.c -lm
 
 # Run test
 ./nerf_test
 
 # Check output PPM
 file nerf_simd_test_output.ppm
-identify nerf_simd_test_output.ppm  # ImageMagick
+identify nerf_simd_test_output.ppm # ImageMagick
 
 # Benchmark individual component
 gcc -DBENCH_ONLY -O3 -march=native -std=c11 \
-    -o nerf_bench nerf_simd.c vec3.c nerf_simd_test.c -lm
+ -o nerf_bench nerf_simd.c vec3.c nerf_simd_test.c -lm
 ./nerf_bench
 ```
 
@@ -207,10 +207,10 @@ gcc -DBENCH_ONLY -O3 -march=native -std=c11 \
 
 ```
 ysu_nerf_data_load() ────┐
-                         ├──→ ysu_volume_integrate_batch()
-ysu_mlp_inference_batch()┤       ├─ ysu_hashgrid_lookup_batch()
-                         ├──→    ├─ ysu_occupancy_lookup_batch()
-ysu_adaptive_step_size() ┴──→    └─ Volume compositing loop
+ ├──→ ysu_volume_integrate_batch()
+ysu_mlp_inference_batch()┤ ├─ ysu_hashgrid_lookup_batch()
+ ├──→ ├─ ysu_occupancy_lookup_batch()
+ysu_adaptive_step_size() ┴──→ └─ Volume compositing loop
 ```
 
 ## Memory Usage
@@ -229,25 +229,25 @@ ysu_adaptive_step_size() ┴──→    └─ Volume compositing loop
 ### GCC/Linux
 ```bash
 gcc -O3 -march=native -std=c11 \
-    nerf_simd.c vec3.c -o prog -lm -pthread
+ nerf_simd.c vec3.c -o prog -lm -pthread
 ```
 
 ### Clang/macOS
 ```bash
 clang -O3 -march=native -std=c11 \
-    nerf_simd.c vec3.c -o prog -lm -pthread
+ nerf_simd.c vec3.c -o prog -lm -pthread
 ```
 
 ### MSVC/Windows
 ```bash
 cl /O2 /arch:AVX2 /std:c11 \
-    nerf_simd.c vec3.c /link /out:prog.exe
+ nerf_simd.c vec3.c /link /out:prog.exe
 ```
 
 ### With Debug Info
 ```bash
 gcc -O3 -g -march=native -std=c11 \
-    nerf_simd.c vec3.c -o prog -lm -pthread
+ nerf_simd.c vec3.c -o prog -lm -pthread
 gdb ./prog
 ```
 

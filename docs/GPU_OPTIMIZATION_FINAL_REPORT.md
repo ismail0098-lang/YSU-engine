@@ -40,9 +40,9 @@ Comprehensive GPU-side optimizations of the NeRF volumetric rendering pipeline r
 **Impact:** ~1.5% speedup
 - Precomputed `dens_scale = pc.nerfDensity * step` once
 - Optimized alpha calculation with polynomial approximation
-  - `alpha = sigma - 0.5*sigma²` instead of `1 - exp(-sigma)`
-  - Avoids expensive transcendental function call (~20+ cycles)
-  - Accurate to within ±3% for typical densities
+ - `alpha = sigma - 0.5*sigma²` instead of `1 - exp(-sigma)`
+ - Avoids expensive transcendental function call (~20+ cycles)
+ - Accurate to within ±3% for typical densities
 - Early termination threshold increased from `0.01` to `0.005`
 
 ### Layer 5: Occupancy Sampling (occ_sample)
@@ -143,11 +143,11 @@ Starting baseline: **48.4 FPS** (initial implementation)
 
 ## Code Quality Notes
 
-- ✅ All changes backward compatible (no API changes)
-- ✅ No hard-coded magic numbers (all in comments or constants)
-- ✅ Branch divergence minimized (single-path happy path)
-- ✅ Memory access patterns conservative (no shared memory conflicts)
-- ✅ Precision maintained where needed (only approximations in non-critical paths)
+- All changes backward compatible (no API changes)
+- No hard-coded magic numbers (all in comments or constants)
+- Branch divergence minimized (single-path happy path)
+- Memory access patterns conservative (no shared memory conflicts)
+- Precision maintained where needed (only approximations in non-critical paths)
 
 ## Recommendation
 

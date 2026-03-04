@@ -15,8 +15,8 @@ Successfully implemented quad-aware OBJ loading for the YSU GPU raytracer. The s
 #### New Function: gpu_load_obj_triangles_and_quads()
 ```c
 int gpu_load_obj_triangles_and_quads(const char* path, 
-                                      GPUTriangle** out_tris, size_t* out_tri_count,
-                                      GPUSquare** out_quads, size_t* out_quad_count)
+ GPUTriangle** out_tris, size_t* out_tri_count,
+ GPUSquare** out_quads, size_t* out_quad_count)
 ```
 
 **Features:**
@@ -30,23 +30,23 @@ int gpu_load_obj_triangles_and_quads(const char* path,
 **Face Detection Logic:**
 ```c
 if(fn == 3) {
-    // Store as single triangle
-    push_tri(&tris, &tcount, &tcap, verts[i0], verts[i1], verts[i2]);
+ // Store as single triangle
+ push_tri(&tris, &tcount, &tcap, verts[i0], verts[i1], verts[i2]);
 } else if(fn == 4) {
-    // Store as single quad (NEW)
-    push_quad(&quads, &qcount, &qcap, verts[i0], verts[i1], verts[i2], verts[i3]);
+ // Store as single quad (NEW)
+ push_quad(&quads, &qcount, &qcap, verts[i0], verts[i1], verts[i2], verts[i3]);
 } else {
-    // Fan triangulation for n>4
-    for(int i=1; i+1<fn; i++) {
-        push_tri(...);
-    }
+ // Fan triangulation for n>4
+ for(int i=1; i+1<fn; i++) {
+ push_tri(...);
+ }
 }
 ```
 
 #### New Helper: push_quad()
 ```c
 static void push_quad(GPUSquare** quads, size_t* qcount, size_t* qcap,
-                      V3 a, V3 b, V3 c, V3 d)
+ V3 a, V3 b, V3 c, V3 d)
 ```
 - Allocates and appends quad to array
 - Mirrors `push_tri()` pattern for consistency
@@ -69,42 +69,42 @@ Verifies three scenarios:
 
 **Test 1: Mixed Geometry**
 - Input: 1 quad + 1 triangle
-- Output: ✓ 1 triangle, 1 quad (topology preserved)
+- Output: 1 triangle, 1 quad (topology preserved)
 
 **Test 2: All Quads**
 - Input: 6 quads (cube faces)
-- Output: ✓ 0 triangles, 6 quads (exact preservation)
+- Output: 0 triangles, 6 quads (exact preservation)
 
 **Test 3: Backward Compatibility**
 - Input: 6 quads
-- Output: ✓ 12 triangles (each quad → 2 triangles)
+- Output: 12 triangles (each quad → 2 triangles)
 
-**Result: ALL TESTS PASSED ✓**
+**Result: ALL TESTS PASSED **
 
 ## Integration Points
 
 The quad-aware loader is now ready to integrate with:
 
 1. **GPU Raytracer (render.c)**
-   - Add quad array iteration in compute shader dispatch
-   - Add quad intersection testing in BVH traversal
-   - Maintain acceleration structure for both tri/quad geometry
+ - Add quad array iteration in compute shader dispatch
+ - Add quad intersection testing in BVH traversal
+ - Maintain acceleration structure for both tri/quad geometry
 
 2. **Scene Loading (ysu_main.c / gpu_vulkan_demo.c)**
-   - Update OBJ loading calls to use new quad-aware function
-   - Handle both triangle and quad arrays in scene setup
+ - Update OBJ loading calls to use new quad-aware function
+ - Handle both triangle and quad arrays in scene setup
 
 3. **BVH Construction**
-   - Extend BVH builder to include quads in acceleration structure
-   - Compute AABB for quad geometry
+ - Extend BVH builder to include quads in acceleration structure
+ - Compute AABB for quad geometry
 
 ## Architecture Benefits
 
-✅ **Topology Preservation**: Blender quads stay as quads (not triangulated)
-✅ **Backward Compatible**: Old code using gpu_load_obj_triangles() still works
-✅ **Clean API**: Separate triangle and quad arrays with clear semantics
-✅ **Efficient Storage**: Quads use less memory than 2 triangles (1 quad = 4 vertices vs 2 triangles = 6 vertices)
-✅ **Robust**: Handles 3-vertex, 4-vertex, and N-vertex faces correctly
+ **Topology Preservation**: Blender quads stay as quads (not triangulated)
+ **Backward Compatible**: Old code using gpu_load_obj_triangles() still works
+ **Clean API**: Separate triangle and quad arrays with clear semantics
+ **Efficient Storage**: Quads use less memory than 2 triangles (1 quad = 4 vertices vs 2 triangles = 6 vertices)
+ **Robust**: Handles 3-vertex, 4-vertex, and N-vertex faces correctly
 
 ## Memory Layout
 
@@ -114,32 +114,32 @@ The quad-aware loader is now ready to integrate with:
 Quads are 33% more efficient than dual-triangle representation (1 quad vs 2 triangles).
 
 ## Build Status
-✅ **Compilation**: Successful (no errors or warnings)
-✅ **Functionality**: All three test cases pass
-✅ **Integration Ready**: Can be plugged into existing pipeline
+ **Compilation**: Successful (no errors or warnings)
+ **Functionality**: All three test cases pass
+ **Integration Ready**: Can be plugged into existing pipeline
 
 ## Next Steps
 
 1. Update `render.c` to handle quad arrays:
-   ```c
-   // In compute shader or host code:
-   - Iterate over both triangle and quad arrays
-   - Test quad intersections with rays
-   - Maintain quadrant information for shading
-   ```
+ ```c
+ // In compute shader or host code:
+ - Iterate over both triangle and quad arrays
+ - Test quad intersections with rays
+ - Maintain quadrant information for shading
+ ```
 
 2. Update `ysu_main.c`/`gpu_vulkan_demo.c`:
-   ```c
-   // Replace old loading:
-   gpu_load_obj_triangles(path, &tris, &tri_count);
-   // With new loading:
-   gpu_load_obj_triangles_and_quads(path, &tris, &tri_count, &quads, &quad_count);
-   ```
+ ```c
+ // Replace old loading:
+ gpu_load_obj_triangles(path, &tris, &tri_count);
+ // With new loading:
+ gpu_load_obj_triangles_and_quads(path, &tris, &tri_count, &quads, &quad_count);
+ ```
 
 3. Test with Blender OBJ exports:
-   - Export a model with quad faces from Blender
-   - Verify loader preserves quad topology
-   - Test rendering with mixed geometry
+ - Export a model with quad faces from Blender
+ - Verify loader preserves quad topology
+ - Test rendering with mixed geometry
 
 ## Files Modified
 - **gpu_obj_loader.h**: Added GPUSquare struct and new function signature

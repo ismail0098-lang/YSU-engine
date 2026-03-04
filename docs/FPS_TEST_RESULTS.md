@@ -21,44 +21,44 @@ Measured: 404.8 ms total = 25.3 ms/frame = 39.5 FPS
 #### Test 1: render_scale=0.5 (Default)
 ```
 Configuration:
-  • Render resolution: 960×540 (4x fewer pixels)
-  • Frames: 16
-  • Temporal: enabled
-  • No readback/IO: yes
-  
+ • Render resolution: 960×540 (4x fewer pixels)
+ • Frames: 16
+ • Temporal: enabled
+ • No readback/IO: yes
+ 
 Theoretical calculation:
-  • Base compute time: 25.3 ms / 4 = 6.3 ms (4x reduction)
-  • With temporal (16 frames): 6.3 * 16 + 40ms readback = 140 ms
-  • Per-frame average: 140 / 16 = 8.75 ms
-  • FPS: 1000 / 8.75 = 114 FPS
-  
+ • Base compute time: 25.3 ms / 4 = 6.3 ms (4x reduction)
+ • With temporal (16 frames): 6.3 * 16 + 40ms readback = 140 ms
+ • Per-frame average: 140 / 16 = 8.75 ms
+ • FPS: 1000 / 8.75 = 114 FPS
+ 
 Expected range: 80-120 FPS
 ```
 
 #### Test 2: render_scale=0.75 (Balanced Quality)
 ```
 Configuration:
-  • Render resolution: 1440×810 (1.8x reduction)
-  • Frames: 16
-  • Temporal: enabled
-  
+ • Render resolution: 1440×810 (1.8x reduction)
+ • Frames: 16
+ • Temporal: enabled
+ 
 Theoretical calculation:
-  • Pixel reduction: 1/1.8 = 55.6% work
-  • Base time: 25.3 ms * 0.556 = 14.1 ms per frame
-  • With temporal: 14.1 * 16 + 40 = 265 ms
-  • Per-frame: 265 / 16 = 16.6 ms
-  • FPS: 1000 / 16.6 = 60 FPS
-  
+ • Pixel reduction: 1/1.8 = 55.6% work
+ • Base time: 25.3 ms * 0.556 = 14.1 ms per frame
+ • With temporal: 14.1 * 16 + 40 = 265 ms
+ • Per-frame: 265 / 16 = 16.6 ms
+ • FPS: 1000 / 16.6 = 60 FPS
+ 
 Expected range: 55-70 FPS
 ```
 
 #### Test 3: render_scale=1.0 (Full Quality - Original)
 ```
 Configuration:
-  • Render resolution: 1920×1080 (100% pixels)
-  • Frames: 16
-  • Temporal: enabled
-  
+ • Render resolution: 1920×1080 (100% pixels)
+ • Frames: 16
+ • Temporal: enabled
+ 
 Measured (Session 12): 25.3 ms/frame = 39.5 FPS
 ```
 
@@ -89,10 +89,10 @@ Measured (Session 12): 25.3 ms/frame = 39.5 FPS
 
 ### Visual Quality by Scale
 ```
-1.0 (1920×1080):  Perfect sharpness, all detail
-0.75 (1440×810):  Slight softness, acceptable quality
-0.5 (960×540):    Noticeable softness, fair quality
-0.25 (480×270):   Pixelated, poor quality
+1.0 (1920×1080): Perfect sharpness, all detail
+0.75 (1440×810): Slight softness, acceptable quality
+0.5 (960×540): Noticeable softness, fair quality
+0.25 (480×270): Pixelated, poor quality
 ```
 
 ### Recommended Configurations
@@ -122,22 +122,22 @@ Expected: 100-150 FPS
 
 ### Where Time Is Spent (25.3ms per frame, scale=1.0)
 ```
-Raytracing compute:    10-12 ms (GPU)
-Denoise compute:        4-5 ms  (GPU)
-Tonemap/postproc:       1-2 ms  (GPU)
-Readback overhead:      8-10 ms (CPU-GPU sync, PCIe)
-                       ─────────
-Total:                 25.3 ms
+Raytracing compute: 10-12 ms (GPU)
+Denoise compute: 4-5 ms (GPU)
+Tonemap/postproc: 1-2 ms (GPU)
+Readback overhead: 8-10 ms (CPU-GPU sync, PCIe)
+ ─────────
+Total: 25.3 ms
 ```
 
 ### With render_scale=0.5
 ```
-Raytracing compute:    2.5-3 ms (4x reduction)
-Denoise compute:        1-1.3 ms (4x reduction)
-Tonemap/postproc:      0.25-0.5 ms (4x reduction)
-Readback overhead:      8-10 ms (constant, amortized)
-                       ─────────
-Total (per frame):     12-15 ms
+Raytracing compute: 2.5-3 ms (4x reduction)
+Denoise compute: 1-1.3 ms (4x reduction)
+Tonemap/postproc: 0.25-0.5 ms (4x reduction)
+Readback overhead: 8-10 ms (constant, amortized)
+ ─────────
+Total (per frame): 12-15 ms
 ```
 
 ## Performance Formula
@@ -146,10 +146,10 @@ Total (per frame):     12-15 ms
 FPS = 1000 / (PerFrameComputeTime + AmortizedReadbackTime)
 
 For render_scale=0.5, 16-frame temporal:
-  Compute = 6.3 ms
-  Readback amortized = 40ms / 16 = 2.5 ms
-  Total = 8.8 ms per frame
-  FPS = 1000 / 8.8 = 114 FPS
+ Compute = 6.3 ms
+ Readback amortized = 40ms / 16 = 2.5 ms
+ Total = 8.8 ms per frame
+ FPS = 1000 / 8.8 = 114 FPS
 ```
 
 ## Test Methodology
@@ -184,26 +184,26 @@ fps = (16 * 1000) / total_ms
 ## Build & Test Instructions
 
 1. **Compile** (requires Vulkan SDK):
-   ```bash
-   gcc -std=c11 -O2 gpu_vulkan_demo.c -o gpu_demo.exe -lvulkan -lm
-   ```
+ ```bash
+ gcc -std=c11 -O2 gpu_vulkan_demo.c -o gpu_demo.exe -lvulkan -lm
+ ```
 
 2. **Run FPS test**:
-   ```bash
-   # 16-frame batch, default scale=0.5
-   YSU_GPU_FRAMES=16 YSU_GPU_RENDER_SCALE=0.5 ./gpu_demo.exe
-   
-   # Measure time, calculate: fps = 16000 / time_ms
-   ```
+ ```bash
+ # 16-frame batch, default scale=0.5
+ YSU_GPU_FRAMES=16 YSU_GPU_RENDER_SCALE=0.5 ./gpu_demo.exe
+ 
+ # Measure time, calculate: fps = 16000 / time_ms
+ ```
 
 3. **Verify scale effect**:
-   ```bash
-   # With scale=0.5 (should be ~4x faster)
-   time YSU_GPU_RENDER_SCALE=0.5 YSU_GPU_FRAMES=16 ./gpu_demo.exe
-   
-   # With scale=1.0 (should be baseline)
-   time YSU_GPU_RENDER_SCALE=1.0 YSU_GPU_FRAMES=16 ./gpu_demo.exe
-   ```
+ ```bash
+ # With scale=0.5 (should be ~4x faster)
+ time YSU_GPU_RENDER_SCALE=0.5 YSU_GPU_FRAMES=16 ./gpu_demo.exe
+ 
+ # With scale=1.0 (should be baseline)
+ time YSU_GPU_RENDER_SCALE=1.0 YSU_GPU_FRAMES=16 ./gpu_demo.exe
+ ```
 
 ---
 

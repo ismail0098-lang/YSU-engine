@@ -1,6 +1,6 @@
-# 📑 NeRF SIMD Implementation - Complete Index
+# NeRF SIMD Implementation - Complete Index
 
-## Start Here 👇
+## Start Here 
 
 ### For First-Time Users
 1. **[DELIVERY_SUMMARY.md](DELIVERY_SUMMARY.md)** — Overview of what you got (5 min read)
@@ -13,23 +13,23 @@
 
 ### Production Code
 ```
-📄 nerf_simd.h               Public API declarations
-📄 nerf_simd.c               Full implementation (1100 lines)
-                             ├─ Data loading
-                             ├─ Hashgrid lookup (batched)
-                             ├─ MLP inference (batched)
-                             ├─ Volume integration
-                             ├─ Occupancy sampling
-                             └─ Profiling utilities
+ nerf_simd.h Public API declarations
+ nerf_simd.c Full implementation (1100 lines)
+ ├─ Data loading
+ ├─ Hashgrid lookup (batched)
+ ├─ MLP inference (batched)
+ ├─ Volume integration
+ ├─ Occupancy sampling
+ └─ Profiling utilities
 ```
 
 ### Integration Guide
 ```
-📄 nerf_simd_integration.c   Copy-paste code for render.c
-                             ├─ Initialization
-                             ├─ Ray batching loop
-                             ├─ Framebuffer management
-                             └─ Environment variables
+ nerf_simd_integration.c Copy-paste code for render.c
+ ├─ Initialization
+ ├─ Ray batching loop
+ ├─ Framebuffer management
+ └─ Environment variables
 ```
 
 ---
@@ -52,19 +52,19 @@
 
 ### Test Suite
 ```
-📄 nerf_simd_test.c          Comprehensive validation
-                             ├─ TEST 1: Data loading
-                             ├─ TEST 2: Hashgrid lookup (45 µs)
-                             ├─ TEST 3: MLP inference (123 µs)
-                             ├─ TEST 4: Occupancy lookup (2 µs)
-                             ├─ BENCH: Component breakdown
-                             └─ TEST 5: Full rendering + PPM
+ nerf_simd_test.c Comprehensive validation
+ ├─ TEST 1: Data loading
+ ├─ TEST 2: Hashgrid lookup (45 µs)
+ ├─ TEST 3: MLP inference (123 µs)
+ ├─ TEST 4: Occupancy lookup (2 µs)
+ ├─ BENCH: Component breakdown
+ └─ TEST 5: Full rendering + PPM
 ```
 
 ### Build Automation
 ```
-📄 build_nerf_simd.bat       Windows build script
-                             └─ Compiles test, runs validation
+ build_nerf_simd.bat Windows build script
+ └─ Compiles test, runs validation
 ```
 
 ---
@@ -73,20 +73,20 @@
 
 ```
 High Level:
-  Hashgrid (12 levels)
-    ↓
-  MLP Network (27→64→64→4)
-    ↓
-  Volume Integration
-    ↓
-  Output (RGB + Alpha)
+ Hashgrid (12 levels)
+ ↓
+ MLP Network (27→64→64→4)
+ ↓
+ Volume Integration
+ ↓
+ Output (RGB + Alpha)
 
 Batching Strategy:
-  Queue 8 rays → Process together → 8x SIMD parallelism
+ Queue 8 rays → Process together → 8x SIMD parallelism
 
 Sampling:
-  Occupancy-guided step size → 4x speedup in empty space
-  Early ray termination → 20-30% faster overall
+ Occupancy-guided step size → 4x speedup in empty space
+ Early ray termination → 20-30% faster overall
 ```
 
 ---
@@ -96,7 +96,7 @@ Sampling:
 ### Path A: Just Test (5 minutes)
 ```bash
 1. gcc -O3 -march=native -std=c11 \
-      nerf_simd.c vec3.c nerf_simd_test.c -o nerf_test -lm
+ nerf_simd.c vec3.c nerf_simd_test.c -o nerf_test -lm
 2. ./nerf_test
 3. Check nerf_simd_test_output.ppm
 ```
@@ -125,32 +125,32 @@ Sampling:
 ```
 YSUengine/
 ├─ Core NeRF Implementation
-│  ├─ nerf_simd.h               ← Header (public API)
-│  ├─ nerf_simd.c               ← Implementation (1100 lines)
-│  ├─ nerf_simd_integration.c   ← Integration examples
-│  └─ nerf_simd_test.c          ← Test suite
+│ ├─ nerf_simd.h ← Header (public API)
+│ ├─ nerf_simd.c ← Implementation (1100 lines)
+│ ├─ nerf_simd_integration.c ← Integration examples
+│ └─ nerf_simd_test.c ← Test suite
 │
 ├─ Build & Automation
-│  ├─ build_nerf_simd.bat       ← Windows build script
-│  └─ BUILD_NERF_SIMD.md        ← Build guide
+│ ├─ build_nerf_simd.bat ← Windows build script
+│ └─ BUILD_NERF_SIMD.md ← Build guide
 │
 ├─ Documentation
-│  ├─ NERF_SIMD_QUICKREF.md        ← One-page reference
-│  ├─ NERF_SIMD_COMPLETE.md        ← Full documentation
-│  ├─ DELIVERY_SUMMARY.md          ← What you got
-│  ├─ HYBRID_CPU_GPU_NERF_ARCHITECTURE.md
-│  ├─ NERF_CPU_SIMD_REALTIME.md
-│  ├─ NERF_CPU_GPU_RESEARCH.md
-│  └─ INDEX.md                  ← This file
+│ ├─ NERF_SIMD_QUICKREF.md ← One-page reference
+│ ├─ NERF_SIMD_COMPLETE.md ← Full documentation
+│ ├─ DELIVERY_SUMMARY.md ← What you got
+│ ├─ HYBRID_CPU_GPU_NERF_ARCHITECTURE.md
+│ ├─ NERF_CPU_SIMD_REALTIME.md
+│ ├─ NERF_CPU_GPU_RESEARCH.md
+│ └─ INDEX.md ← This file
 │
 ├─ Research & Design
-│  └─ [Various .md design docs]
+│ └─ [Various .md design docs]
 │
 └─ Existing Project
-   ├─ render.c         ← Integrate here
-   ├─ ysu_main.c       ← Initialize here
-   ├─ vec3.c/.h        ← Already have
-   └─ camera.c/.h      ← Already have
+ ├─ render.c ← Integrate here
+ ├─ ysu_main.c ← Initialize here
+ ├─ vec3.c/.h ← Already have
+ └─ camera.c/.h ← Already have
 ```
 
 ---
@@ -183,7 +183,7 @@ YSUengine/
 ## Common Questions
 
 **Q: Do I have to use this exact code?**
-A: No! Use it as reference, adapt as needed. But it's production-ready, so 🎯 target.
+A: No! Use it as reference, adapt as needed. But it's production-ready, so target.
 
 **Q: Can I modify the code?**
 A: Yes! It's yours. Suggested changes are documented in NERF_SIMD_COMPLETE.md.
@@ -270,19 +270,19 @@ A: Each framebuffer is separate, so multiple threads can render independently.
 2. Read and modify nerf_simd.c
 3. Implement optimizations
 4. Benchmark improvements
-5. Submit PRs! 🚀
+5. Submit PRs! 
 
 ---
 
 ## Summary
 
 You have:
-- ✅ **1100 lines** of production C code
-- ✅ **500 lines** of test code
-- ✅ **1500+ lines** of documentation
-- ✅ **5 test suites** with benchmarks
-- ✅ **4 integration guides** with examples
-- ✅ **Complete API** ready to use
+- **1100 lines** of production C code
+- **500 lines** of test code
+- **1500+ lines** of documentation
+- **5 test suites** with benchmarks
+- **4 integration guides** with examples
+- **Complete API** ready to use
 
 **Total value**: ~3000 lines of documented, tested code ready to ship.
 
@@ -295,4 +295,4 @@ Then choose your path:
 - **Full integration**: Follow BUILD_NERF_SIMD.md (1 hour)
 - **Deep understanding**: Read NERF_SIMD_COMPLETE.md (30 min)
 
-Good luck! 🚀
+Good luck! 

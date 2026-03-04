@@ -86,7 +86,7 @@ SIMD-friendly batching
 
 Future portability to GPU compute backends
 
-⚠️ Wavefront mode is currently experimental and not enabled by default.
+ Wavefront mode is currently experimental and not enabled by default.
 
 Deterministic RNG Design
 
@@ -148,8 +148,8 @@ YSUengine/
 ├── renderer (MT + adaptive sampling)
 ├── assembly optimizations
 ├── experimental/
-│   ├── SIMD packets
-│   └── wavefront renderer
+│ ├── SIMD packets
+│ └── wavefront renderer
 └── utilities (image, denoise, IO)
 
 Research Directions (Planned)

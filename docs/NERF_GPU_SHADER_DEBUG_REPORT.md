@@ -1,8 +1,8 @@
 # NeRF GPU Shader Debugging Report
 
-**Date:** January 21, 2026  
-**Duration:** 4 days  
-**Status:** ✅ RESOLVED  
+**Date:** January 21, 2026 
+**Duration:** 4 days 
+**Status:** RESOLVED 
 
 ---
 
@@ -20,9 +20,9 @@ The GPU Vulkan shader for rendering NeRF (Neural Radiance Fields) models was pro
 
 ### Sample Progression of Visual Bugs:
 - First attempt: Neon blue/cyan noise with vertical streaks
-- After density tuning: Melted/foggy blob with scattered particles  
+- After density tuning: Melted/foggy blob with scattered particles 
 - After hash fix: Correct shape but BLUE instead of YELLOW
-- Final fix: Correct yellow Lego bulldozer ✅
+- Final fix: Correct yellow Lego bulldozer 
 
 ---
 
@@ -46,9 +46,9 @@ python -c "... full NeRF model loading and rendering ..."
 ```
 
 **Result:** Python rendered a perfect yellow Lego bulldozer! This proved:
-- ✅ Training pipeline is correct
-- ✅ Binary export format is correct  
-- ❌ GPU shader has bugs
+- Training pipeline is correct
+- Binary export format is correct 
+- GPU shader has bugs
 
 ### Step 3: Compare Python vs Shader Logic
 We systematically compared every calculation:
@@ -104,12 +104,12 @@ float v000 = nerf_half(header_bytes + (base_l + get_hash(...) * features + f) * 
 
 **Wrong Code:**
 ```glsl
-vec3 grid = pn * (res - 1.0);  // WRONG
+vec3 grid = pn * (res - 1.0); // WRONG
 ```
 
 **Correct Code:**
 ```glsl
-vec3 grid = pn * res;  // Matches Python exactly
+vec3 grid = pn * res; // Matches Python exactly
 ```
 
 **Impact:** This caused spatial misalignment - the shader was sampling slightly different positions than what was trained.
@@ -124,12 +124,12 @@ vec3 grid = pn * res;  // Matches Python exactly
 
 **Wrong Code:**
 ```glsl
-return vec4(rgb, sigma);  // rgb = vec3(outv[0], outv[1], outv[2])
+return vec4(rgb, sigma); // rgb = vec3(outv[0], outv[1], outv[2])
 ```
 
 **Correct Code:**
 ```glsl
-return vec4(rgb.bgr, sigma);  // Swap R and B channels
+return vec4(rgb.bgr, sigma); // Swap R and B channels
 ```
 
 **Impact:** Yellow (high R, medium G, low B) appeared as blue (high B, medium G, low R).
@@ -150,16 +150,16 @@ return vec4(rgb.bgr, sigma);  // Swap R and B channels
 After applying all fixes:
 
 1. **Rebuild shaders:**
-   ```powershell
-   .\build_shaders.ps1
-   ```
+ ```powershell
+ .\build_shaders.ps1
+ ```
 
 2. **Run viewer:**
-   ```powershell
-   .\run_lego_gpu.bat
-   ```
+ ```powershell
+ .\run_lego_gpu.bat
+ ```
 
-3. **Result:** Yellow Lego bulldozer renders correctly in real-time! ✅
+3. **Result:** Yellow Lego bulldozer renders correctly in real-time! 
 
 ---
 
@@ -197,31 +197,31 @@ set YSU_NERF_SKIP_OCC=1
 ### Correct Hash Grid Embedding (GLSL)
 ```glsl
 for(uint l = 0u; l < levels; l++){
-    float res = float(int(float(base_res) * pow(per_level_scale, float(l))));
-    vec3 grid = pn * res;
-    vec3 pos_f = floor(grid);
-    ivec3 gi = ivec3(pos_f);
-    vec3 w = grid - pos_f;
+ float res = float(int(float(base_res) * pow(per_level_scale, float(l))));
+ vec3 grid = pn * res;
+ vec3 pos_f = floor(grid);
+ ivec3 gi = ivec3(pos_f);
+ vec3 w = grid - pos_f;
 
-    for(uint f = 0u; f < features; f++){
-        uint base_l = l * hashmap_size * features;
-        float v000 = nerf_half(header_bytes + (base_l + get_hash(gi.x, gi.y, gi.z, hashmap_size) * features + f) * 2u);
-        // ... 7 more corners for trilinear interpolation
-    }
+ for(uint f = 0u; f < features; f++){
+ uint base_l = l * hashmap_size * features;
+ float v000 = nerf_half(header_bytes + (base_l + get_hash(gi.x, gi.y, gi.z, hashmap_size) * features + f) * 2u);
+ // ... 7 more corners for trilinear interpolation
+ }
 }
 ```
 
 ### Python Equivalent (Reference)
 ```python
 for l in range(self.levels):
-    res = int(self.base_res * (self.per_level_scale ** l))
-    pos = x * res
-    pos_floor = torch.floor(pos).long()
-    # ... trilinear interpolation
-    table = self.tables[l]  # tables[level][hash_index][feature]
+ res = int(self.base_res * (self.per_level_scale ** l))
+ pos = x * res
+ pos_floor = torch.floor(pos).long()
+ # ... trilinear interpolation
+ table = self.tables[l] # tables[level][hash_index][feature]
 ```
 
 ---
 
-**Report generated after successful debugging session.**  
-**The Lego bulldozer is now yellow as intended. 🚜🟡**
+**Report generated after successful debugging session.** 
+**The Lego bulldozer is now yellow as intended. **

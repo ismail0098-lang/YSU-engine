@@ -61,8 +61,8 @@ time (YSU_GPU_W=1920 YSU_GPU_H=1080 YSU_GPU_FRAMES=16 ./gpu_demo.exe)
 pixels_rendered = width * height * render_scale²
 
 Example (render_scale=0.5):
-  Original: 1920 × 1080 = 2,073,600 pixels
-  Scaled:   960 × 540 = 518,400 pixels (75% reduction = 4x fewer)
+ Original: 1920 × 1080 = 2,073,600 pixels
+ Scaled: 960 × 540 = 518,400 pixels (75% reduction = 4x fewer)
 ```
 
 ### FPS Speedup Formula
@@ -70,7 +70,7 @@ Example (render_scale=0.5):
 speedup = 1 / render_scale²
 
 Example (render_scale=0.5):
-  speedup = 1 / 0.5² = 1 / 0.25 = 4x
+ speedup = 1 / 0.5² = 1 / 0.25 = 4x
 ```
 
 ### Amortized Per-Frame Time
@@ -83,16 +83,16 @@ FPS = 1000 / per-frame
 ## Performance Validation
 
 ### Quick Sanity Check
-- ✅ scale=0.5 should be ~4x faster than scale=1.0
-- ✅ scale=0.75 should be ~1.8x faster than scale=1.0
-- ✅ scale=0.25 should be ~16x faster than scale=1.0
+- scale=0.5 should be ~4x faster than scale=1.0
+- scale=0.75 should be ~1.8x faster than scale=1.0
+- scale=0.25 should be ~16x faster than scale=1.0
 
 ### Example Validation
 ```
 If scale=1.0 gives 40 FPS:
-  scale=0.75 should give ~71 FPS (1.8x)
-  scale=0.5 should give ~160 FPS (4x)
-  scale=0.25 should give ~640 FPS (16x)
+ scale=0.75 should give ~71 FPS (1.8x)
+ scale=0.5 should give ~160 FPS (4x)
+ scale=0.25 should give ~640 FPS (16x)
 ```
 
 ## Build & Compile
@@ -102,7 +102,7 @@ If scale=1.0 gives 40 FPS:
 gcc -std=c11 -O2 gpu_vulkan_demo.c -o gpu_demo.exe -lvulkan -lm
 
 # Verify compilation
-./gpu_demo.exe --help  # or just run a test
+./gpu_demo.exe --help # or just run a test
 ```
 
 ## Troubleshooting

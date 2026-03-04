@@ -14,16 +14,16 @@
 | Baseline (no denoise) | 44.80 | - |
 | Denoise skip=1 | 44.69 | -0.2% |
 | Denoise skip=2 | 45.54 | +1.7% |
-| **Denoise skip=4** | **45.99** | **+2.7%** ⭐ |
+| **Denoise skip=4** | **45.99** | **+2.7%** |
 | Denoise skip=8 | 45.77 | +2.2% |
 
 ## Key Findings
 
-✅ **Denoise skip is working**
+ **Denoise skip is working**
 - Configuration changes recognized
 - skip=4 shows optimal performance (+2.7%)
 
-✅ **Low cost on simple scenes**
+ **Low cost on simple scenes**
 - Denoise overhead is minimal (~0.2-2.7% variation)
 - Simple cube scene doesn't stress denoiser
 
@@ -87,10 +87,10 @@ Get-Content fps_results_*.csv | Format-Table
 
 ## Status
 
-✅ **Baseline FPS Testing**: Complete  
-✅ **Denoise Skip Patterns**: Validated  
-⏳ **Advanced Features**: Coded, awaiting compile  
-⏳ **Complex Scene Tests**: Pending  
+ **Baseline FPS Testing**: Complete 
+ **Denoise Skip Patterns**: Validated 
+⏳ **Advanced Features**: Coded, awaiting compile 
+⏳ **Complex Scene Tests**: Pending 
 
 ---
 

@@ -1,4 +1,4 @@
-# Stable Persistent Interactive Window ✅
+# Stable Persistent Interactive Window 
 
 ## What Changed
 
@@ -30,13 +30,13 @@ if(window_enabled) frames = 1;
 **Window Render Loop** (lines 2070+)
 ```c
 while(window && !glfwWindowShouldClose(window)){
-    // Each iteration:
-    // - Input handling (WASD, mouse)
-    // - Update camera UBO
-    // - Render 1 frame
-    // - Present to screen
-    // - Increment frame_id
-    // - Loop continues until ESC or window close
+ // Each iteration:
+ // - Input handling (WASD, mouse)
+ // - Update camera UBO
+ // - Render 1 frame
+ // - Present to screen
+ // - Increment frame_id
+ // - Loop continues until ESC or window close
 }
 ```
 
@@ -44,11 +44,11 @@ while(window && !glfwWindowShouldClose(window)){
 ```c
 // Render 1 sample per frame in interactive window mode for responsive input
 {
-    PushConstants pc_push = {0};
-    pc_push.frame = frame_id;  // Advances each iteration
-    // ... dispatch raytrace
+ PushConstants pc_push = {0};
+ pc_push.frame = frame_id; // Advances each iteration
+ // ... dispatch raytrace
 }
-frame_id += frames;  // frames=1 in window mode, so frame_id++
+frame_id += frames; // frames=1 in window mode, so frame_id++
 ```
 
 ---
@@ -77,8 +77,8 @@ $env:YSU_GPU_H=1080
 ### With Camera Speed Control
 ```powershell
 $env:YSU_GPU_WINDOW=1
-$env:YSU_CAM_SPEED=5.0      # Faster movement (default 3.0)
-$env:YSU_CAM_MOUSE_SENS=0.002  # Faster mouse (default 0.0025)
+$env:YSU_CAM_SPEED=5.0 # Faster movement (default 3.0)
+$env:YSU_CAM_MOUSE_SENS=0.002 # Faster mouse (default 0.0025)
 .\gpu_demo.exe
 ```
 

@@ -1,28 +1,28 @@
 # QUICK REFERENCE - Skip=8 Animated Scene Validation
 
-## 🎬 What Was Done
+## What Was Done
 
 Created **orbiting camera scene** with smooth animation to validate aggressive denoise skip=8 configuration under realistic movement conditions.
 
-**Camera Path**: Circular orbit around cube  
-**Speed**: 200 frames per complete rotation  
-**Tests**: 240 frames (4 orbits) + 360 frames (6 orbits)  
+**Camera Path**: Circular orbit around cube 
+**Speed**: 200 frames per complete rotation 
+**Tests**: 240 frames (4 orbits) + 360 frames (6 orbits) 
 
 ---
 
-## 📊 Results: EXCELLENT ✅
+## Results: EXCELLENT 
 
 ### FPS Performance
 ```
-Baseline (animated):    178.4 FPS
-Skip=8 (4 orbits):      183.34 FPS  (+2.8%)
-Skip=8 (6 orbits):      184.95 FPS  (-0.9% variance)
-Adaptive (warmup):      129.91 FPS
+Baseline (animated): 178.4 FPS
+Skip=8 (4 orbits): 183.34 FPS (+2.8%)
+Skip=8 (6 orbits): 184.95 FPS (-0.9% variance)
+Adaptive (warmup): 129.91 FPS
 ```
 
 ### Temporal Coherence
 ```
-Consistency over 6 full orbits: -0.9% (EXCELLENT ✅)
+Consistency over 6 full orbits: -0.9% (EXCELLENT )
 - 240 frame run: 183.34 FPS
 - 360 frame run: 184.95 FPS
 - Variation: Within 1% = STABLE and COHERENT
@@ -30,17 +30,17 @@ Consistency over 6 full orbits: -0.9% (EXCELLENT ✅)
 
 ---
 
-## ✅ Validation Checklist
+## Validation Checklist
 
-✅ Skip=8 maintains smooth motion without artifacts  
-✅ Denoise history coherent across frame boundaries  
-✅ FPS stable over extended sequences (6 orbits)  
-✅ No ghosting or temporal flickering  
-✅ Performance improvement consistent  
+ Skip=8 maintains smooth motion without artifacts 
+ Denoise history coherent across frame boundaries 
+ FPS stable over extended sequences (6 orbits) 
+ No ghosting or temporal flickering 
+ Performance improvement consistent 
 
 ---
 
-## 🚀 Skip=8 is Production-Ready
+## Skip=8 is Production-Ready
 
 **Verdict**: APPROVED FOR DEPLOYMENT
 
@@ -48,7 +48,7 @@ The aggressive skip=8 denoise configuration has been thoroughly tested under rea
 
 ---
 
-## 🎛️ How to Use
+## How to Use
 
 ### Run Animated Scene
 ```powershell
@@ -73,18 +73,18 @@ $env:YSU_GPU_DENOISE_SKIP=8
 
 ---
 
-## 📈 Performance Summary
+## Performance Summary
 
 | Configuration | Static | Animated |
 |--------------|--------|----------|
 | Baseline | 117.0 FPS | 178.4 FPS |
 | Skip=4 | 122.9 FPS | ~175 FPS (proj.) |
-| Skip=8 | 124.8 FPS | **183.34 FPS** ⭐ |
+| Skip=8 | 124.8 FPS | **183.34 FPS** |
 | Adaptive | 104.4 FPS | 129.91 FPS |
 
 ---
 
-## 💡 Key Findings
+## Key Findings
 
 1. **Skip=8 is stable** during extended animation
 2. **Temporal coherence is excellent** (-0.9% variance)
@@ -94,7 +94,7 @@ $env:YSU_GPU_DENOISE_SKIP=8
 
 ---
 
-## 📁 Files
+## Files
 
 **Scripts**:
 - `build_and_test_animation.bat` - Build + tests
@@ -110,7 +110,7 @@ $env:YSU_GPU_DENOISE_SKIP=8
 
 ---
 
-## ✨ Recommended Configuration
+## Recommended Configuration
 
 ```powershell
 # For best performance with excellent quality
@@ -124,6 +124,6 @@ $env:YSU_GPU_RENDER_SCALE=0.5
 
 ---
 
-**Status**: ✅ **SKIP=8 VALIDATED AND APPROVED**
+**Status**: **SKIP=8 VALIDATED AND APPROVED**
 
 Safe for production deployment on animated/moving scenes!

@@ -13,9 +13,9 @@ Added render-scale reduction to GPU raytracer. Resolution is scaled by a factor 
 ```c
 // Render scale: 0.5 = render at half resolution, 0.25 = quarter res
 // Applied directly to W/H (output resolution matches render resolution)
-float render_scale = 0.5f;  // Default 0.5 = 2x speedup
+float render_scale = 0.5f; // Default 0.5 = 2x speedup
 if(env_render_scale) render_scale = ysu_env_float("YSU_GPU_RENDER_SCALE", 0.5f);
-if(render_scale < 0.1f) render_scale = 0.1f;  // clamp to reasonable values
+if(render_scale < 0.1f) render_scale = 0.1f; // clamp to reasonable values
 if(render_scale > 1.0f) render_scale = 1.0f;
 ```
 
@@ -28,9 +28,9 @@ if(render_scale > 1.0f) render_scale = 1.0f;
 ```c
 // Apply render scale BEFORE shader setup
 if(render_scale < 1.0f){
-    W = (int)(W * render_scale);
-    H = (int)(H * render_scale);
-    fprintf(stderr, "[GPU] render scale %.2f -> %dx%d\n", render_scale, W, H);
+ W = (int)(W * render_scale);
+ H = (int)(H * render_scale);
+ fprintf(stderr, "[GPU] render scale %.2f -> %dx%d\n", render_scale, W, H);
 }
 ```
 
@@ -45,14 +45,14 @@ if(render_scale < 1.0f){
 ```
 Pixels to render = W × H × render_scale²
 
-render_scale=0.5:  W×H × 0.25 = 4x fewer pixels
-render_scale=0.66: W×H × 0.44 = 2.3x fewer pixels  
+render_scale=0.5: W×H × 0.25 = 4x fewer pixels
+render_scale=0.66: W×H × 0.44 = 2.3x fewer pixels 
 render_scale=0.75: W×H × 0.56 = 1.8x fewer pixels
 ```
 
 **Theoretical Speedup** (from 39.5 FPS baseline):
 ```
-render_scale=0.5  → 4x reduction → 160 FPS (practical: 80-120 FPS)
+render_scale=0.5 → 4x reduction → 160 FPS (practical: 80-120 FPS)
 render_scale=0.66 → 2.3x reduction → 90 FPS
 render_scale=0.75 → 1.8x reduction → 70 FPS
 ```
@@ -95,7 +95,7 @@ YSU_GPU_RENDER_SCALE=1.0 ./gpu_demo.exe
 
 ## Backward Compatibility
 
-✅ **Fully compatible**:
+ **Fully compatible**:
 - Default `render_scale=0.5` (new behavior, 2x faster)
 - Can disable with `YSU_GPU_RENDER_SCALE=1.0` (original)
 - All existing env vars work unchanged

@@ -1,25 +1,25 @@
 # Animated Camera Scene - Skip=8 Validation Report
-**Date**: January 19, 2026  
-**Scene Type**: Orbiting camera around cube with smooth motion  
-**Resolution**: 1920×1080  
-**Key Focus**: Validating skip=8 quality/performance under camera movement  
+**Date**: January 19, 2026 
+**Scene Type**: Orbiting camera around cube with smooth motion 
+**Resolution**: 1920×1080 
+**Key Focus**: Validating skip=8 quality/performance under camera movement 
 
 ---
 
-##  Executive Summary
+## Executive Summary
 
 **Skip=8 validation: PASSED** 
 
 Camera movement testing confirms that aggressive denoise skipping (skip=8) maintains excellent temporal coherence and visual quality during animated scenes:
 
-- **Temporal Coherence**: 183.34 FPS (240f) vs 184.95 FPS (360f) = **-0.9% difference** ✅
+- **Temporal Coherence**: 183.34 FPS (240f) vs 184.95 FPS (360f) = **-0.9% difference** 
 - **Movement Cost**: Negligible (-87.4% indicates calculation artifact due to frame count difference)
 - **Skip=8 Under Animation**: **183.34 FPS** (+2.8% vs baseline)
 - **Conclusion**: Skip=8 is production-ready for dynamic scenes
 
 ---
 
-##  Test Results
+## Test Results
 
 ### FPS Performance with Animated Camera
 
@@ -33,7 +33,7 @@ Camera movement testing confirms that aggressive denoise skipping (skip=8) maint
 
 ---
 
-##  Detailed Analysis
+## Detailed Analysis
 
 ### 1. Camera Movement Cost Analysis
 
@@ -50,9 +50,9 @@ This is a **measurement artifact**, not real performance improvement:
 - Animated test uses 240 frames (steady state)
 - After warmup, system reaches higher FPS
 - **True comparison**: Normalize both to same frame count
-  - Static (extrapolated 240f): ~95 FPS
-  - Animated (240f): ~178 FPS
-  - **Actual difference**: ~+87% (animation increases compute, not speed)
+ - Static (extrapolated 240f): ~95 FPS
+ - Animated (240f): ~178 FPS
+ - **Actual difference**: ~+87% (animation increases compute, not speed)
 
 **Real cost of animation:**
 - Ray tracing: Same (rays still shot, hit tested)
@@ -75,10 +75,10 @@ This is a **measurement artifact**, not real performance improvement:
 - Difference: **-0.9%** (excellent stability)
 
 **Interpretation**:
-- ✅ FPS consistent across all orbits
-- ✅ Denoise history maintains coherence
-- ✅ No temporal artifacts visible
-- ✅ Gradient descent in motion is smooth
+- FPS consistent across all orbits
+- Denoise history maintains coherence
+- No temporal artifacts visible
+- Gradient descent in motion is smooth
 
 **Validation**: Skip=8 is **SAFE** for production use with moving cameras
 
@@ -120,33 +120,33 @@ This is a **measurement artifact**, not real performance improvement:
 
 ---
 
-##  Key Insights
+## Key Insights
 
 ### 1. Skip=8 is Production-Ready
-✅ Maintains temporal coherence across multiple orbits  
-✅ Stable FPS (183.34 vs 184.95 = -0.9% variance)  
-✅ Smooth motion without ghosting/artifacts  
-✅ Recommended for deployment  
+ Maintains temporal coherence across multiple orbits 
+ Stable FPS (183.34 vs 184.95 = -0.9% variance) 
+ Smooth motion without ghosting/artifacts 
+ Recommended for deployment 
 
 ### 2. Adaptive Denoise is Valuable
-✅ Provides quality when it matters (startup)  
-✅ Provides speed when quality is sufficient (steady state)  
-✅ 129.91 FPS average (vs 183.34 fps pure skip=8)  
-✅ Better for interactive applications  
+ Provides quality when it matters (startup) 
+ Provides speed when quality is sufficient (steady state) 
+ 129.91 FPS average (vs 183.34 fps pure skip=8) 
+ Better for interactive applications 
 
 ### 3. Camera Movement is Zero-Cost
-✅ Calculated in shader (no CPU overhead)  
-✅ No extra memory buffers needed  
-✅ No pipeline changes required  
-✅ Can add to any test scene easily  
+ Calculated in shader (no CPU overhead) 
+ No extra memory buffers needed 
+ No pipeline changes required 
+ Can add to any test scene easily 
 
 ### 4. Denoise History Works Correctly
-✅ No ghosting during camera motion  
-✅ Coherence maintained across frame boundaries  
-✅ History reset feature (when enabled) prevents accumulation errors  
+ No ghosting during camera motion 
+ Coherence maintained across frame boundaries 
+ History reset feature (when enabled) prevents accumulation errors 
 
 ---
-##  Performance Summary
+## Performance Summary
 
 ### Configuration Recommendations for Animated Scenes
 
@@ -175,19 +175,19 @@ $env:YSU_GPU_DENOISE_ADAPTIVE_MAX = 8
 
 ---
 
-## 🎬 Validation Checklist
+## Validation Checklist
 
-✅ **Shader modified** for animated camera (orbital path)  
-✅ **Recompiled successfully** with Vulkan SDK  
-✅ **FPS measured** across 240 and 360 frame sequences  
-✅ **Temporal coherence validated** (-0.9% variance is excellent)  
-✅ **No visual artifacts** observed during motion  
-✅ **Performance stable** across multiple orbits  
-✅ **Skip=8 confirmed safe** for production  
+ **Shader modified** for animated camera (orbital path) 
+ **Recompiled successfully** with Vulkan SDK 
+ **FPS measured** across 240 and 360 frame sequences 
+ **Temporal coherence validated** (-0.9% variance is excellent) 
+ **No visual artifacts** observed during motion 
+ **Performance stable** across multiple orbits 
+ **Skip=8 confirmed safe** for production 
 
 ---
 
-##  Generated Assets
+## Generated Assets
 
 **Test Scripts**:
 - `build_and_test_animation.bat` - Build + animation tests
@@ -203,16 +203,16 @@ $env:YSU_GPU_DENOISE_ADAPTIVE_MAX = 8
 
 ---
 
-##  Conclusion
+## Conclusion
 
 **Mission Complete**: Skip=8 denoise configuration has been validated for animated scenes with moving cameras.
 
 **Key Results**:
-- ✅ **Excellent temporal coherence** (-0.9% FPS variance)
-- ✅ **Production-ready performance** (183.34 FPS sustained)
-- ✅ **Zero visual artifacts** during camera motion
-- ✅ **Adaptive alternative available** (129.91 FPS for quality priority)
+- **Excellent temporal coherence** (-0.9% FPS variance)
+- **Production-ready performance** (183.34 FPS sustained)
+- **Zero visual artifacts** during camera motion
+- **Adaptive alternative available** (129.91 FPS for quality priority)
 
 **Recommendation**: Deploy skip=8 configuration for real-time rendering. Adaptive denoise provides quality-first alternative for interactive tools.
 
-**Status**: ✅ **SKIP=8 VALIDATED FOR ANIMATED SCENES**
+**Status**: **SKIP=8 VALIDATED FOR ANIMATED SCENES**

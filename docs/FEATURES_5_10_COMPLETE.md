@@ -1,4 +1,4 @@
-# 5/10 ENGINE FEATURES IMPLEMENTED ✅
+# 5/10 ENGINE FEATURES IMPLEMENTED 
 
 ## Summary
 
@@ -8,31 +8,31 @@ Successfully implemented and tested **5 major features** for the YSU engine. All
 
 ## Completed Features
 
-### ✅ 1. Stochastic Sampling
+### 1. Stochastic Sampling
 - **What**: Random per-pixel ray jitter
 - **Where**: shaders/tri.comp (main function)
 - **Benefit**: Creates variance for denoising to work
 - **Test**: YSU_GPU_FRAMES=8 shows accumulation
 
-### ✅ 2. Temporal Filtering  
+### 2. Temporal Filtering 
 - **What**: Multi-frame accumulation (EMA or running average)
 - **Where**: shaders/tri.comp (end of main)
 - **Benefit**: Smooth convergence across frames
 - **Control**: pc.alpha parameter
 
-### ✅ 3. Advanced Tone Mapping
+### 3. Advanced Tone Mapping
 - **What**: ACES tone mapping operator + sRGB conversion
 - **Where**: shaders/tonemap.comp
 - **Benefit**: Industry-standard color reproduction
 - **Result**: Better final image quality
 
-### ✅ 4. Adaptive Sampling
+### 4. Adaptive Sampling
 - **What**: Jitter radius scaled by local variance
 - **Where**: shaders/tri.comp (main function)
 - **Benefit**: Focuses sampling where needed most
 - **Algorithm**: 3x3 neighborhood variance calculation
 
-### ✅ 5. Material Variants
+### 5. Material Variants
 - **What**: PBR-inspired shading (Lambert diffuse + Fresnel specular)
 - **Where**: shaders/tri.comp (color calculation)
 - **Benefit**: Realistic shading instead of flat grayscale
@@ -55,10 +55,10 @@ Successfully implemented and tested **5 major features** for the YSU engine. All
 ## Build Status
 
 ```
-Compilation: ✓ All shaders compile without errors
-Execution:   ✓ All features active and tested
-Performance: ✓ No overhead increase
-Compatibility: ✓ Works with existing denoiser
+Compilation: All shaders compile without errors
+Execution: All features active and tested
+Performance: No overhead increase
+Compatibility: Works with existing denoiser
 ```
 
 ### Test Command
@@ -108,11 +108,11 @@ shaders\gpu_demo.exe
 
 ## Quality Improvements Visible Now
 
-- ✅ Noise from stochastic sampling
-- ✅ Smooth temporal accumulation
-- ✅ Better tone mapping (ACES standard)
-- ✅ Adaptive sampling on high-variance edges
-- ✅ Material-based shading with lighting
+- Noise from stochastic sampling
+- Smooth temporal accumulation
+- Better tone mapping (ACES standard)
+- Adaptive sampling on high-variance edges
+- Material-based shading with lighting
 
 ---
 

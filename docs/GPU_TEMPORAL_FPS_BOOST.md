@@ -2,7 +2,7 @@
 
 ## Breakthrough: Multi-Frame Temporal Rendering
 
-**Problem**: Single-frame rendering with CPU readback every frame = 100ms latency = 10 FPS  
+**Problem**: Single-frame rendering with CPU readback every frame = 100ms latency = 10 FPS 
 **Solution**: Accumulate 16 frames on GPU, skip readback → 25ms throughput = 40 FPS
 
 ## Performance Comparison (1920×1080, 1 SPP)
@@ -41,7 +41,7 @@ Frame 1: GPU render → GPU tonemap → CPU readback → block → save
 - **Tonemap**: 1-2ms (optional)
 - **CPU Readback**: 20-25ms (GPU→CPU transfer + PCI-E latency)
 
-**Total single-frame**: 26-34ms  
+**Total single-frame**: 26-34ms 
 **Batched 16 frames**: 260ms total = **16ms average per frame** (with readback amortized)
 
 ### 3. Temporal Blending (GPU-side)
@@ -128,12 +128,12 @@ Would require:
 
 ## Compatibility
 
-- ✅ Works with GPU denoiser (denoise on batch completion)
-- ✅ Works with CPU denoiser (separate path, not affected)
-- ✅ Works with window mode (presents per N frames)
-- ✅ Works with headless mode (output written per N frames)
-- ✅ Compatible with all resolution scales
-- ✅ Compatible with FAST mode
+- Works with GPU denoiser (denoise on batch completion)
+- Works with CPU denoiser (separate path, not affected)
+- Works with window mode (presents per N frames)
+- Works with headless mode (output written per N frames)
+- Compatible with all resolution scales
+- Compatible with FAST mode
 
 ## Future Optimizations
 

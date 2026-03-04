@@ -1,6 +1,6 @@
 # Option 1: Denoise Skip Implementation
 
-**Status**: ✅ COMPLETE (Code ready, awaiting Vulkan SDK build)
+**Status**: COMPLETE (Code ready, awaiting Vulkan SDK build)
 
 ## What is Denoise Skip?
 
@@ -8,7 +8,7 @@ Denoise skipping is a temporal optimization that **skips the bilateral denoiser 
 
 ### How it works:
 - Frame 0: Ray trace → Denoise → Tonemap
-- Frame 1: Ray trace → (SKIP denoise) → Tonemap  
+- Frame 1: Ray trace → (SKIP denoise) → Tonemap 
 - Frame 2: Ray trace → (SKIP denoise) → Tonemap
 - Frame 3: Ray trace → Denoise → Tonemap
 - ...repeats based on skip parameter
@@ -21,14 +21,14 @@ The human eye integrates the noisy intermediate frames with the denoised frame, 
 
 **1. Parameter Parsing (Line 1650)**:
 ```c
-int denoise_skip = ysu_env_int("YSU_GPU_DENOISE_SKIP", 1);  
+int denoise_skip = ysu_env_int("YSU_GPU_DENOISE_SKIP", 1); 
 // 1=every frame (default), 2=every 2nd, 4=every 4th, etc.
 ```
 
 **2. Logging (Line 1663)**:
 ```c
 fprintf(stderr, "[GPU] GPU denoiser: ENABLED (radius=%d sigma_s=%.2f sigma_r=%.4f skip=%d)\n", 
-        denoise_radius, denoise_sigma_s, denoise_sigma_r, denoise_skip);
+ denoise_radius, denoise_sigma_s, denoise_sigma_r, denoise_skip);
 ```
 
 **3. Denoiser Dispatch Conditional (Lines 1968-1970)**:
@@ -36,7 +36,7 @@ fprintf(stderr, "[GPU] GPU denoiser: ENABLED (radius=%d sigma_s=%.2f sigma_r=%.4
 // Skip denoising on certain frames for performance boost
 int should_denoise = (denoise_skip <= 1) || ((frame_id % denoise_skip) == 0);
 if(gpu_denoise_enabled && pipe_denoise != VK_NULL_HANDLE && should_denoise){
-    // ... denoiser dispatch code ...
+ // ... denoiser dispatch code ...
 }
 ```
 
@@ -94,17 +94,17 @@ YSU_GPU_DENOISE=1 YSU_GPU_DENOISE_SKIP=8 ./gpu_demo.exe
 **How to minimize quality loss:**
 
 1. **Use with Temporal Accumulation** (YSU_GPU_TEMPORAL=1):
-   - 16-frame batching automatically blends noisy frames
-   - Temporal coherence masks temporal aliasing
-   - **Recommended pairing**: Denoise Skip=4 + Temporal=1
+ - 16-frame batching automatically blends noisy frames
+ - Temporal coherence masks temporal aliasing
+ - **Recommended pairing**: Denoise Skip=4 + Temporal=1
 
 2. **Increase Base Samples** (YSU_GPU_SPP):
-   - Higher SPP = less noise even on skipped frames
-   - SPP=4 can tolerate higher skip values
-   
+ - Higher SPP = less noise even on skipped frames
+ - SPP=4 can tolerate higher skip values
+ 
 3. **Use Motion Estimation** (future Option 5):
-   - Skip denoiser less in high-motion areas
-   - Keep high-quality denoising in static regions
+ - Skip denoiser less in high-motion areas
+ - Keep high-quality denoising in static regions
 
 ## Comparison with Other Optimizations
 
@@ -120,12 +120,12 @@ YSU_GPU_DENOISE=1 YSU_GPU_DENOISE_SKIP=8 ./gpu_demo.exe
 
 1. **Build with Vulkan SDK** to compile changes
 2. **Test with different skip values**:
-   ```bash
-   # Test suite
-   YSU_GPU_FRAMES=16 YSU_GPU_DENOISE_SKIP=2 ./gpu_demo.exe
-   YSU_GPU_FRAMES=16 YSU_GPU_DENOISE_SKIP=4 ./gpu_demo.exe
-   YSU_GPU_FRAMES=16 YSU_GPU_DENOISE_SKIP=8 ./gpu_demo.exe
-   ```
+ ```bash
+ # Test suite
+ YSU_GPU_FRAMES=16 YSU_GPU_DENOISE_SKIP=2 ./gpu_demo.exe
+ YSU_GPU_FRAMES=16 YSU_GPU_DENOISE_SKIP=4 ./gpu_demo.exe
+ YSU_GPU_FRAMES=16 YSU_GPU_DENOISE_SKIP=8 ./gpu_demo.exe
+ ```
 3. **Measure actual FPS** with built executable
 4. **Visually inspect** for temporal artifacts
 5. **Document results** in FPS_TEST_RESULTS.md

@@ -4,7 +4,7 @@
 
 When running `gpu_demo.exe` with NeRF integration, the output showed:
 - **Mode 17 (MLP output)**: Blue/cyan streaky patterns radiating from center
-- **Mode 2 (hybrid)**: Similar corrupted blue streaks over mesh  
+- **Mode 2 (hybrid)**: Similar corrupted blue streaks over mesh 
 - **Mode 19 (buffer validation)**: Solid gray (actually correct, just dark)
 
 ## Root Cause
@@ -14,8 +14,8 @@ When running `gpu_demo.exe` with NeRF integration, the output showed:
 ```glsl
 // BEFORE (BROKEN):
 float nerf_half(uint byteOffset){
-    uint h = nerf_u16(byteOffset);
-    return unpackHalf2x16(h).x;  // ❌ WRONG!
+ uint h = nerf_u16(byteOffset);
+ return unpackHalf2x16(h).x; // WRONG!
 }
 ```
 
@@ -39,11 +39,11 @@ obtained by unpacking a 32-bit unsigned integer into a pair of
 ```glsl
 // AFTER (FIXED):
 float nerf_half(uint byteOffset){
-    uint h = nerf_u16(byteOffset);
-    // unpackHalf2x16 expects uint32 with TWO float16 values
-    // Pack our single float16 in low 16 bits, zeros in high 16 bits
-    uint packed = h & 0xFFFFu;
-    return unpackHalf2x16(packed).x;
+ uint h = nerf_u16(byteOffset);
+ // unpackHalf2x16 expects uint32 with TWO float16 values
+ // Pack our single float16 in low 16 bits, zeros in high 16 bits
+ uint packed = h & 0xFFFFu;
+ return unpackHalf2x16(packed).x;
 }
 ```
 
@@ -121,12 +121,12 @@ Mode 17 now shows error colors:
 
 IEEE 754 float16 format:
 - 1 sign bit
-- 5 exponent bits  
+- 5 exponent bits 
 - 10 mantissa bits
 
 When packed in uint32 for `unpackHalf2x16`:
 ```
-Bits 0-15:  First float16 (what we want)
+Bits 0-15: First float16 (what we want)
 Bits 16-31: Second float16 (we set to 0)
 ```
 
@@ -136,8 +136,8 @@ Our fix ensures the single float16 value is in bits 0-15, with bits 16-31 = 0.
 
 ## Quick Reference
 
-**Before fix:** Blue streaky artifacts  
-**After fix:** Proper NeRF rendering  
-**Test:** Run `test_nerf_fix.bat` or set `YSU_RENDER_MODE=17`  
-**Files:** `shaders/tri.comp` (recompile required)  
+**Before fix:** Blue streaky artifacts 
+**After fix:** Proper NeRF rendering 
+**Test:** Run `test_nerf_fix.bat` or set `YSU_RENDER_MODE=17` 
+**Files:** `shaders/tri.comp` (recompile required) 
 **Rebuild:** `cd shaders && glslc tri.comp -o tri.comp.spv`

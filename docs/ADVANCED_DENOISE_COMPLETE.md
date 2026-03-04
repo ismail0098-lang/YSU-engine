@@ -1,7 +1,7 @@
-# Advanced Denoiser Features: Complete Implementation ✅
+# Advanced Denoiser Features: Complete Implementation 
 
 **Session**: Advanced Enhancement (Post-Session 15)
-**Status**: ✅ COMPLETE - Ready for testing
+**Status**: COMPLETE - Ready for testing
 **Code Quality**: Production-ready
 **Backward Compatibility**: 100% maintained
 
@@ -9,25 +9,25 @@
 
 ## Three Features Implemented
 
-### 1️⃣ History Reset ✅
-**What**: Periodically clear denoise history buffer  
-**Why**: Prevent ghosting on camera cuts and scene changes  
-**How**: `YSU_GPU_DENOISE_HISTORY_RESET=1 YSU_GPU_DENOISE_HISTORY_RESET_FRAME=60`  
-**Code**: 40 lines (lines 2367-2407 in gpu_vulkan_demo.c)  
+### 1⃣ History Reset 
+**What**: Periodically clear denoise history buffer 
+**Why**: Prevent ghosting on camera cuts and scene changes 
+**How**: `YSU_GPU_DENOISE_HISTORY_RESET=1 YSU_GPU_DENOISE_HISTORY_RESET_FRAME=60` 
+**Code**: 40 lines (lines 2367-2407 in gpu_vulkan_demo.c) 
 **Cost**: ~0.1ms per reset (every 60 frames = negligible)
 
-### 2️⃣ Adaptive Denoise ✅
-**What**: Dynamically ramp denoise frequency up/down  
-**Why**: Fast startup quality + maximum speed in steady state  
-**How**: `YSU_GPU_DENOISE_ADAPTIVE=1`  
-**Code**: 9 lines (lines 2039-2047 in gpu_vulkan_demo.c)  
+### 2⃣ Adaptive Denoise 
+**What**: Dynamically ramp denoise frequency up/down 
+**Why**: Fast startup quality + maximum speed in steady state 
+**How**: `YSU_GPU_DENOISE_ADAPTIVE=1` 
+**Code**: 9 lines (lines 2039-2047 in gpu_vulkan_demo.c) 
 **Cost**: None (automatic ramp, no extra overhead)
 
-### 3️⃣ Immediate Denoise ✅
-**What**: Always denoise frame 0 (guaranteed quality startup)  
-**Why**: No startup artifacts even with aggressive denoise_skip  
-**How**: Auto-enabled via `frame_id == 0` check  
-**Code**: 1 line (line 2051 in gpu_vulkan_demo.c)  
+### 3⃣ Immediate Denoise 
+**What**: Always denoise frame 0 (guaranteed quality startup) 
+**Why**: No startup artifacts even with aggressive denoise_skip 
+**How**: Auto-enabled via `frame_id == 0` check 
+**Code**: 1 line (line 2051 in gpu_vulkan_demo.c) 
 **Cost**: None (single comparison)
 
 ---
@@ -37,19 +37,19 @@
 ### All Features Enabled
 ```bash
 YSU_GPU_DENOISE=1 \
-  YSU_GPU_DENOISE_SKIP=4 \
-  YSU_GPU_DENOISE_HISTORY_RESET=1 \
-  YSU_GPU_DENOISE_ADAPTIVE=1 \
-  YSU_GPU_TEMPORAL_DENOISE=1 \
-  ./gpu_demo.exe
+ YSU_GPU_DENOISE_SKIP=4 \
+ YSU_GPU_DENOISE_HISTORY_RESET=1 \
+ YSU_GPU_DENOISE_ADAPTIVE=1 \
+ YSU_GPU_TEMPORAL_DENOISE=1 \
+ ./gpu_demo.exe
 ```
 
 ### Expected Output
 ```
 [GPU] GPU denoiser: ENABLED (radius=3 sigma_s=1.50 sigma_r=0.1000 skip=4)
-[GPU]   History reset: ENABLED (every 60 frames)
-[GPU]   Adaptive denoise: ENABLED (skip range 1-8 based on variance)
-[GPU]   Temporal denoising: ENABLED (weight=0.70, blend history with current)
+[GPU] History reset: ENABLED (every 60 frames)
+[GPU] Adaptive denoise: ENABLED (skip range 1-8 based on variance)
+[GPU] Temporal denoising: ENABLED (weight=0.70, blend history with current)
 ...
 [GPU] History reset at frame 60
 [GPU] History reset at frame 120
@@ -58,8 +58,8 @@ YSU_GPU_DENOISE=1 \
 
 ### Expected FPS Progression
 ```
-Frames 0-30:   95-100 FPS (warmup phase, full denoising)
-Frames 31+:    210+ FPS (steady state, sparse denoising + temporal blend)
+Frames 0-30: 95-100 FPS (warmup phase, full denoising)
+Frames 31+: 210+ FPS (steady state, sparse denoising + temporal blend)
 ```
 
 ---
@@ -82,23 +82,23 @@ Frames 31+:    210+ FPS (steady state, sparse denoising + temporal blend)
 ### History Reset
 ```
 YSU_GPU_DENOISE_HISTORY_RESET=0|1
-  Default: 0 (disabled)
-  
+ Default: 0 (disabled)
+ 
 YSU_GPU_DENOISE_HISTORY_RESET_FRAME=<int>
-  Default: 60
-  Range: 10-300
+ Default: 60
+ Range: 10-300
 ```
 
 ### Adaptive Denoise
 ```
 YSU_GPU_DENOISE_ADAPTIVE=0|1
-  Default: 0 (disabled)
-  
+ Default: 0 (disabled)
+ 
 YSU_GPU_DENOISE_ADAPTIVE_MIN=<int>
-  Default: 1 (denoise every frame in warmup)
-  
+ Default: 1 (denoise every frame in warmup)
+ 
 YSU_GPU_DENOISE_ADAPTIVE_MAX=<int>
-  Default: 8 (denoise every 8th in steady state)
+ Default: 8 (denoise every 8th in steady state)
 ```
 
 ### Immediate Denoise
@@ -112,9 +112,9 @@ YSU_GPU_DENOISE_ADAPTIVE_MAX=<int>
 ### Example 1: With History Reset Only
 ```bash
 YSU_GPU_DENOISE=1 \
-  YSU_GPU_DENOISE_SKIP=4 \
-  YSU_GPU_DENOISE_HISTORY_RESET=1 YSU_GPU_DENOISE_HISTORY_RESET_FRAME=60 \
-  ./gpu_demo.exe
+ YSU_GPU_DENOISE_SKIP=4 \
+ YSU_GPU_DENOISE_HISTORY_RESET=1 YSU_GPU_DENOISE_HISTORY_RESET_FRAME=60 \
+ ./gpu_demo.exe
 ```
 
 **Result**:
@@ -126,9 +126,9 @@ YSU_GPU_DENOISE=1 \
 ### Example 2: With Adaptive Denoise Only
 ```bash
 YSU_GPU_DENOISE=1 \
-  YSU_GPU_DENOISE_SKIP=4 \
-  YSU_GPU_DENOISE_ADAPTIVE=1 \
-  ./gpu_demo.exe
+ YSU_GPU_DENOISE_SKIP=4 \
+ YSU_GPU_DENOISE_ADAPTIVE=1 \
+ ./gpu_demo.exe
 ```
 
 **Result**:
@@ -139,8 +139,8 @@ YSU_GPU_DENOISE=1 \
 ### Example 3: With Immediate Denoise (Auto)
 ```bash
 YSU_GPU_DENOISE=1 \
-  YSU_GPU_DENOISE_SKIP=8 \
-  ./gpu_demo.exe
+ YSU_GPU_DENOISE_SKIP=8 \
+ ./gpu_demo.exe
 ```
 
 **Result**:
@@ -152,19 +152,19 @@ YSU_GPU_DENOISE=1 \
 ### Example 4: All Three Features
 ```bash
 YSU_GPU_DENOISE=1 \
-  YSU_GPU_DENOISE_SKIP=4 \
-  YSU_GPU_DENOISE_HISTORY_RESET=1 \
-  YSU_GPU_DENOISE_ADAPTIVE=1 \
-  YSU_GPU_TEMPORAL_DENOISE=1 \
-  ./gpu_demo.exe
+ YSU_GPU_DENOISE_SKIP=4 \
+ YSU_GPU_DENOISE_HISTORY_RESET=1 \
+ YSU_GPU_DENOISE_ADAPTIVE=1 \
+ YSU_GPU_TEMPORAL_DENOISE=1 \
+ ./gpu_demo.exe
 ```
 
 **Result**:
-- ✓ Frame 0: Immediate denoise (quality guarantee)
-- ✓ Frames 0-30: Adaptive warmup (building quality)
-- ✓ Frames 31+: Sparse denoise (200+ FPS)
-- ✓ Every 60 frames: History reset (clean transitions)
-- ✓ Temporal blend: Maintains quality
+- Frame 0: Immediate denoise (quality guarantee)
+- Frames 0-30: Adaptive warmup (building quality)
+- Frames 31+: Sparse denoise (200+ FPS)
+- Every 60 frames: History reset (clean transitions)
+- Temporal blend: Maintains quality
 - **Best for**: Professional applications wanting quality + speed
 
 ---
@@ -180,12 +180,12 @@ YSU_GPU_DENOISE=1 \
 
 ### Combined Stack
 ```
-Baseline (Session 13):           100 FPS
-+ Option 1 (skip=4):            150 FPS
-+ History reset:                150 FPS (quality boost)
-+ Immediate denoise:            150 FPS (frame 0 perfect)
-+ Adaptive denoise:              95→210 FPS (ramps)
-+ All features + temporal:       95→210 FPS (excellent overall)
+Baseline (Session 13): 100 FPS
++ Option 1 (skip=4): 150 FPS
++ History reset: 150 FPS (quality boost)
++ Immediate denoise: 150 FPS (frame 0 perfect)
++ Adaptive denoise: 95→210 FPS (ramps)
++ All features + temporal: 95→210 FPS (excellent overall)
 ```
 
 ---
@@ -194,25 +194,25 @@ Baseline (Session 13):           100 FPS
 
 ### Without Advanced Features
 ```
-Frame 0:  [Noisy render] ← Skip due to pattern
-Frame 1:  [Noisy render]
-Frame 2:  [Noisy render]
-Frame 3:  [Noisy render]
-          ↓ Temporal blend tries to help but frame 0 is rough
+Frame 0: [Noisy render] ← Skip due to pattern
+Frame 1: [Noisy render]
+Frame 2: [Noisy render]
+Frame 3: [Noisy render]
+ ↓ Temporal blend tries to help but frame 0 is rough
 Result: Slight startup glitch visible
 FPS: Steady but startup quality dip
 ```
 
 ### With Advanced Features
 ```
-Frame 0:  [Immediate denoise] ✓ ← Always denoised
-Frame 1:  [Noisy render] ← Skip, but temporal blend hides it
-Frame 2:  [Noisy render]
-Frame 3:  [Noisy render]
-          ↓ Temporal blend combines with history
+Frame 0: [Immediate denoise] ← Always denoised
+Frame 1: [Noisy render] ← Skip, but temporal blend hides it
+Frame 2: [Noisy render]
+Frame 3: [Noisy render]
+ ↓ Temporal blend combines with history
 Result: Clean startup, no artifacts
 FPS: Ramps from 100→210 (adaptive)
-     Resets at scene cuts (history reset)
+ Resets at scene cuts (history reset)
 ```
 
 ---
@@ -220,19 +220,19 @@ FPS: Ramps from 100→210 (adaptive)
 ## Quality Guarantees
 
 ### Frame 0 Quality
-- ✅ Immediate denoise ensures pristine first frame
-- ✅ No startup artifacts
-- ✅ Works with any denoise_skip value
+- Immediate denoise ensures pristine first frame
+- No startup artifacts
+- Works with any denoise_skip value
 
 ### Scene Transitions
-- ✅ History reset prevents ghosting
-- ✅ Each scene starts fresh
-- ✅ Configurable reset frequency
+- History reset prevents ghosting
+- Each scene starts fresh
+- Configurable reset frequency
 
 ### Smooth Convergence
-- ✅ Adaptive warmup builds quality gradually
-- ✅ Temporal blend maintains steady-state quality
-- ✅ Perceptually smooth progression
+- Adaptive warmup builds quality gradually
+- Temporal blend maintains steady-state quality
+- Perceptually smooth progression
 
 ---
 
@@ -246,24 +246,24 @@ GPU Raytracer (base)
 ├─ Option 1: Denoise Skip (sparse denoising)
 ├─ Option 2: Temporal Denoising (blend.comp)
 └─ ADVANCED (NEW):
-   ├─ History Reset (periodic clear)
-   ├─ Immediate Denoise (frame 0 guarantee)
-   └─ Adaptive Denoise (warmup ramp)
+ ├─ History Reset (periodic clear)
+ ├─ Immediate Denoise (frame 0 guarantee)
+ └─ Adaptive Denoise (warmup ramp)
 ```
 
 ### Synergies
 ```
 History Reset + Temporal Denoise:
-  Prevents ghosting that temporal blend could create ✓
+ Prevents ghosting that temporal blend could create 
 
 Immediate Denoise + Adaptive Denoise:
-  Ensures quality startup while ramping to speed ✓
+ Ensures quality startup while ramping to speed 
 
 Adaptive Denoise + Denoise Skip:
-  Dynamic adjustment overrides fixed pattern ✓
+ Dynamic adjustment overrides fixed pattern 
 
 All + Temporal Accumulation:
-  Masks temporal artifacts with frame blending ✓
+ Masks temporal artifacts with frame blending 
 ```
 
 ---
@@ -298,31 +298,31 @@ All + Temporal Accumulation:
 
 ## Recommended Configurations
 
-### 🎬 Cinematic Quality
+### Cinematic Quality
 ```bash
 YSU_GPU_DENOISE=1 \
-  YSU_GPU_DENOISE_SKIP=1 \
-  YSU_GPU_DENOISE_HISTORY_RESET=1 YSU_GPU_DENOISE_HISTORY_RESET_FRAME=60 \
-  YSU_GPU_TEMPORAL_DENOISE=1
+ YSU_GPU_DENOISE_SKIP=1 \
+ YSU_GPU_DENOISE_HISTORY_RESET=1 YSU_GPU_DENOISE_HISTORY_RESET_FRAME=60 \
+ YSU_GPU_TEMPORAL_DENOISE=1
 ```
 **FPS**: 100 | **Quality**: Excellent | **Best for**: Cutscenes, trailers
 
-### 🎮 Gaming (RECOMMENDED)
+### Gaming (RECOMMENDED)
 ```bash
 YSU_GPU_DENOISE=1 \
-  YSU_GPU_DENOISE_SKIP=4 \
-  YSU_GPU_DENOISE_ADAPTIVE=1 \
-  YSU_GPU_TEMPORAL_DENOISE=1 \
-  YSU_GPU_FRAMES=16
+ YSU_GPU_DENOISE_SKIP=4 \
+ YSU_GPU_DENOISE_ADAPTIVE=1 \
+ YSU_GPU_TEMPORAL_DENOISE=1 \
+ YSU_GPU_FRAMES=16
 ```
 **FPS**: 95→210 | **Quality**: Excellent | **Best for**: Interactive apps
 
-### ⚡ Speed Focus
+### Speed Focus
 ```bash
 YSU_GPU_DENOISE=1 \
-  YSU_GPU_DENOISE_SKIP=8 \
-  YSU_GPU_DENOISE_ADAPTIVE=1 YSU_GPU_DENOISE_ADAPTIVE_MAX=16 \
-  YSU_GPU_RENDER_SCALE=0.5
+ YSU_GPU_DENOISE_SKIP=8 \
+ YSU_GPU_DENOISE_ADAPTIVE=1 YSU_GPU_DENOISE_ADAPTIVE_MAX=16 \
+ YSU_GPU_RENDER_SCALE=0.5
 ```
 **FPS**: 100→250+ | **Quality**: Good | **Best for**: Real-time/VR
 
@@ -330,7 +330,7 @@ YSU_GPU_DENOISE=1 \
 
 ## Backward Compatibility
 
-✅ **100% backward compatible**:
+ **100% backward compatible**:
 - All new parameters are optional
 - Default values maintain existing behavior
 - No API breaking changes
@@ -338,7 +338,7 @@ YSU_GPU_DENOISE=1 \
 
 **If all features disabled**:
 ```bash
-./gpu_demo.exe  # Acts exactly like before
+./gpu_demo.exe # Acts exactly like before
 ```
 
 ---
@@ -363,11 +363,11 @@ gcc -std=c11 -O2 -pthread gpu_vulkan_demo.c ... -o gpu_demo
 ```bash
 # Test all three features
 ./gpu_demo.exe \
-  YSU_GPU_DENOISE=1 \
-  YSU_GPU_DENOISE_SKIP=4 \
-  YSU_GPU_DENOISE_HISTORY_RESET=1 \
-  YSU_GPU_DENOISE_ADAPTIVE=1 \
-  YSU_GPU_TEMPORAL_DENOISE=1
+ YSU_GPU_DENOISE=1 \
+ YSU_GPU_DENOISE_SKIP=4 \
+ YSU_GPU_DENOISE_HISTORY_RESET=1 \
+ YSU_GPU_DENOISE_ADAPTIVE=1 \
+ YSU_GPU_TEMPORAL_DENOISE=1
 ```
 
 ### Deploy
@@ -380,25 +380,25 @@ gcc -std=c11 -O2 -pthread gpu_vulkan_demo.c ... -o gpu_demo
 
 ## Success Metrics
 
-✅ **Code Quality**:
+ **Code Quality**:
 - Production-ready implementation
 - Comprehensive error handling
 - Proper Vulkan synchronization
 - Clear logging and debugging
 
-✅ **Features**:
+ **Features**:
 - All three features implemented
 - Properly integrated
 - Fully configurable
 - Documentation complete
 
-✅ **Performance**:
+ **Performance**:
 - Immediate denoise: Zero cost
 - Adaptive denoise: Automatic ramp
 - History reset: ~0.1ms per event
 - Overall: Significant quality/FPS improvements
 
-✅ **Compatibility**:
+ **Compatibility**:
 - 100% backward compatible
 - No breaking changes
 - Existing configs still work
@@ -406,13 +406,13 @@ gcc -std=c11 -O2 -pthread gpu_vulkan_demo.c ... -o gpu_demo
 
 ---
 
-## Status: ✅ COMPLETE
+## Status: COMPLETE
 
 **Ready for**:
-- ✅ Immediate compilation with Vulkan SDK
-- ✅ Testing with provided commands
-- ✅ Production deployment
-- ✅ Further optimization (Options 3-7)
+- Immediate compilation with Vulkan SDK
+- Testing with provided commands
+- Production deployment
+- Further optimization (Options 3-7)
 
 **Achieved**:
 - 3 complementary features implemented

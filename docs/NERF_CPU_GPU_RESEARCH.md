@@ -15,16 +15,16 @@ Your codebase already has:
 
 ---
 
-## Approach 1: Hybrid Occupancy + Multi-level Sampling ⭐ RECOMMENDED
+## Approach 1: Hybrid Occupancy + Multi-level Sampling RECOMMENDED
 
 **Concept**: Skip the failing MLP entirely. Use hashgrid as a multi-level feature pyramid. Render coarse-to-fine with early termination.
 
 **Advantages**:
-- ✅ Uses existing hashgrid infrastructure (verified working)
-- ✅ No MLP, no neural network overhead
-- ✅ GPU-only compute (better parallelism)
-- ✅ Can achieve photorealistic results with proper feature encoding
-- ✅ Deterministic (no training needed)
+- Uses existing hashgrid infrastructure (verified working)
+- No MLP, no neural network overhead
+- GPU-only compute (better parallelism)
+- Can achieve photorealistic results with proper feature encoding
+- Deterministic (no training needed)
 
 **Disadvantages**:
 - Feature-based rendering (not "true" NeRF)
@@ -50,14 +50,14 @@ Your codebase already has:
 **Concept**: Precompute hashgrid features on CPU, batch them, send to GPU for MLP inference only.
 
 **Advantages**:
-- ✅ Leverages GPU MLP computation (if it works)
-- ✅ Reduces per-ray overhead (batched inference)
-- ✅ Can debug MLP separately from hashgrid
+- Leverages GPU MLP computation (if it works)
+- Reduces per-ray overhead (batched inference)
+- Can debug MLP separately from hashgrid
 
 **Disadvantages**:
-- ❌ CPU-GPU synchronization cost
-- ❌ Still requires fixing the MLP
-- ❌ More complex pipeline
+- CPU-GPU synchronization cost
+- Still requires fixing the MLP
+- More complex pipeline
 
 **When to Consider**:
 - After fixing MLP in isolation (on CPU, in Python)
@@ -79,14 +79,14 @@ Your codebase already has:
 **Concept**: CPU renders initial ray grid → GPU computes NeRF for all rays in parallel → CPU composes final image.
 
 **Advantages**:
-- ✅ Maximum GPU utilization (all rays hit MLP at once)
-- ✅ Best for high-resolution rendering
-- ✅ Can use advanced denoising post-processing
+- Maximum GPU utilization (all rays hit MLP at once)
+- Best for high-resolution rendering
+- Can use advanced denoising post-processing
 
 **Disadvantages**:
-- ❌ Requires architectural redesign
-- ❌ Higher latency (CPU must wait for GPU)
-- ❌ Complex memory management
+- Requires architectural redesign
+- Higher latency (CPU must wait for GPU)
+- Complex memory management
 
 **When to Consider**:
 - Offline rendering (cinema, VFX)
@@ -119,7 +119,7 @@ Your codebase already has:
 
 | Approach | Time to Implement | GPU Utilization | Visual Quality | Maintenance |
 |----------|------------------|-----------------|----------------|------------|
-| **Hybrid Occupancy** ⭐ | 30 min | 85% | Good (feature-based) | Low |
+| **Hybrid Occupancy** | 30 min | 85% | Good (feature-based) | Low |
 | **CPU Feature Cache** | 2 hrs | 60% | Excellent (if MLP fixed) | Medium |
 | **Tile-based Deferred** | 5 hrs | 95% | Excellent | High |
 | Current (MLP broken) | ∞ | 30% | Bad | Very High |
@@ -152,25 +152,25 @@ Your codebase already has:
 
 **Key Papers**:
 - **Instant-NeRF** (Müller et al., 2022): Multi-level hash encoding for fast NeRF
-  - Architecture: 8-12 levels, 2 features per entry, ~30-50 dims total
-  - Lookup: O(1) hash table per level, sum all features
-  - MLP: 2 hidden layers, ReLU activation
-  
+ - Architecture: 8-12 levels, 2 features per entry, ~30-50 dims total
+ - Lookup: O(1) hash table per level, sum all features
+ - MLP: 2 hidden layers, ReLU activation
+ 
 - **Mip-NeRF** (Barron et al., 2021): Multi-scale rendering for NeRF
-  - Renders coarse + fine hierarchically
-  - Early ray termination based on cumulative alpha
-  - Better for dynamic/deformable scenes
+ - Renders coarse + fine hierarchically
+ - Early ray termination based on cumulative alpha
+ - Better for dynamic/deformable scenes
 
 - **Neural Radiance Caching** (Mueller et al., 2021): Sparse NeRF feature cache
-  - Precompute features on a coarse grid
-  - Interpolate + refine on the fly
-  - Good for CPU+GPU split
+ - Precompute features on a coarse grid
+ - Interpolate + refine on the fly
+ - Good for CPU+GPU split
 
 **Your Features**:
 - **Hashgrid**: 12 levels, 2 features → ~24 total dims (good for 2-layer MLP)
 - **Occupancy grid**: 64³ sparse grid (good for early ray termination)
 - **View direction**: 3 dims (position in space)
-- **Total MLP input**: 24 + 3 = 27 dims ✓ (correct)
+- **Total MLP input**: 24 + 3 = 27 dims (correct)
 
 ---
 
@@ -197,19 +197,19 @@ If you retry MLP later, check:
 1. Backup current tri.comp
 2. Comment out nerf_mlp_eval() call
 3. Create hashgrid_feature_to_rgb() function:
-   - Extract 24 features from all 12 levels
-   - Normalize to [0, 1] via abs + scaling
-   - Map to RGB (e.g., avg 3 features → R, G, B each)
+ - Extract 24 features from all 12 levels
+ - Normalize to [0, 1] via abs + scaling
+ - Map to RGB (e.g., avg 3 features → R, G, B each)
 4. Integrate with occupancy grid:
-   - Use occ_grid for density (sigma)
-   - Use features for color
+ - Use occ_grid for density (sigma)
+ - Use features for color
 5. Add Phong shading:
-   - Normal approximation from gradient
-   - Diffuse + specular term
+ - Normal approximation from gradient
+ - Diffuse + specular term
 6. Test with multiple blend modes:
-   - Simple avg
-   - Level-weighted avg
-   - Occupancy-weighted blending
+ - Simple avg
+ - Level-weighted avg
+ - Occupancy-weighted blending
 7. Tune parameters (density, steps, bounds)
 8. Compare with fallback rendering (current hash result)
 ```
@@ -217,8 +217,6 @@ If you retry MLP later, check:
 ---
 
 ## Next Action
-
-**Recommend**: Start **Approach 1** immediately. Would you like me to:
 
 A) **Generate shader code** for hybrid occupancy (feature extraction + color mapping)
 B) **Provide pseudocode** for feature normalization strategy

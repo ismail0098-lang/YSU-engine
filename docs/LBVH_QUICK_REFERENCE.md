@@ -2,7 +2,7 @@
 
 | Aspect | Details |
 |--------|---------|
-| **Status** | ✅ COMPLETE & ACTIVE |
+| **Status** | COMPLETE & ACTIVE |
 | **Location** | gpu_bvh_lbv.c (294 lines) |
 | **Integration** | gpu_vulkan_demo.c lines 708, 750 |
 | **Algorithm** | Linear BVH with Morton codes + Karras search |
@@ -19,8 +19,8 @@
 **Linear BVH** = BVH built using spatial sorting (Morton codes) instead of spatial splits
 
 ```
-Standard BVH:     Axis-aligned splits → may not preserve locality
-LBVH:            Z-order curve sorting → excellent spatial locality
+Standard BVH: Axis-aligned splits → may not preserve locality
+LBVH: Z-order curve sorting → excellent spatial locality
 ```
 
 ---
@@ -38,10 +38,10 @@ LBVH:            Z-order curve sorting → excellent spatial locality
 ## Key Files
 
 ```
-gpu_bvh_lbv.c         ← Main implementation
-gpu_bvh_lbv.h         ← Public API
-gpu_vulkan_demo.c     ← Caller (lines 708, 750)
-gpu_bvh.h             ← Data structures (GPUBVHNode)
+gpu_bvh_lbv.c ← Main implementation
+gpu_bvh_lbv.h ← Public API
+gpu_vulkan_demo.c ← Caller (lines 708, 750)
+gpu_bvh.h ← Data structures (GPUBVHNode)
 ```
 
 ---
@@ -50,8 +50,8 @@ gpu_bvh.h             ← Data structures (GPUBVHNode)
 
 Currently **always used** when:
 ```c
-use_bvh != 0              // BVH mode enabled
-&& !cache_hit             // Fresh build needed
+use_bvh != 0 // BVH mode enabled
+&& !cache_hit // Fresh build needed
 ```
 
 Automatically called in two scenarios:
@@ -110,23 +110,23 @@ python -c "from PIL import Image; import numpy as np; img = Image.open('output_g
 
 ```
 Triangles in 3D space
-         ↓
+ ↓
 Compute centroids + bounds
-         ↓
+ ↓
 Normalize to scene AABB
-         ↓
+ ↓
 Compute Morton codes (Z-order)
-         ↓
+ ↓
 Radix sort by Morton (O(n))
-         ↓
+ ↓
 Binary search for splits (Karras)
-         ↓
+ ↓
 Build BVH recursively
-         ↓
+ ↓
 Generate GPU BVHNode format
-         ↓
+ ↓
 Upload to GPU
-         ↓
+ ↓
 Ray traversal uses LBVH layout
 ```
 
@@ -150,20 +150,20 @@ Ray traversal uses LBVH layout
 ```c
 // Interleave 10-bit values into 30-bit code
 uint32_t morton3(float x, float y, float z) {
-    x = fminf(fmaxf(x, 0.0f), 0.999999f);
-    y = fminf(fmaxf(y, 0.0f), 0.999999f);
-    z = fminf(fmaxf(z, 0.0f), 0.999999f);
-    
-    uint32_t xx = (uint32_t)(x * 1024.0f);
-    uint32_t yy = (uint32_t)(y * 1024.0f);
-    uint32_t zz = (uint32_t)(z * 1024.0f);
-    
-    // Expand bits and interleave
-    uint32_t xb = expand_bits_10(xx);
-    uint32_t yb = expand_bits_10(yy);
-    uint32_t zb = expand_bits_10(zz);
-    
-    return (xb << 0) | (yb << 1) | (zb << 2);
+ x = fminf(fmaxf(x, 0.0f), 0.999999f);
+ y = fminf(fmaxf(y, 0.0f), 0.999999f);
+ z = fminf(fmaxf(z, 0.0f), 0.999999f);
+ 
+ uint32_t xx = (uint32_t)(x * 1024.0f);
+ uint32_t yy = (uint32_t)(y * 1024.0f);
+ uint32_t zz = (uint32_t)(z * 1024.0f);
+ 
+ // Expand bits and interleave
+ uint32_t xb = expand_bits_10(xx);
+ uint32_t yb = expand_bits_10(yy);
+ uint32_t zb = expand_bits_10(zz);
+ 
+ return (xb << 0) | (yb << 1) | (zb << 2);
 }
 ```
 
@@ -174,24 +174,24 @@ uint32_t morton3(float x, float y, float z) {
 If you want to push beyond current 2,500+ FPS:
 
 1. **GPU LBVH Construction**
-   - Build BVH on GPU instead of CPU
-   - Eliminate CPU-GPU transfer
-   - Enable real-time updates
+ - Build BVH on GPU instead of CPU
+ - Eliminate CPU-GPU transfer
+ - Enable real-time updates
 
 2. **LBVH with Refitting**
-   - Update BVH for deforming geometry
-   - Maintain temporal coherence
-   - Reuse Morton ordering
+ - Update BVH for deforming geometry
+ - Maintain temporal coherence
+ - Reuse Morton ordering
 
 3. **Compressed LBVH**
-   - Smaller memory footprint
-   - Better cache utilization
-   - Maintains performance
+ - Smaller memory footprint
+ - Better cache utilization
+ - Maintains performance
 
 4. **Warp-level Optimization**
-   - GPU SIMD traversal
-   - Coherent shading
-   - Further locality
+ - GPU SIMD traversal
+ - Coherent shading
+ - Further locality
 
 ---
 
@@ -200,28 +200,28 @@ If you want to push beyond current 2,500+ FPS:
 **Do you need to integrate LBVH?**
 ```
 → Is LBVH already running?
-  └─ YES ✅ (gpu_vulkan_demo.c lines 708, 750)
-     └─ Do nothing, it's working
-  └─ NO (unlikely)
-     └─ Check gpu_bvh_lbv.c is being called
+ └─ YES (gpu_vulkan_demo.c lines 708, 750)
+ └─ Do nothing, it's working
+ └─ NO (unlikely)
+ └─ Check gpu_bvh_lbv.c is being called
 ```
 
 **Do you need more speed?**
 ```
 → Is GPU at 2,500+ FPS?
-  └─ YES ✅
-     └─ LBVH is already providing benefits
-     └─ Denoiser is bottleneck, not GPU
-  └─ NO (unlikely with current code)
-     └─ Investigate other issues
+ └─ YES 
+ └─ LBVH is already providing benefits
+ └─ Denoiser is bottleneck, not GPU
+ └─ NO (unlikely with current code)
+ └─ Investigate other issues
 ```
 
 **What should you do?**
 ```
 → LBVH is working perfectly
-  └─ Continue with current deployment
-  └─ 60 FPS target already met
-  └─ No action needed
+ └─ Continue with current deployment
+ └─ 60 FPS target already met
+ └─ No action needed
 ```
 
 ---
@@ -239,7 +239,7 @@ If you want to push beyond current 2,500+ FPS:
 
 ## Bottom Line
 
-✅ **LBVH is integrated, active, and working perfectly**
+ **LBVH is integrated, active, and working perfectly**
 
 - No further work needed
 - Already providing 10-20% locality benefits

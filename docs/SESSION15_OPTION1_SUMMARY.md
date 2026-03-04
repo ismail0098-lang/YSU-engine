@@ -15,29 +15,29 @@ Implemented **Denoise Skip optimization** (Option 1 of 7 planned enhancements). 
 
 **Change 2: Enhanced Logging (Line 1663)**
 - Updated stderr output to include skip value:
-  ```
-  [GPU] GPU denoiser: ENABLED (radius=3 sigma_s=1.50 sigma_r=0.1000 skip=2)
-  ```
+ ```
+ [GPU] GPU denoiser: ENABLED (radius=3 sigma_s=1.50 sigma_r=0.1000 skip=2)
+ ```
 
 **Change 3: Denoiser Dispatch Conditional (Lines 1968-1970)**
 - Added frame skip logic before denoiser dispatch:
-  ```c
-  int should_denoise = (denoise_skip <= 1) || ((frame_id % denoise_skip) == 0);
-  if(gpu_denoise_enabled && pipe_denoise != VK_NULL_HANDLE && should_denoise){
-      // ... existing denoiser code ...
-  }
-  ```
+ ```c
+ int should_denoise = (denoise_skip <= 1) || ((frame_id % denoise_skip) == 0);
+ if(gpu_denoise_enabled && pipe_denoise != VK_NULL_HANDLE && should_denoise){
+ // ... existing denoiser code ...
+ }
+ ```
 
 ## Technical Details
 
 ### How It Works
 
 Frame-by-frame processing with conditional denoiser:
-- Frame 0: Denoise (0 % 4 == 0) ✓
+- Frame 0: Denoise (0 % 4 == 0) 
 - Frame 1: Skip (1 % 4 != 0)
 - Frame 2: Skip (2 % 4 != 0)
 - Frame 3: Skip (3 % 4 != 0)
-- Frame 4: Denoise (4 % 4 == 0) ✓
+- Frame 4: Denoise (4 % 4 == 0) 
 
 With temporal accumulation enabled (Session 12), the noisy intermediate frames are temporally blended, making the skipped denoiser almost imperceptible.
 
@@ -72,12 +72,12 @@ YSU_GPU_DENOISE=1 YSU_GPU_DENOISE_SKIP=8 YSU_GPU_RENDER_SCALE=0.5 YSU_GPU_FRAMES
 
 ## Code Quality
 
-- ✅ Backward compatible (default skip=1 maintains existing behavior)
-- ✅ No breaking changes to API or data structures
-- ✅ Uses existing `frame_id` counter (no new state)
-- ✅ Efficient modulo arithmetic on GPU
-- ✅ Follows existing code style and conventions
-- ✅ Minimal code addition (5 lines of logic)
+- Backward compatible (default skip=1 maintains existing behavior)
+- No breaking changes to API or data structures
+- Uses existing `frame_id` counter (no new state)
+- Efficient modulo arithmetic on GPU
+- Follows existing code style and conventions
+- Minimal code addition (5 lines of logic)
 
 ## Integration with Previous Optimizations
 
@@ -97,7 +97,7 @@ This change works seamlessly with:
 
 ## Optimization Roadmap Progress
 
-- ✅ Option 1: Denoise Skip (COMPLETE)
+- Option 1: Denoise Skip (COMPLETE)
 - ⏳ Option 2: Temporal Denoising (Next)
 - ⏳ Option 3: Half-Precision Compute
 - ⏳ Option 4: Async Compute Queue

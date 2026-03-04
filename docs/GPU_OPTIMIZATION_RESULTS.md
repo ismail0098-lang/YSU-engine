@@ -2,7 +2,7 @@
 
 ## Performance Baselines
 
-**Target**: 60 FPS @ 1080p = 16.67 ms/frame  
+**Target**: 60 FPS @ 1080p = 16.67 ms/frame 
 **Current**: ~100-105 ms/frame (6x too slow)
 
 ### Test Configuration
@@ -34,10 +34,10 @@
 
 ### 3. Fast Mode (Combined Optimizations)
 ```bash
-YSU_GPU_FAST=1  # Enables:
-  - Auto 50% render resolution scale (960×540)
-  - SPP forced to 1 (if not set)
-  - Denoiser radius=1, sigma_s=0.8, sigma_r=0.05
+YSU_GPU_FAST=1 # Enables:
+ - Auto 50% render resolution scale (960×540)
+ - SPP forced to 1 (if not set)
+ - Denoiser radius=1, sigma_s=0.8, sigma_r=0.05
 ```
 
 | Configuration | Time/Frame |
@@ -47,22 +47,22 @@ YSU_GPU_FAST=1  # Enables:
 ## Key Findings
 
 1. **Vulkan overhead dominates** (~90ms of the 100ms)
-   - Command buffer recording
-   - Image layout transitions & barriers
-   - GPU memory readback
-   - Tonemap shader dispatch
-   - This is unavoidable per-frame cost
+ - Command buffer recording
+ - Image layout transitions & barriers
+ - GPU memory readback
+ - Tonemap shader dispatch
+ - This is unavoidable per-frame cost
 
 2. **Compute shader cost is minimal**
-   - Main render: ~5-10ms
-   - Denoiser: ~4-5ms
-   - Reducing resolution doesn't help much
+ - Main render: ~5-10ms
+ - Denoiser: ~4-5ms
+ - Reducing resolution doesn't help much
 
 3. **To reach 60 FPS**, need one of:
-   - **Option A**: Multiple frames per swapchain present (3-4 frames in ~50ms)
-   - **Option B**: Move to native graphics API with less overhead (CUDA, OptiX)
-   - **Option C**: Custom Vulkan optimization (reduce synchronization, async compute)
-   - **Option D**: Accept lower quality (accept ~25-30 FPS is achievable with current setup)
+ - **Option A**: Multiple frames per swapchain present (3-4 frames in ~50ms)
+ - **Option B**: Move to native graphics API with less overhead (CUDA, OptiX)
+ - **Option C**: Custom Vulkan optimization (reduce synchronization, async compute)
+ - **Option D**: Accept lower quality (accept ~25-30 FPS is achievable with current setup)
 
 ## Recommended Next Steps
 
@@ -111,6 +111,6 @@ YSU_GPU_DENOISE=1 YSU_NEURAL_DENOISE=0 \
 
 **Current Architecture Limitation**: The Vulkan command buffer recording and GPU synchronization overhead (~90ms) is the hard bottleneck, not the compute shaders. Reaching true 60 FPS at 1080p with current code structure would require significant architectural changes (multi-frame buffering, async compute, reduced synchronization) or switching to lower-overhead APIs.
 
-**Achievable**: 25-30 FPS interactive (comfortable for realtime interaction)  
-**Theoretical max with optimizations**: 40-45 FPS (requires async compute + temporal filtering)  
+**Achievable**: 25-30 FPS interactive (comfortable for realtime interaction) 
+**Theoretical max with optimizations**: 40-45 FPS (requires async compute + temporal filtering) 
 **Native 60 FPS**: Would require CUDA/OptiX or complete Vulkan restructuring

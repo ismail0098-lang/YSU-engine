@@ -1,29 +1,29 @@
-# 🎬 NeRF Walkable 360 Scene - Quick Reference
+# NeRF Walkable 360 Scene - Quick Reference
 
 ## What Was Built
 
 **Walkable 360-degree environment** with:
-- ✅ Walking camera (spiral path through space)
-- ✅ Head look-around (360° head rotation)
-- ✅ Perspective rendering (true 3D, not panoramic)
-- ✅ NeRF-ready architecture (prepared for neural network integration)
+- Walking camera (spiral path through space)
+- Head look-around (360° head rotation)
+- Perspective rendering (true 3D, not panoramic)
+- NeRF-ready architecture (prepared for neural network integration)
 
 ---
 
-## 🚀 Performance: Amazing!
+## Performance: Amazing!
 
 | Config | FPS | Use Case |
 |--------|-----|----------|
 | Skip=8 (max speed) | **481.63** | Real-time walkthrough |
-| **Skip=4 (recommended)** | **489.15** | **Best balance** ⭐ |
+| **Skip=4 (recommended)** | **489.15** | **Best balance** |
 | Adaptive (smart) | 417.54 | Interactive mode |
 | Skip=1 (max quality) | 260.70 | Presentation |
 
-**Bottom Line**: 489 FPS on walkable NeRF environment! 🎉
+**Bottom Line**: 489 FPS on walkable NeRF environment! 
 
 ---
 
-## 📊 vs Original
+## vs Original
 
 | Metric | Value |
 |--------|-------|
@@ -33,7 +33,7 @@
 
 ---
 
-## 🎮 Scene Details
+## Scene Details
 
 ### Camera Movement
 ```
@@ -56,7 +56,7 @@ Head Rotation:
 
 ---
 
-## 🧠 NeRF Integration Ready
+## NeRF Integration Ready
 
 The system is **designed to receive NeRF weights** at runtime:
 
@@ -72,19 +72,19 @@ The system is **designed to receive NeRF weights** at runtime:
 
 ---
 
-## ✨ Key Features
+## Key Features
 
-✅ Free-form camera (not just orbital)  
-✅ Walking locomotion (natural human movement)  
-✅ Head look-around (smooth 360° rotation)  
-✅ Perspective projection (true 3D perspective)  
-✅ NeRF integration framework (weights-ready)  
-✅ Ultra-high FPS (480+ for real-time)  
-✅ All denoise optimizations included (skip, adaptive, history)  
+ Free-form camera (not just orbital) 
+ Walking locomotion (natural human movement) 
+ Head look-around (smooth 360° rotation) 
+ Perspective projection (true 3D perspective) 
+ NeRF integration framework (weights-ready) 
+ Ultra-high FPS (480+ for real-time) 
+ All denoise optimizations included (skip, adaptive, history) 
 
 ---
 
-## 🚀 How to Use
+## How to Use
 
 ### Build
 ```batch
@@ -95,8 +95,8 @@ The system is **designed to receive NeRF weights** at runtime:
 ```powershell
 $env:YSU_GPU_W=1920
 $env:YSU_GPU_H=1080
-$env:YSU_GPU_FRAMES=600        # 10 seconds of walking
-$env:YSU_GPU_DENOISE_SKIP=4    # Optimal quality/speed
+$env:YSU_GPU_FRAMES=600 # 10 seconds of walking
+$env:YSU_GPU_DENOISE_SKIP=4 # Optimal quality/speed
 .\gpu_demo.exe
 ```
 
@@ -107,7 +107,7 @@ powershell -ExecutionPolicy Bypass -File test_nerf_fps.ps1
 
 ---
 
-## 📝 What Changed
+## What Changed
 
 **Shader** (`shaders/tri.comp`): +35 lines
 - Added free-form camera positioning
@@ -122,58 +122,58 @@ powershell -ExecutionPolicy Bypass -File test_nerf_fps.ps1
 
 ---
 
-## 🎯 Next: NeRF Integration
+## Next: NeRF Integration
 
 To integrate actual NeRF neural network:
 
 1. **Get NeRF model**
-   - Train on 360 scene (nerfstudio)
-   - Or download pre-trained model
-   - Export weights (JSON or binary)
+ - Train on 360 scene (nerfstudio)
+ - Or download pre-trained model
+ - Export weights (JSON or binary)
 
 2. **Load in engine**
-   - Add weight loading code
-   - Create descriptor binding
-   - Pass to shader
+ - Add weight loading code
+ - Create descriptor binding
+ - Pass to shader
 
 3. **Query in shader**
-   - Replace procedural coloring
-   - Call NeRF network
-   - Get RGB + density
+ - Replace procedural coloring
+ - Call NeRF network
+ - Get RGB + density
 
 4. **Deploy**
-   - Test performance
-   - Optimize for speed
-   - Deploy walkable NeRF!
+ - Test performance
+ - Optimize for speed
+ - Deploy walkable NeRF!
 
 See `NERF_INTEGRATION_GUIDE.md` for detailed instructions.
 
 ---
 
-## 📊 Performance by Quality
+## Performance by Quality
 
 ```
-Skip=8:    481 FPS (aggressive, every 8th frame)
-Skip=4:    489 FPS (recommended, every 4th frame)  ⭐
-Skip=2:    254 FPS (good quality, every 2nd frame)
-Skip=1:    260 FPS (max quality, every frame)
-Adaptive:  417 FPS (smart ramping, warmup→sparse)
+Skip=8: 481 FPS (aggressive, every 8th frame)
+Skip=4: 489 FPS (recommended, every 4th frame) 
+Skip=2: 254 FPS (good quality, every 2nd frame)
+Skip=1: 260 FPS (max quality, every frame)
+Adaptive: 417 FPS (smart ramping, warmup→sparse)
 ```
 
 All configurations are smooth and excellent!
 
 ---
 
-## 🏆 Achievement
+## Achievement
 
-✅ **12.4x performance improvement** (39.5 → 489 FPS)  
-✅ **Walkable 360 environment** ready for NeRF  
-✅ **NeRF integration framework** in place  
-✅ **Production-ready code** for deployment  
+ **12.4x performance improvement** (39.5 → 489 FPS) 
+ **Walkable 360 environment** ready for NeRF 
+ **NeRF integration framework** in place 
+ **Production-ready code** for deployment 
 
 ---
 
-## 📁 Files
+## Files
 
 **Build/Test**:
 - `build_and_test_nerf_walk.bat` - Compile + test
@@ -186,9 +186,9 @@ All configurations are smooth and excellent!
 
 ---
 
-## 🎬 Status: **READY FOR NERF WEIGHTS** ✅
+## Status: **READY FOR NERF WEIGHTS** 
 
-Walkable 360 camera system complete!  
+Walkable 360 camera system complete! 
 Ready to load your NeRF neural network and render photorealistic scenes at 150-180 FPS!
 
-Next step: Integrate actual NeRF model 🧠
+Next step: Integrate actual NeRF model 

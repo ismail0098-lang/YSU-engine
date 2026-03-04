@@ -28,22 +28,22 @@ Comprehensive optimization journey: **10 FPS → 80-120 FPS** (8x-12x speedup)
 - **Conclusion**: Single-frame optimization insufficient
 - **Result**: ~10 FPS (limited improvement from tuning)
 
-### Session 12: Temporal Accumulation ⭐
+### Session 12: Temporal Accumulation 
 - **Breakthrough**: Batch multiple frames before CPU readback
 - **Strategy**: Render 16 frames on GPU, skip readback on frames 1-15, readback on frame 16
 - **New Variables**: 
-  - `YSU_GPU_TEMPORAL` (default: 1)
-  - `YSU_GPU_READBACK_SKIP` (default: 4)
+ - `YSU_GPU_TEMPORAL` (default: 1)
+ - `YSU_GPU_READBACK_SKIP` (default: 4)
 - **Math**: 16 frames = 400ms total, 1 readback = 40ms, per-frame avg = 25ms = 40 FPS
-- **Result**: **39.5 FPS** (4x improvement) ✨
+- **Result**: **39.5 FPS** (4x improvement) 
 
-### Session 13: Render Scale ⭐⭐
+### Session 13: Render Scale 
 - **Breakthrough**: Reduce internal render resolution, compute becomes focus
 - **Strategy**: Render at 50% resolution (960×540 vs 1920×1080) = 4x fewer pixels
 - **New Variable**: 
-  - `YSU_GPU_RENDER_SCALE` (default: 0.5)
+ - `YSU_GPU_RENDER_SCALE` (default: 0.5)
 - **Math**: 4x fewer rays = 4x faster compute
-- **Result**: **80-120 FPS** (2-4x improvement) ✨✨
+- **Result**: **80-120 FPS** (2-4x improvement) 
 
 ## Performance Summary
 
@@ -71,38 +71,38 @@ Comprehensive optimization journey: **10 FPS → 80-120 FPS** (8x-12x speedup)
 ### Environment Variables (Full List)
 ```bash
 # Core rendering
-YSU_GPU_W=1920                    # Output width
-YSU_GPU_H=1080                    # Output height
-YSU_GPU_SPP=1                     # Samples per pixel
-YSU_GPU_FRAMES=16                 # Batch frame count
+YSU_GPU_W=1920 # Output width
+YSU_GPU_H=1080 # Output height
+YSU_GPU_SPP=1 # Samples per pixel
+YSU_GPU_FRAMES=16 # Batch frame count
 
 # Temporal accumulation (Session 12)
-YSU_GPU_TEMPORAL=1                # Enable temporal mode (default: ON)
-YSU_GPU_READBACK_SKIP=4           # Readback every N frames
-YSU_GPU_NO_IO=1                   # Skip all readback (fastest)
+YSU_GPU_TEMPORAL=1 # Enable temporal mode (default: ON)
+YSU_GPU_READBACK_SKIP=4 # Readback every N frames
+YSU_GPU_NO_IO=1 # Skip all readback (fastest)
 
 # Render scale (Session 13)
-YSU_GPU_RENDER_SCALE=0.5          # Resolution scale (0.1-1.0, default: 0.5)
+YSU_GPU_RENDER_SCALE=0.5 # Resolution scale (0.1-1.0, default: 0.5)
 
 # Denoiser
-YSU_GPU_DENOISE=1                 # Enable GPU denoiser
-YSU_GPU_DENOISE_RADIUS=3          # Filter radius
-YSU_NEURAL_DENOISE=1              # CPU neural denoiser (if needed)
+YSU_GPU_DENOISE=1 # Enable GPU denoiser
+YSU_GPU_DENOISE_RADIUS=3 # Filter radius
+YSU_NEURAL_DENOISE=1 # CPU neural denoiser (if needed)
 
 # Other
-YSU_GPU_WINDOW=0                  # Display window (interactive)
-YSU_GPU_MINIMAL=0                 # Benchmark mode (no overhead)
-YSU_GPU_FAST=0                    # Fast mode (aggressive defaults)
+YSU_GPU_WINDOW=0 # Display window (interactive)
+YSU_GPU_MINIMAL=0 # Benchmark mode (no overhead)
+YSU_GPU_FAST=0 # Fast mode (aggressive defaults)
 ```
 
 ## File Structure
 
 ### Core Rendering
 - `gpu_vulkan_demo.c` - Main GPU implementation (2,778 lines)
-  - Lines 1-600: Config, initialization
-  - Lines 575-591: **Render scale (NEW Session 13)**
-  - Lines 1645-1660: **Temporal mode config (NEW Session 12)**
-  - Lines 2546+: **Conditional readback (MODIFIED Session 12)**
+ - Lines 1-600: Config, initialization
+ - Lines 575-591: **Render scale (NEW Session 13)**
+ - Lines 1645-1660: **Temporal mode config (NEW Session 12)**
+ - Lines 2546+: **Conditional readback (MODIFIED Session 12)**
 
 ### Shaders
 - `shaders/denoise.comp` - GPU denoiser (separable bilateral filter)
@@ -177,7 +177,7 @@ YSU_GPU_RENDER_SCALE=1.0 YSU_GPU_TEMPORAL=0 ./gpu_demo.exe
 - **Tonemap**: 0.25-0.5ms (**4x reduction**)
 - **Readback overhead**: 8-10ms (constant)
 
-**Result**: Total = 12-15ms per frame (with readback) → 67-83 FPS  
+**Result**: Total = 12-15ms per frame (with readback) → 67-83 FPS 
 (Better with temporal batching: 6-7ms average)
 
 ## Quality vs Speed Trade-off
@@ -234,10 +234,10 @@ YSU_GPU_NO_IO=1 ./gpu_demo.exe
 ## Summary
 
 **Mission Accomplished**: 
-- ✅ Started at 10 FPS (single-frame bottleneck)
-- ✅ Achieved 39.5 FPS via temporal accumulation (Session 12)
-- ✅ Achieved 80-120 FPS via render scale (Session 13)
-- ✅ **Exceeded original 60 FPS goal by 1.3x-2x**
+- Started at 10 FPS (single-frame bottleneck)
+- Achieved 39.5 FPS via temporal accumulation (Session 12)
+- Achieved 80-120 FPS via render scale (Session 13)
+- **Exceeded original 60 FPS goal by 1.3x-2x**
 
 **Key Insights**:
 1. Bottleneck identification was crucial (readback first, then compute)
@@ -246,13 +246,13 @@ YSU_GPU_NO_IO=1 ./gpu_demo.exe
 4. Backward compatibility preserved throughout
 
 **Production Ready**:
-- ✅ Code stable and tested
-- ✅ Well documented
-- ✅ Configurable quality/speed
-- ✅ Ready for real-time applications
+- Code stable and tested
+- Well documented
+- Configurable quality/speed
+- Ready for real-time applications
 
 ---
 
-**Repository**: YSUengine_fixed_renderc_patch  
-**Branch**: Active development (gpu_vulkan_demo.c)  
-**Status**: Complete and stable ✨
+**Repository**: YSUengine_fixed_renderc_patch 
+**Branch**: Active development (gpu_vulkan_demo.c) 
+**Status**: Complete and stable 

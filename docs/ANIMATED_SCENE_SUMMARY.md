@@ -1,33 +1,33 @@
-# 🎬 Animated Scene with Skip=8 - Final Summary
+# Animated Scene with Skip=8 - Final Summary
 
-## Build & Test Complete ✅
+## Build & Test Complete 
 
-**Scene Type**: Orbiting camera around cube  
-**Camera Animation**: 200 frames per complete orbit  
-**Resolution**: 1920×1080  
-**Compiler**: GCC with -O2, Vulkan SDK  
+**Scene Type**: Orbiting camera around cube 
+**Camera Animation**: 200 frames per complete orbit 
+**Resolution**: 1920×1080 
+**Compiler**: GCC with -O2, Vulkan SDK 
 
 ---
 
-## 🚀 Results: Excellent Temporal Coherence
+## Results: Excellent Temporal Coherence
 
 | Config | Frames | FPS | Notes |
 |--------|--------|-----|-------|
 | **Animated baseline** | 240 | 178.4 | Reference |
-| **Animated skip=8** (4 orbits) | 240 | 183.34 | +2.8% ⭐ |
-| **Animated skip=8** (6 orbits) | 360 | 184.95 | -0.9% variance ✅ |
+| **Animated skip=8** (4 orbits) | 240 | 183.34 | +2.8% |
+| **Animated skip=8** (6 orbits) | 360 | 184.95 | -0.9% variance |
 | **Animated adaptive** | 120 | 129.91 | Quality focus |
 
 ---
 
-## ✅ Validation Results
+## Validation Results
 
 **Temporal Coherence**: PASSED
 - 240 frame run: 183.34 FPS
 - 360 frame run: 184.95 FPS
 - Difference: **-0.9%** (excellent stability)
-- ✅ Denoise history maintains coherence during motion
-- ✅ No ghosting or artifacts observed
+- Denoise history maintains coherence during motion
+- No ghosting or artifacts observed
 
 **Visual Quality Under Motion**: PASSED
 - Camera orbits smoothly around scene
@@ -42,27 +42,27 @@
 
 ---
 
-## 📊 Key Findings
+## Key Findings
 
 1. **Skip=8 is Safe for Animation**
-   - Only -0.9% FPS variance over 6 orbits
-   - Temporal coherence maintained
-   - Ready for production use
+ - Only -0.9% FPS variance over 6 orbits
+ - Temporal coherence maintained
+ - Ready for production use
 
 2. **Camera Movement is Efficient**
-   - Calculated entirely in shader
-   - Zero additional memory overhead
-   - No pipeline changes needed
+ - Calculated entirely in shader
+ - Zero additional memory overhead
+ - No pipeline changes needed
 
 3. **Adaptive Denoise Works Well**
-   - 129.91 FPS average with warmup phase
-   - Quality-first approach for interactive apps
-   - Warmup (0-30f) provides startup quality
-   - Steady-state (31+f) provides speed
+ - 129.91 FPS average with warmup phase
+ - Quality-first approach for interactive apps
+ - Warmup (0-30f) provides startup quality
+ - Steady-state (31+f) provides speed
 
 ---
 
-## 🎯 Scene Description
+## Scene Description
 
 **Camera Path**: Orbiting circle
 - **Center**: (0, 0.5, 0)
@@ -83,7 +83,7 @@
 
 ---
 
-## 🎛️ Configuration Examples
+## Configuration Examples
 
 ### Maximum FPS (Realtime)
 ```powershell
@@ -113,7 +113,7 @@ $env:YSU_GPU_DENOISE_ADAPTIVE_MAX = 8
 
 ---
 
-## 📁 Files Generated
+## Files Generated
 
 **Scripts**:
 - `build_and_test_animation.bat` - Full build + test
@@ -130,10 +130,10 @@ $env:YSU_GPU_DENOISE_ADAPTIVE_MAX = 8
 
 ---
 
-## ✨ What Was Changed
+## What Was Changed
 
 ### Shader Update
-**File**: `shaders/tri.comp`  
+**File**: `shaders/tri.comp` 
 **Change**: Added orbital camera animation based on frame number
 - Camera orbits around center point
 - Smooth circular path
@@ -141,7 +141,7 @@ $env:YSU_GPU_DENOISE_ADAPTIVE_MAX = 8
 - **Cost**: Negligible (3 trig functions per ray)
 
 ### Build Script
-**File**: `build_and_test_animation.bat`  
+**File**: `build_and_test_animation.bat` 
 - Compiles modified tri.comp shader
 - Runs 4 test configurations
 - Tests with 240, 360 frame sequences
@@ -156,19 +156,19 @@ $env:YSU_GPU_DENOISE_ADAPTIVE_MAX = 8
 
 ---
 
-## 🏆 Achievement Summary
+## Achievement Summary
 
-✅ **Animated scene created** with smooth camera movement  
-✅ **Shader modified** for orbital camera path  
-✅ **Build successful** with all modifications  
-✅ **FPS tested** across long sequences (360 frames)  
-✅ **Temporal coherence validated** (-0.9% variance excellent)  
-✅ **Skip=8 confirmed** production-ready for animation  
-✅ **Documentation complete** with analysis and configs  
+ **Animated scene created** with smooth camera movement 
+ **Shader modified** for orbital camera path 
+ **Build successful** with all modifications 
+ **FPS tested** across long sequences (360 frames) 
+ **Temporal coherence validated** (-0.9% variance excellent) 
+ **Skip=8 confirmed** production-ready for animation 
+ **Documentation complete** with analysis and configs 
 
 ---
 
-## 🎬 Performance vs Original Build
+## Performance vs Original Build
 
 | Metric | Old Build | New Build | Change |
 |--------|-----------|-----------|--------|
@@ -181,13 +181,13 @@ $env:YSU_GPU_DENOISE_ADAPTIVE_MAX = 8
 
 ---
 
-## 🎯 Status: **COMPLETE** ✅
+## Status: **COMPLETE** 
 
-- ✅ Animated scene implemented
-- ✅ All features validated under motion
-- ✅ Skip=8 proven safe for production
-- ✅ Performance excellent (180+ FPS)
-- ✅ Ready for deployment
+- Animated scene implemented
+- All features validated under motion
+- Skip=8 proven safe for production
+- Performance excellent (180+ FPS)
+- Ready for deployment
 
 **Next Steps** (Optional):
 - Export rendered frames as video sequence

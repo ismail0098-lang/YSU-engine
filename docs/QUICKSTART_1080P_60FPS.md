@@ -1,7 +1,7 @@
 # Quick Start: 1080p 60 FPS Optimization
 
 ## TL;DR
-✅ **Already achieved!** Use these settings for 60 FPS at 1080p display quality:
+ **Already achieved!** Use these settings for 60 FPS at 1080p display quality:
 
 ```bash
 # Settings for 60 FPS
@@ -21,19 +21,19 @@ shaders\gpu_demo.exe
 
 ## Three Quick Commands
 
-### 🚀 **60 FPS (Maximum Smoothness)**
+### **60 FPS (Maximum Smoothness)**
 ```bash
 set YSU_GPU_W=640 & set YSU_GPU_H=360 & set YSU_GPU_FRAMES=2 & set YSU_NEURAL_DENOISE=1 & set YSU_SPP=2 & shaders\gpu_demo.exe
 ```
 → 60+ FPS, good quality, best for interactive use
 
-### 💎 **35 FPS (Maximum Quality)**  
+### **35 FPS (Maximum Quality)** 
 ```bash
 set YSU_GPU_W=960 & set YSU_GPU_H=540 & set YSU_GPU_FRAMES=4 & set YSU_NEURAL_DENOISE=1 & set YSU_SPP=1 & shaders\gpu_demo.exe
 ```
 → 30-35 FPS, excellent quality, best for previewing
 
-### 🔬 **Native 1080p (Reference)**
+### **Native 1080p (Reference)**
 ```bash
 set YSU_GPU_W=1920 & set YSU_GPU_H=1080 & set YSU_GPU_FRAMES=1 & set YSU_NEURAL_DENOISE=0 & set YSU_SPP=1 & shaders\gpu_demo.exe
 ```
@@ -50,9 +50,9 @@ set YSU_GPU_W=1920 & set YSU_GPU_H=1080 & set YSU_GPU_FRAMES=1 & set YSU_NEURAL_
 4. **Shader Registers** - Reduced pressure
 
 ### Performance
-- ✅ GPU compute: 2,500+ FPS
-- ✅ Frame time: ~16ms (60 FPS target)
-- ✅ Quality: 4 effective samples + AI upscaling
+- GPU compute: 2,500+ FPS
+- Frame time: ~16ms (60 FPS target)
+- Quality: 4 effective samples + AI upscaling
 
 ### All Changes
 - Modified: `triangle.c`, `shaders/tri.comp`
@@ -69,13 +69,13 @@ set YSU_GPU_W=1920 & set YSU_GPU_H=1080 & set YSU_GPU_FRAMES=1 & set YSU_NEURAL_
 | AABB ops | Standard | Optimized | ~3-5% |
 | BVH traverse | Random | Front-to-back | ~5-10% |
 | Register use | Higher | Lower | ~2-5% |
-| Real FPS (640×360) | ~58 | ~61+ | ✅ Target! |
+| Real FPS (640×360) | ~58 | ~61+ | Target! |
 
 ---
 
 ## Quality Verification
 
-✅ **All optimizations tested and verified**:
+ **All optimizations tested and verified**:
 - 199 colors in output (material shading)
 - Proper luminance (0.847 ± 0.108)
 - No visual artifacts
@@ -96,11 +96,11 @@ set YSU_GPU_W=1920 & set YSU_GPU_H=1080 & set YSU_GPU_FRAMES=1 & set YSU_NEURAL_
 - `DEPLOYMENT_READY_1080P_60FPS.md` - Full analysis
 
 **Tests Passed**:
-- ✅ Shader compilation
-- ✅ GPU rendering
-- ✅ Denoiser integration
-- ✅ Image quality
-- ✅ Benchmark suite
+- Shader compilation
+- GPU rendering
+- Denoiser integration
+- Image quality
+- Benchmark suite
 
 ---
 
@@ -124,18 +124,18 @@ For more information, see:
 
 ## Support
 
-Q: **Why is GPU FPS so high (2,500+) but real FPS lower?**  
+Q: **Why is GPU FPS so high (2,500+) but real FPS lower?** 
 A: Because GPU is only 0.1% of frame time. Denoiser, display, and OS overhead dominate.
 
-Q: **Is 640×360 upsampled good quality?**  
+Q: **Is 640×360 upsampled good quality?** 
 A: Yes! With 2 SPP + 2 frames temporal + AI upscaling, it's equivalent to 4 SPP native.
 
-Q: **Can I run native 1080p 60 FPS?**  
+Q: **Can I run native 1080p 60 FPS?** 
 A: Not yet, but on roadmap. Would need LBVH integration + further optimization (2-3 weeks).
 
-Q: **Will these optimizations break anything?**  
+Q: **Will these optimizations break anything?** 
 A: No, all changes are backward compatible and tested.
 
 ---
 
-**Status**: ✅ Production-ready for 60 FPS 1080p display!
+**Status**: Production-ready for 60 FPS 1080p display!

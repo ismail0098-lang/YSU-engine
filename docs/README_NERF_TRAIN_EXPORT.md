@@ -20,11 +20,11 @@ python -m pip install -r requirements.txt
 ## 2) Train + export
 ```powershell
 py -3 nerf_train_export.py --data DataNeRF/data/nerf/fox \
-  --iters 2000 --batch_rays 1024 --n_samples 32 \
-  --levels 12 --features 2 --hashmap_size 8192 \
-  --base_res 16 --per_level_scale 1.5 \
-  --hidden 64 --layers 2 \
-  --occ_dim 64 --occ_threshold 1.0
+ --iters 2000 --batch_rays 1024 --n_samples 32 \
+ --levels 12 --features 2 --hashmap_size 8192 \
+ --base_res 16 --per_level_scale 1.5 \
+ --hidden 64 --layers 2 \
+ --occ_dim 64 --occ_threshold 1.0
 ```
 
 ## 3) Outputs

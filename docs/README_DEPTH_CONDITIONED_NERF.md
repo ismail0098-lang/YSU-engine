@@ -14,17 +14,17 @@ This achieves **10-40% speedup** with negligible quality loss.
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                        Frame N                                  │
+│ Frame N │
 ├─────────────────────────────────────────────────────────────────┤
-│  CPU: Occupancy Grid Prepass (1/4 resolution)                   │
-│  ├── Load 64³ occupancy grid from training                      │
-│  ├── Ray march 16 coarse steps per pixel block                  │
-│  └── Output: depth hints buffer (vec4 per pixel)                │
+│ CPU: Occupancy Grid Prepass (1/4 resolution) │
+│ ├── Load 64³ occupancy grid from training │
+│ ├── Ray march 16 coarse steps per pixel block │
+│ └── Output: depth hints buffer (vec4 per pixel) │
 ├─────────────────────────────────────────────────────────────────┤
-│  GPU: Depth-Conditioned NeRF Integration                        │
-│  ├── Read depth hint for pixel                                  │
-│  ├── If confidence > 0.5: sample [depth-δ, depth+δ] with 8 steps│
-│  └── Else: sample full [t_near, t_far] with 32 steps            │
+│ GPU: Depth-Conditioned NeRF Integration │
+│ ├── Read depth hint for pixel │
+│ ├── If confidence > 0.5: sample [depth-δ, depth+δ] with 8 steps│
+│ └── Else: sample full [t_near, t_far] with 32 steps │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -38,12 +38,12 @@ This achieves **10-40% speedup** with negligible quality loss.
 
 # Train on Lego scene (35k iterations for good quality)
 python nerf_instant_ngp_fixed.py `
-    --data nerf-synthetic/nerf_synthetic/lego `
-    --iters 35000 `
-    --hidden 64 `
-    --levels 16 `
-    --out_hashgrid models/lego.bin `
-    --out_occ models/lego_occ.bin
+ --data nerf-synthetic/nerf_synthetic/lego `
+ --iters 35000 `
+ --hidden 64 `
+ --levels 16 `
+ --out_hashgrid models/lego.bin `
+ --out_occ models/lego_occ.bin
 ```
 
 ### 2. Build the Renderer
@@ -54,11 +54,11 @@ C:\VulkanSDK\1.4.335.0\Bin\glslangValidator.exe -V shaders/tri.comp -o shaders/t
 
 # Build executable
 gcc -O3 -march=native -ffast-math -I./include -I./raylib/include -L./raylib/lib `
-    -o gpu_vulkan_demo.exe `
-    gpu_vulkan_demo.c nerf_scheduler.c nerf_batch.c neural_denoise.c `
-    bilateral_denoise.c bvh.c vec3.c sphere.c ray.c `
-    gpu_bvh_build.c gpu_bvh_lbv.c gpu_bvh_lbvh_builder.c `
-    -lglfw3 -lraylib -lgdi32 -lwinmm -lopengl32 -lvulkan-1
+ -o gpu_vulkan_demo.exe `
+ gpu_vulkan_demo.c nerf_scheduler.c nerf_batch.c neural_denoise.c `
+ bilateral_denoise.c bvh.c vec3.c sphere.c ray.c `
+ gpu_bvh_build.c gpu_bvh_lbv.c gpu_bvh_lbvh_builder.c `
+ -lglfw3 -lraylib -lgdi32 -lwinmm -lopengl32 -lvulkan-1
 ```
 
 ### 3. Run
@@ -104,29 +104,29 @@ $env:YSU_RENDER_MODE=26
 ### Hashgrid Binary (.bin)
 ```
 Header (64 bytes):
-  - uint32 L: number of levels
-  - uint32 F: features per level
-  - uint32 H: hashmap size
-  - uint32 base_resolution
-  - uint32 num_layers
-  - uint32 hidden_dim
-  - float center[3]
-  - float scale
-  
+ - uint32 L: number of levels
+ - uint32 F: features per level
+ - uint32 H: hashmap size
+ - uint32 base_resolution
+ - uint32 num_layers
+ - uint32 hidden_dim
+ - float center[3]
+ - float scale
+ 
 Data:
-  - float[L * H * F]: hashgrid features
-  - float[...]: MLP weights
+ - float[L * H * F]: hashgrid features
+ - float[...]: MLP weights
 ```
 
 ### Occupancy Binary (.bin)
 ```
 Header (16 bytes):
-  - uint32 dim: grid dimension (e.g., 64)
-  - float threshold
-  - uint32 reserved[2]
-  
+ - uint32 dim: grid dimension (e.g., 64)
+ - float threshold
+ - uint32 reserved[2]
+ 
 Data:
-  - uint8[dim³]: occupancy values (0-255)
+ - uint8[dim³]: occupancy values (0-255)
 ```
 
 ## Performance
@@ -156,10 +156,10 @@ If you use this work, please cite:
 
 ```bibtex
 @misc{ysu_depth_nerf_2026,
-  title={Depth-Conditioned Heterogeneous Sampling for Real-Time NeRF},
-  author={YSU Engine Contributors},
-  year={2026},
-  howpublished={\url{https://github.com/...}}
+ title={Depth-Conditioned Heterogeneous Sampling for Real-Time NeRF},
+ author={YSU Engine Contributors},
+ year={2026},
+ howpublished={\url{https://github.com/...}}
 }
 ```
 

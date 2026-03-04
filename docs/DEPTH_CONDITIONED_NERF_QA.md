@@ -43,7 +43,7 @@
 **A:** A CPU-side computation that runs before GPU rendering:
 
 ```
-Input:  Camera pose + occupancy grid
+Input: Camera pose + occupancy grid
 Output: Per-pixel depth hints (depth, delta, confidence)
 
 Steps:
@@ -85,15 +85,15 @@ The proxy mesh is:
 
 ```glsl
 // Traditional uniform sampling
-float t_near = 2.0, t_far = 6.0;  // Full range
+float t_near = 2.0, t_far = 6.0; // Full range
 int steps = 64;
 
 // Depth-conditioned sampling
 vec4 hint = depth_hints[pixel_id];
-if (hint.z > 0.5) {  // High confidence hit
-    t_near = hint.x - hint.y;  // depth - delta
-    t_far = hint.x + hint.y;   // depth + delta
-    steps = 16;  // Fewer samples needed
+if (hint.z > 0.5) { // High confidence hit
+ t_near = hint.x - hint.y; // depth - delta
+ t_far = hint.x + hint.y; // depth + delta
+ steps = 16; // Fewer samples needed
 }
 ```
 
@@ -107,10 +107,10 @@ if (hint.z > 0.5) {  // High confidence hit
 
 ```bash
 python nerf_instant_ngp_fixed.py \
-    --data nerf-synthetic/nerf_synthetic/lego \
-    --iters 100000 \
-    --out_hashgrid models/lego.bin \
-    --out_occ models/lego_occ.bin  # Only this is new!
+ --data nerf-synthetic/nerf_synthetic/lego \
+ --iters 100000 \
+ --out_hashgrid models/lego.bin \
+ --out_occ models/lego_occ.bin # Only this is new!
 ```
 
 The only training requirement is saving the occupancy grid (which instant-NGP already computes internally).
@@ -153,12 +153,12 @@ The only training requirement is saving the occupancy grid (which instant-NGP al
 **A:** The speedup has three components:
 
 ```
-1. Sample reduction:    64 → 16 samples = 4x fewer evaluations
-2. Narrower band:       [2,6] → [3.2,3.8] = 10x fewer "empty" samples
-3. Early termination:   Stop when alpha saturates = variable speedup
+1. Sample reduction: 64 → 16 samples = 4x fewer evaluations
+2. Narrower band: [2,6] → [3.2,3.8] = 10x fewer "empty" samples
+3. Early termination: Stop when alpha saturates = variable speedup
 
 Combined theoretical speedup: 4-10x
-Practical observed speedup:   4-8x (some overhead)
+Practical observed speedup: 4-8x (some overhead)
 ```
 
 ### Q: What is the overhead of the CPU prepass?
@@ -272,16 +272,16 @@ depth_prepass_gpu_compute_and_upload(&depth_ctx, camera, cmd_buffer);
 ```glsl
 // Add binding for depth hints
 layout(std430, set=0, binding=10) readonly buffer DepthHintBuf {
-    vec4 hints[];  // [depth, delta, confidence, flags]
+ vec4 hints[]; // [depth, delta, confidence, flags]
 } depthHints;
 
 // Modify sampling loop
 void nerf_depth_conditioned_integrate() {
-    vec4 hint = depthHints.hints[pixel_id];
-    float t_near = hint.z > 0.5 ? hint.x - hint.y : 2.0;
-    float t_far = hint.z > 0.5 ? hint.x + hint.y : 6.0;
-    
-    // Continue with normal NeRF integration using narrowed [t_near, t_far]
+ vec4 hint = depthHints.hints[pixel_id];
+ float t_near = hint.z > 0.5 ? hint.x - hint.y : 2.0;
+ float t_far = hint.z > 0.5 ? hint.x + hint.y : 6.0;
+ 
+ // Continue with normal NeRF integration using narrowed [t_near, t_far]
 }
 ```
 
@@ -294,30 +294,30 @@ void nerf_depth_conditioned_integrate() {
 **A:**
 
 1. **Adaptive Delta (δ)**
-   - Use surface normal to estimate foreshortening
-   - Larger δ for oblique angles
+ - Use surface normal to estimate foreshortening
+ - Larger δ for oblique angles
 
 2. **Temporal Coherence**
-   - Reuse previous frame's depth hints
-   - Motion vectors for moving camera
+ - Reuse previous frame's depth hints
+ - Motion vectors for moving camera
 
 3. **Foveated Rendering**
-   - Full quality in fovea (center)
-   - CPU-only rendering in periphery
+ - Full quality in fovea (center)
+ - CPU-only rendering in periphery
 
 4. **Depth Supervision**
-   - Use CPU depth as training regularization
-   - Improve NeRF geometry
+ - Use CPU depth as training regularization
+ - Improve NeRF geometry
 
 ### Q: How could this apply to 3D Gaussian Splatting?
 
 **A:** Similar principle:
 
 ```
-CPU:  Trace rays → depth per pixel
-GPU:  Prioritize Gaussians near expected depth
-      Skip Gaussians far from depth
-      
+CPU: Trace rays → depth per pixel
+GPU: Prioritize Gaussians near expected depth
+ Skip Gaussians far from depth
+ 
 Potential speedup: 2-4x for dense Gaussian scenes
 ```
 
@@ -331,35 +331,35 @@ Potential speedup: 2-4x for dense Gaussian scenes
 
 ```
 1. Abstract (250 words)
-   - Problem: Real-time NeRF is computationally expensive
-   - Solution: CPU+GPU heterogeneous depth-guided sampling
-   - Results: 4-8x speedup with <1 dB quality loss
+ - Problem: Real-time NeRF is computationally expensive
+ - Solution: CPU+GPU heterogeneous depth-guided sampling
+ - Results: 4-8x speedup with <1 dB quality loss
 
 2. Introduction (2 pages)
-   - NeRF background
-   - Real-time rendering challenge
-   - Our contribution
+ - NeRF background
+ - Real-time rendering challenge
+ - Our contribution
 
 3. Related Work (1 page)
-   - NeRF acceleration methods
-   - Depth-based rendering
-   - Heterogeneous computing
+ - NeRF acceleration methods
+ - Depth-based rendering
+ - Heterogeneous computing
 
 4. Method (3 pages)
-   - Depth prepass design
-   - Proxy mesh extraction
-   - GPU integration
-   - Theoretical analysis
+ - Depth prepass design
+ - Proxy mesh extraction
+ - GPU integration
+ - Theoretical analysis
 
 5. Experiments (3 pages)
-   - Dataset description
-   - Quantitative results (FPS, PSNR, SSIM)
-   - Ablation studies
-   - Comparison with baselines
+ - Dataset description
+ - Quantitative results (FPS, PSNR, SSIM)
+ - Ablation studies
+ - Comparison with baselines
 
 6. Conclusion (0.5 page)
-   - Summary
-   - Future work
+ - Summary
+ - Future work
 
 7. References
 ```

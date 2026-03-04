@@ -15,8 +15,8 @@ Implemented a **separable bilateral denoiser** for the GPU raytracer pipeline. T
 
 1. **`neural_denoise.c`** - Updated to call bilateral denoiser (was placeholder)
 2. **`gpu_vulkan_demo.c`** - Integrated denoiser into both:
-   - Window dump readback (line ~1845)
-   - Output file export (line ~2067)
+ - Window dump readback (line ~1845)
+ - Output file export (line ~2067)
 3. **`test_bilateral.bat`** - New test script for validation
 
 ## How It Works
@@ -66,9 +66,9 @@ YSU_BILATERAL_RADIUS=3
 
 | Configuration | Time | Quality vs 32 SPP |
 |---|---|---|
-| 4 SPP raw | ~ms | Very noisy (❌) |
-| 4 SPP + bilateral | ~2ms denoise | Matches 32 SPP ✅ |
-| 32 SPP raw | ~8ms compute | Reference (✓) |
+| 4 SPP raw | ~ms | Very noisy () |
+| 4 SPP + bilateral | ~2ms denoise | Matches 32 SPP |
+| 32 SPP raw | ~8ms compute | Reference () |
 
 **Summary**: 4 SPP + denoise ≈ same quality as 32 SPP, ~4x total speedup
 (compute 4ms + denoise 2ms = 6ms vs 8ms)
@@ -111,7 +111,7 @@ The denoiser is applied **after** readback:
 ```c
 // Direct call with parameters
 void bilateral_denoise(Vec3 *pixels, int width, int height,
-                       float sigma_s, float sigma_r, int radius);
+ float sigma_s, float sigma_r, int radius);
 
 // Environment-controlled wrapper
 void bilateral_denoise_maybe(Vec3 *pixels, int width, int height);
@@ -142,9 +142,9 @@ void ysu_neural_denoise_maybe(Vec3 *pixels, int width, int height);
 
 ```bash
 gcc -std=c11 -O2 -pthread -o gpu_demo.exe \
-    gpu_vulkan_demo.c gpu_bvh_lbv.c \
-    bilateral_denoise.c neural_denoise.c \
-    -lvulkan-1 -lglfw3 -lws2_32 -luser32 -lm
+ gpu_vulkan_demo.c gpu_bvh_lbv.c \
+ bilateral_denoise.c neural_denoise.c \
+ -lvulkan-1 -lglfw3 -lws2_32 -luser32 -lm
 ```
 
 ## Test Results
@@ -157,7 +157,7 @@ gcc -std=c11 -O2 -pthread -o gpu_demo.exe \
 [GPU] wrote window_dump.ppm (320x180)
 ```
 
-✅ Denoiser executing successfully and producing output files.
+ Denoiser executing successfully and producing output files.
 
 ## Limitations
 
@@ -175,6 +175,6 @@ For **true real-time** (60 FPS):
 4. Consider temporal consistency for video sequences
 
 Current implementation is suitable for:
-- ✅ Batch rendering (offline)
-- ✅ Interactive preview (interactive)
-- ❌ Real-time (need GPU denoiser for that)
+- Batch rendering (offline)
+- Interactive preview (interactive)
+- Real-time (need GPU denoiser for that)

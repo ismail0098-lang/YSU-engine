@@ -13,16 +13,16 @@ Temporal denoising blends the current frame's render output with the **previous 
 
 ```
 Frame N:
-  1. Ray trace → out_img (current noisy render)
-  2. Denoise out_img → temp_denoised (current frame denoising)
-  3. Blend: result = 0.7 * prev_denoised + 0.3 * temp_denoised
-  4. Save temp_denoised → denoise_history for Frame N+1
+ 1. Ray trace → out_img (current noisy render)
+ 2. Denoise out_img → temp_denoised (current frame denoising)
+ 3. Blend: result = 0.7 * prev_denoised + 0.3 * temp_denoised
+ 4. Save temp_denoised → denoise_history for Frame N+1
 
 Frame N+1:
-  1. Ray trace → out_img
-  2. Denoise out_img → temp_denoised
-  3. Blend: result = 0.7 * denoise_history + 0.3 * temp_denoised (uses Frame N's denoised)
-  4. Save temp_denoised → denoise_history
+ 1. Ray trace → out_img
+ 2. Denoise out_img → temp_denoised
+ 3. Blend: result = 0.7 * denoise_history + 0.3 * temp_denoised (uses Frame N's denoised)
+ 4. Save temp_denoised → denoise_history
 ```
 
 This creates a temporal feedback loop where denoising results are accumulated over time.
@@ -62,8 +62,8 @@ This creates a temporal feedback loop where denoising results are accumulated ov
 ### 3. New Environment Variable
 
 ```c
-int temporal_denoise_enabled = ysu_env_bool("YSU_GPU_TEMPORAL_DENOISE", 1);  // default ON
-float temporal_denoise_weight = ysu_env_float("YSU_GPU_TEMPORAL_DENOISE_WEIGHT", 0.7f);  // 0.7 = 70% prev, 30% curr
+int temporal_denoise_enabled = ysu_env_bool("YSU_GPU_TEMPORAL_DENOISE", 1); // default ON
+float temporal_denoise_weight = ysu_env_float("YSU_GPU_TEMPORAL_DENOISE_WEIGHT", 0.7f); // 0.7 = 70% prev, 30% curr
 ```
 
 ## Shader Changes
@@ -75,26 +75,26 @@ float temporal_denoise_weight = ysu_env_float("YSU_GPU_TEMPORAL_DENOISE_WEIGHT",
 
 layout(local_size_x = 16, local_size_y = 16) in;
 
-layout(set=0, binding=0, rgba32f) uniform image2D current_frame;  // Current denoised
-layout(set=0, binding=1, rgba32f) uniform image2D history_frame;  // Previous denoised
-layout(set=0, binding=2, rgba32f) uniform image2D output;         // Blended result
+layout(set=0, binding=0, rgba32f) uniform image2D current_frame; // Current denoised
+layout(set=0, binding=1, rgba32f) uniform image2D history_frame; // Previous denoised
+layout(set=0, binding=2, rgba32f) uniform image2D output; // Blended result
 
 layout(push_constant) uniform PC {
-    int W, H;
-    float weight;  // 0.7 = 70% history, 30% current
+ int W, H;
+ float weight; // 0.7 = 70% history, 30% current
 } pc;
 
 void main() {
-    ivec2 pos = ivec2(gl_GlobalInvocationID.xy);
-    if(pos.x >= pc.W || pos.y >= pc.H) return;
-    
-    vec4 curr = imageLoad(current_frame, pos);
-    vec4 hist = imageLoad(history_frame, pos);
-    
-    // Temporal blend
-    vec4 result = mix(curr, hist, pc.weight);
-    
-    imageStore(output, pos, result);
+ ivec2 pos = ivec2(gl_GlobalInvocationID.xy);
+ if(pos.x >= pc.W || pos.y >= pc.H) return;
+ 
+ vec4 curr = imageLoad(current_frame, pos);
+ vec4 hist = imageLoad(history_frame, pos);
+ 
+ // Temporal blend
+ vec4 result = mix(curr, hist, pc.weight);
+ 
+ imageStore(output, pos, result);
 }
 ```
 
@@ -137,9 +137,9 @@ void main() {
 ## Integration Points
 
 ### Works with:
-- ✅ Option 1 (Denoise Skip) - complementary, temporal blend masks skip artifacts
-- ✅ Session 12 (Temporal Accumulation) - stacks with frame blending
-- ✅ Session 13 (Render Scale) - scale applies to all stages
+- Option 1 (Denoise Skip) - complementary, temporal blend masks skip artifacts
+- Session 12 (Temporal Accumulation) - stacks with frame blending
+- Session 13 (Render Scale) - scale applies to all stages
 
 ### Considerations:
 - Need to manage history buffer lifecycle

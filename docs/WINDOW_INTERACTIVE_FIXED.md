@@ -1,10 +1,10 @@
-# Interactive Window Mode - FIXED ✅
+# Interactive Window Mode - FIXED 
 
 ## Summary
 
 Successfully implemented interactive windowed GPU raytracer with WASD movement and mouse look controls using **uniform buffers** for camera data instead of push constants.
 
-**Status**: ✅ WORKING - Window renders at ~85 FPS (640×360) with all controls functional
+**Status**: WORKING - Window renders at ~85 FPS (640×360) with all controls functional
 
 ---
 
@@ -20,18 +20,18 @@ Two issues were discovered and fixed:
 
 ### Solution: Uniform Buffer + Pipeline Binding
 1. **Moved camera data to uniform buffer** (binding 7, CameraUBO struct, 64 bytes)
-   - Much more stable than push constants for per-frame camera updates
-   - Supports larger data structures without Vulkan driver quirks
-   - Better for interactive controls (read from mapped buffer each frame)
+ - Much more stable than push constants for per-frame camera updates
+ - Supports larger data structures without Vulkan driver quirks
+ - Better for interactive controls (read from mapped buffer each frame)
 
 2. **Reduced push constants** to 48 bytes (10 ints + 2 floats)
-   - Stays well within 128-byte Vulkan limit
-   - No driver validation issues
+ - Stays well within 128-byte Vulkan limit
+ - No driver validation issues
 
 3. **Fixed missing pipeline binding** in window render loop
-   - Added `vkCmdBindPipeline()` on first frame
-   - Added `vkCmdBindDescriptorSets()` on first frame
-   - Both stay bound across multiple dispatch calls
+ - Added `vkCmdBindPipeline()` on first frame
+ - Added `vkCmdBindDescriptorSets()` on first frame
+ - Both stay bound across multiple dispatch calls
 
 ---
 
@@ -42,22 +42,22 @@ Two issues were discovered and fixed:
 **1. Camera UBO Structure** (gpu_vulkan_demo.c, line ~120)
 ```c
 typedef struct {
-    float pos[4];      // xyz = camera position, w = unused
-    float forward[4];  // xyz = forward direction, w = unused
-    float right[4];    // xyz = right direction, w = unused
-    float up[4];       // xyz = up direction, w = unused
+ float pos[4]; // xyz = camera position, w = unused
+ float forward[4]; // xyz = forward direction, w = unused
+ float right[4]; // xyz = right direction, w = unused
+ float up[4]; // xyz = up direction, w = unused
 } CameraUBO;
 ```
 
 **2. Push Constants Reduced** (gpu_vulkan_demo.c, line ~120)
 ```c
 typedef struct {
-    int W, H, frame, seed, triCount, nodeCount, useBVH;
-    int cullBackface, rootCount, enableCounters;
-    float alpha;
-    int resetAccum;
-    // Camera now in UBO binding 7 instead of push constants
-} PushConstants;  // 48 bytes (was 112)
+ int W, H, frame, seed, triCount, nodeCount, useBVH;
+ int cullBackface, rootCount, enableCounters;
+ float alpha;
+ int resetAccum;
+ // Camera now in UBO binding 7 instead of push constants
+} PushConstants; // 48 bytes (was 112)
 ```
 
 **3. Descriptor Set Layout** (gpu_vulkan_demo.c, line ~1400)
@@ -68,7 +68,7 @@ typedef struct {
 ```c
 VkBuffer cam_ubo = create_buffer(dev, sizeof(CameraUBO), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT);
 VkDeviceMemory cam_ubo_mem = alloc_bind_buffer_mem(phy, dev, cam_ubo, 
-    VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+ VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 void* cam_ubo_mapped = NULL;
 vkMapMemory(dev, cam_ubo_mem, 0, sizeof(CameraUBO), 0, &cam_ubo_mapped);
 ```
@@ -85,8 +85,8 @@ cam_data->up[0] = up.x; cam_data->up[1] = up.y; cam_data->up[2] = up.z; cam_data
 **6. Fixed Pipeline Binding** (gpu_vulkan_demo.c, line ~2175)
 ```c
 if(render_count == 1 && f == 0) { 
-    vkCmdBindPipeline(cb, VK_PIPELINE_BIND_POINT_COMPUTE, pipe);
-    vkCmdBindDescriptorSets(cb, VK_PIPELINE_BIND_POINT_COMPUTE, pl, 0, 1, &ds, 0, NULL);
+ vkCmdBindPipeline(cb, VK_PIPELINE_BIND_POINT_COMPUTE, pipe);
+ vkCmdBindDescriptorSets(cb, VK_PIPELINE_BIND_POINT_COMPUTE, pl, 0, 1, &ds, 0, NULL);
 }
 ```
 
@@ -99,31 +99,31 @@ if(render_count == 1 && f == 0) {
 **Before** (Camera in push constants):
 ```glsl
 layout(push_constant) uniform Push {
-    int W, H, frame, seed, triCount, nodeCount, useBVH;
-    int cullBackface, rootCount, enableCounters;
-    float alpha;
-    int resetAccum;
-    vec4 camPos;
-    vec4 camForward;
-    vec4 camRight;
-    vec4 camUp;
+ int W, H, frame, seed, triCount, nodeCount, useBVH;
+ int cullBackface, rootCount, enableCounters;
+ float alpha;
+ int resetAccum;
+ vec4 camPos;
+ vec4 camForward;
+ vec4 camRight;
+ vec4 camUp;
 } pc;
 ```
 
 **After** (Camera in uniform buffer):
 ```glsl
 layout(std140, set=0, binding=7) uniform CameraUBO {
-    vec4 pos;      // xyz = camera position
-    vec4 forward;  // xyz = forward direction
-    vec4 right;    // xyz = right direction
-    vec4 up;       // xyz = up direction
+ vec4 pos; // xyz = camera position
+ vec4 forward; // xyz = forward direction
+ vec4 right; // xyz = right direction
+ vec4 up; // xyz = up direction
 } camera;
 
 layout(push_constant) uniform Push {
-    int W, H, frame, seed, triCount, nodeCount, useBVH;
-    int cullBackface, rootCount, enableCounters;
-    float alpha;
-    int resetAccum;
+ int W, H, frame, seed, triCount, nodeCount, useBVH;
+ int cullBackface, rootCount, enableCounters;
+ float alpha;
+ int resetAccum;
 } pc;
 ```
 
@@ -143,7 +143,7 @@ vec3 up = safe_normalize(camera.up.xyz);
 - **Resolution**: 1280×1024 input (640×360 render scale)
 - **Frames tested**: 120 @ 640×360
 - **Time**: 1.41 seconds
-- **FPS**: **~85 FPS** ✅
+- **FPS**: **~85 FPS** 
 
 ### Headless Mode (Unchanged)
 - **Resolution**: 1920×1080 (or render scaled)
@@ -153,9 +153,9 @@ vec3 up = safe_normalize(camera.up.xyz);
 ### Comparison vs Previous Attempts
 | Mode | Before | After | Status |
 |------|--------|-------|--------|
-| Window (interactive) | CRASH vkCmdDispatch | 85 FPS | ✅ FIXED |
-| Headless (scripted) | 180 FPS | 180 FPS | ✅ Unchanged |
-| Push constant size | 112 bytes | 48 bytes | ✅ Reduced |
+| Window (interactive) | CRASH vkCmdDispatch | 85 FPS | FIXED |
+| Headless (scripted) | 180 FPS | 180 FPS | Unchanged |
+| Push constant size | 112 bytes | 48 bytes | Reduced |
 
 ---
 
@@ -177,10 +177,10 @@ vec3 up = safe_normalize(camera.up.xyz);
 
 **Environment Variables**:
 ```
-YSU_GPU_WINDOW=1              # Enable window mode
-YSU_CAM_SPEED=3.0             # Movement speed (units/sec)
-YSU_CAM_MOUSE_SENS=0.0025     # Mouse sensitivity (rad/pixel)
-YSU_CAM_MOUSE_LOCK=1          # Lock/hide cursor for FPS-style look
+YSU_GPU_WINDOW=1 # Enable window mode
+YSU_CAM_SPEED=3.0 # Movement speed (units/sec)
+YSU_CAM_MOUSE_SENS=0.0025 # Mouse sensitivity (rad/pixel)
+YSU_CAM_MOUSE_LOCK=1 # Lock/hide cursor for FPS-style look
 ```
 
 ---
@@ -235,29 +235,29 @@ $env:YSU_GPU_FRAMES=600
 ## Files Modified
 
 1. **gpu_vulkan_demo.c** (~20 lines added, ~10 lines removed)
-   - Camera UBO struct definition
-   - Descriptor binding for UBO
-   - Camera UBO creation and mapping
-   - Per-frame camera data update
-   - Pipeline binding fix
+ - Camera UBO struct definition
+ - Descriptor binding for UBO
+ - Camera UBO creation and mapping
+ - Per-frame camera data update
+ - Pipeline binding fix
 
 2. **shaders/tri.comp** (~10 lines changed)
-   - Push constant layout reduced
-   - Camera UBO struct added
-   - Ray setup updated to use UBO instead of push constants
+ - Push constant layout reduced
+ - Camera UBO struct added
+ - Ray setup updated to use UBO instead of push constants
 
 ---
 
 ## Testing Checklist
 
-- ✅ Window opens without crashing
-- ✅ First frame renders correctly
-- ✅ Maintains 85+ FPS
-- ✅ WASD movement works
-- ✅ Mouse look works
-- ✅ Camera stays consistent across frames
-- ✅ Headless mode still works (unchanged logic)
-- ✅ Build succeeds cleanly
+- Window opens without crashing
+- First frame renders correctly
+- Maintains 85+ FPS
+- WASD movement works
+- Mouse look works
+- Camera stays consistent across frames
+- Headless mode still works (unchanged logic)
+- Build succeeds cleanly
 
 ---
 

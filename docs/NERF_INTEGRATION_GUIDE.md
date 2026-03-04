@@ -10,17 +10,17 @@ The GPU raytracer has been enhanced with a **NeRF-style walkable camera system**
 
 ---
 
-## 🎬 Scene Features
+## Scene Features
 
 ### Camera Movement
 - **Position**: Walks in spiral pattern through space
-  - Oscillates left-right (±3.0 units)
-  - Maintains eye height at 1.6 units
-  - Moves forward/backward smoothly
+ - Oscillates left-right (±3.0 units)
+ - Maintains eye height at 1.6 units
+ - Moves forward/backward smoothly
 - **Head Look**: Turns head smoothly to look around
-  - Full 360° horizontal head rotation (300 frame period)
-  - Gentle up/down head tilt
-  - Maintains natural eye-to-world orientation
+ - Full 360° horizontal head rotation (300 frame period)
+ - Gentle up/down head tilt
+ - Maintains natural eye-to-world orientation
 
 ### Environment
 - **360-degree viewing**: Can look in any direction
@@ -38,7 +38,7 @@ The GPU raytracer has been enhanced with a **NeRF-style walkable camera system**
 
 ---
 
-## 🧠 NeRF Neural Network Integration
+## NeRF Neural Network Integration
 
 ### Method 1: NeRF Weight Loading (RECOMMENDED)
 
@@ -46,27 +46,27 @@ For integrating pre-trained NeRF models, add a compute shader that queries the n
 
 ```glsl
 // nerf_eval.comp - Query NeRF network for ray color
-layout(set=0, binding=7, rgba32f) uniform image3D nerf_weights;  // Network weights
-layout(set=0, binding=8) uniform sampler3D nerf_features;        // Feature cache
+layout(set=0, binding=7, rgba32f) uniform image3D nerf_weights; // Network weights
+layout(set=0, binding=8) uniform sampler3D nerf_features; // Feature cache
 
 vec3 query_nerf(vec3 ro, vec3 rd, float t) {
-    // Sample point along ray
-    vec3 pos = ro + rd * t;
-    
-    // Normalize position to [-1, 1] for network input
-    vec3 normalized_pos = pos / 8.0;  // Assuming 8-unit scene radius
-    
-    // Query positional encoding
-    vec3 encoded = positional_encoding(normalized_pos);
-    
-    // MLP forward pass (simplified - real implementation needs full network)
-    vec3 features = texture(nerf_features, encoded).rgb;
-    
-    // Output RGB + density
-    vec3 color = features.rgb;
-    float alpha = features.a;
-    
-    return color;
+ // Sample point along ray
+ vec3 pos = ro + rd * t;
+ 
+ // Normalize position to [-1, 1] for network input
+ vec3 normalized_pos = pos / 8.0; // Assuming 8-unit scene radius
+ 
+ // Query positional encoding
+ vec3 encoded = positional_encoding(normalized_pos);
+ 
+ // MLP forward pass (simplified - real implementation needs full network)
+ vec3 features = texture(nerf_features, encoded).rgb;
+ 
+ // Output RGB + density
+ vec3 color = features.rgb;
+ float alpha = features.a;
+ 
+ return color;
 }
 ```
 
@@ -76,7 +76,7 @@ Use Instant Neural Graphics Primitives for real-time NeRF:
 
 ```c
 // In gpu_vulkan_demo.c
-#include "instant_ngp.h"  // Or similar library
+#include "instant_ngp.h" // Or similar library
 
 // Load NeRF checkpoint
 ngp_network_t nerf = ngp_load_checkpoint("path/to/nerf_model.json");
@@ -92,25 +92,25 @@ Use a procedural approximation of NeRF behavior:
 ```glsl
 // Procedural NeRF-like rendering (in tri.comp)
 vec3 nerf_color(vec3 ro, vec3 rd, float t) {
-    vec3 pos = ro + rd * t;
-    
-    // Simple NeRF-like volumetric shading
-    float density = exp(-length(pos) * 0.1);  // Falloff from origin
-    
-    // Ambient + directional lighting
-    vec3 light_dir = normalize(vec3(1.0, 2.0, 1.0));
-    float diffuse = max(0.3, dot(normalize(pos), light_dir));
-    
-    // Color based on position (hash-based)
-    vec3 color = sin(pos * 2.0) * 0.5 + 0.5;
-    
-    return color * diffuse * density;
+ vec3 pos = ro + rd * t;
+ 
+ // Simple NeRF-like volumetric shading
+ float density = exp(-length(pos) * 0.1); // Falloff from origin
+ 
+ // Ambient + directional lighting
+ vec3 light_dir = normalize(vec3(1.0, 2.0, 1.0));
+ float diffuse = max(0.3, dot(normalize(pos), light_dir));
+ 
+ // Color based on position (hash-based)
+ vec3 color = sin(pos * 2.0) * 0.5 + 0.5;
+ 
+ return color * diffuse * density;
 }
 ```
 
 ---
 
-## 🚀 Running Walkable NeRF Scene
+## Running Walkable NeRF Scene
 
 ### Build Command
 ```batch
@@ -122,9 +122,9 @@ gcc -std=c11 -O2 -pthread -o gpu_demo.exe gpu_vulkan_demo.c gpu_bvh_lbv.c bilate
 ```powershell
 $env:YSU_GPU_W = 1920
 $env:YSU_GPU_H = 1080
-$env:YSU_GPU_FRAMES = 600          # 10 seconds of walking
+$env:YSU_GPU_FRAMES = 600 # 10 seconds of walking
 $env:YSU_GPU_DENOISE = 1
-$env:YSU_GPU_DENOISE_SKIP = 8      # Fast denoising for smooth motion
+$env:YSU_GPU_DENOISE_SKIP = 8 # Fast denoising for smooth motion
 .\gpu_demo.exe
 ```
 
@@ -132,13 +132,13 @@ $env:YSU_GPU_DENOISE_SKIP = 8      # Fast denoising for smooth motion
 ```powershell
 $env:YSU_GPU_NERF_ENABLED = 1
 $env:YSU_GPU_NERF_MODEL = "path/to/nerf.json"
-$env:YSU_GPU_NERF_SCALE = 8.0       # Scene radius
+$env:YSU_GPU_NERF_SCALE = 8.0 # Scene radius
 .\gpu_demo.exe
 ```
 
 ---
 
-## 📊 Performance Characteristics
+## Performance Characteristics
 
 ### Current Implementation (Procedural Scene)
 
@@ -158,26 +158,26 @@ $env:YSU_GPU_NERF_SCALE = 8.0       # Scene radius
 
 ---
 
-## 🎮 Camera Control Parameters
+## Camera Control Parameters
 
 ### Environment Variables
 
 ```powershell
 # Walking speed
-$env:YSU_NERF_WALK_SPEED = 0.01    # Units per frame (default 0.01)
+$env:YSU_NERF_WALK_SPEED = 0.01 # Units per frame (default 0.01)
 
 # Head look speed
-$env:YSU_NERF_HEAD_YAW_SPEED = 1.0  # 360° turns per N frames (default 300)
-$env:YSU_NERF_HEAD_PITCH_SPEED = 0.01  # Up/down tilt speed
+$env:YSU_NERF_HEAD_YAW_SPEED = 1.0 # 360° turns per N frames (default 300)
+$env:YSU_NERF_HEAD_PITCH_SPEED = 0.01 # Up/down tilt speed
 
 # Camera height
-$env:YSU_NERF_EYE_HEIGHT = 1.6      # Human eye height in units
+$env:YSU_NERF_EYE_HEIGHT = 1.6 # Human eye height in units
 
 # Scene scale
-$env:YSU_NERF_SCALE = 8.0           # Radius of NeRF volume
+$env:YSU_NERF_SCALE = 8.0 # Radius of NeRF volume
 
 # Walking path type
-$env:YSU_NERF_PATH = "spiral"       # Options: spiral, circle, linear, brownian
+$env:YSU_NERF_PATH = "spiral" # Options: spiral, circle, linear, brownian
 ```
 
 ### Camera Path Types
@@ -190,9 +190,9 @@ $env:YSU_NERF_PATH = "spiral"       # Options: spiral, circle, linear, brownian
 
 ---
 
-## 📝 Integration Checklist
+## Integration Checklist
 
-### Phase 1: Walkable Camera (✅ COMPLETE)
+### Phase 1: Walkable Camera ( COMPLETE)
 - [x] Free-form camera positioning
 - [x] Head look-around capability
 - [x] Perspective projection
@@ -220,7 +220,7 @@ $env:YSU_NERF_PATH = "spiral"       # Options: spiral, circle, linear, brownian
 
 ---
 
-## 💻 Code Integration Points
+## Code Integration Points
 
 ### For Custom NeRF Network
 
@@ -240,7 +240,7 @@ vkUpdateDescriptorSetWithTemplate(..., nerf_weights_image);
 ```c
 // Line 2050, modify:
 int nerf_enabled = ysu_env_bool("YSU_GPU_NERF_ENABLED", 0);
-push_i[10] = nerf_enabled;  // Pass to shader
+push_i[10] = nerf_enabled; // Pass to shader
 ```
 
 ### For Shader Integration
@@ -258,15 +258,15 @@ layout(set=0, binding=11) uniform sampler3D nerf_cache;
 // Replace color computation with:
 vec3 final_color;
 if(pc.nerf_enabled != 0) {
-    final_color = trace_nerf_ray(ro, rd);
+ final_color = trace_nerf_ray(ro, rd);
 } else {
-    final_color = trace_geometry_ray(ro, rd);
+ final_color = trace_geometry_ray(ro, rd);
 }
 ```
 
 ---
 
-## 📁 File Modifications
+## File Modifications
 
 ### Changed Files
 - `shaders/tri.comp` - Added walkable camera system (+35 lines)
@@ -279,7 +279,7 @@ if(pc.nerf_enabled != 0) {
 
 ---
 
-## 🎯 Next Steps
+## Next Steps
 
 ### Immediate (Optional Enhancements)
 1. Test walkable camera with animated sequence
@@ -307,7 +307,7 @@ if(pc.nerf_enabled != 0) {
 
 ---
 
-## 📖 Resources
+## Resources
 
 ### NeRF Papers & Implementations
 - Original NeRF: https://arxiv.org/abs/2003.08934
@@ -321,9 +321,9 @@ if(pc.nerf_enabled != 0) {
 
 ---
 
-## ✨ Features Summary
+## Features Summary
 
-### Implemented ✅
+### Implemented 
 - Free-form 360-degree camera
 - Walking movement through space
 - Natural head look-around
@@ -331,14 +331,14 @@ if(pc.nerf_enabled != 0) {
 - Skip=8 optimization
 - Frame-based animation
 
-### Ready for Integration 🔧
+### Ready for Integration 
 - NeRF network evaluation pipeline
 - Weight loading infrastructure
 - Multiple path types
 - Configurable parameters
 - Performance monitoring
 
-### Future Enhancements 🚀
+### Future Enhancements 
 - Interactive input (keyboard, mouse)
 - Real-time NeRF training
 - Multi-scene support
@@ -347,7 +347,7 @@ if(pc.nerf_enabled != 0) {
 
 ---
 
-## 🎬 Example Output
+## Example Output
 
 Run this for a walkable 360 NeRF-style scene:
 
@@ -370,4 +370,4 @@ Expected: Smooth camera motion through 360 environment at 180+ FPS
 
 ---
 
-**Status**: ✅ Walkable NeRF camera system ready for integration
+**Status**: Walkable NeRF camera system ready for integration

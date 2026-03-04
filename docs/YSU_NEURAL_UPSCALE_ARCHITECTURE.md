@@ -25,58 +25,58 @@
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                    FRAME N PIPELINE                              │
-│                                                                  │
-│  ┌─────────┐   ┌───────────┐   ┌──────────────┐                │
-│  │ G-Buffer │──▶│ Low-Res   │──▶│ Motion Vector│                │
-│  │ + Depth  │   │ Raytracer │   │ Generation   │                │
-│  └─────────┘   └───────────┘   └──────┬───────┘                │
-│       │              │                  │                        │
-│       ▼              ▼                  ▼                        │
-│  ┌─────────────────────────────────────────────────┐            │
-│  │     PASS 1: Temporal Reprojection (Compute)      │            │
-│  │                                                   │            │
-│  │  • Reproject history H_{n-1} using MV             │            │
-│  │  • Neighborhood color clamping (AABB / variance)  │            │
-│  │  • Disocclusion detection via depth + MV length   │            │
-│  │  • Output: reprojected_color, confidence_mask     │            │
-│  └─────────────────────┬───────────────────────────┘            │
-│                         │                                        │
-│                         ▼                                        │
-│  ┌─────────────────────────────────────────────────┐            │
-│  │     PASS 2: Neural Super-Resolution (Compute)    │            │
-│  │                                                   │            │
-│  │  Input tensor (per output pixel):                 │            │
-│  │    • Bilinear-sampled low-res color (3ch)         │            │
-│  │    • Reprojected history color (3ch)              │            │
-│  │    • Flow/MV at output res (2ch)                  │            │
-│  │    • Depth (1ch)                                  │            │
-│  │    • Jitter offset (2ch)                          │            │
-│  │    • Confidence/disocclusion mask (1ch)           │            │
-│  │  ─────────────────────────────────                │            │
-│  │  Total: 12 channels                               │            │
-│  │                                                   │            │
-│  │  Architecture: Lightweight hybrid CNN             │            │
-│  │    Encoder  → 3×3 depthwise-sep convolutions      │            │
-│  │    Bottleneck → channel attention (SE block)       │            │
-│  │    Decoder  → sub-pixel shuffle (ESPCN-style)     │            │
-│  │    Skip     → direct bilinear upsample bypass     │            │
-│  │                                                   │            │
-│  │  Output: upscaled color (3ch) at W_hi × H_hi     │            │
-│  └─────────────────────┬───────────────────────────┘            │
-│                         │                                        │
-│                         ▼                                        │
-│  ┌─────────────────────────────────────────────────┐            │
-│  │     PASS 3: Sharpening + History Update           │            │
-│  │                                                   │            │
-│  │  • Adaptive CAS (contrast-adaptive sharpening)    │            │
-│  │  • Write output to display target                 │            │
-│  │  • Copy output → history buffer H_n               │            │
-│  └─────────────────────────────────────────────────┘            │
-│                                                                  │
-│  FALLBACK PATH (no neural weights):                              │
-│    Pass 1 reprojection → Catmull-Rom upsample + TAA blend        │
-│    (No neural inference, ~0.3 ms at 4K on mid-range GPU)         │
+│ FRAME N PIPELINE │
+│ │
+│ ┌─────────┐ ┌───────────┐ ┌──────────────┐ │
+│ │ G-Buffer │──│ Low-Res │──│ Motion Vector│ │
+│ │ + Depth │ │ Raytracer │ │ Generation │ │
+│ └─────────┘ └───────────┘ └──────┬───────┘ │
+│ │ │ │ │
+│ ▼ ▼ ▼ │
+│ ┌─────────────────────────────────────────────────┐ │
+│ │ PASS 1: Temporal Reprojection (Compute) │ │
+│ │ │ │
+│ │ • Reproject history H_{n-1} using MV │ │
+│ │ • Neighborhood color clamping (AABB / variance) │ │
+│ │ • Disocclusion detection via depth + MV length │ │
+│ │ • Output: reprojected_color, confidence_mask │ │
+│ └─────────────────────┬───────────────────────────┘ │
+│ │ │
+│ ▼ │
+│ ┌─────────────────────────────────────────────────┐ │
+│ │ PASS 2: Neural Super-Resolution (Compute) │ │
+│ │ │ │
+│ │ Input tensor (per output pixel): │ │
+│ │ • Bilinear-sampled low-res color (3ch) │ │
+│ │ • Reprojected history color (3ch) │ │
+│ │ • Flow/MV at output res (2ch) │ │
+│ │ • Depth (1ch) │ │
+│ │ • Jitter offset (2ch) │ │
+│ │ • Confidence/disocclusion mask (1ch) │ │
+│ │ ───────────────────────────────── │ │
+│ │ Total: 12 channels │ │
+│ │ │ │
+│ │ Architecture: Lightweight hybrid CNN │ │
+│ │ Encoder → 3×3 depthwise-sep convolutions │ │
+│ │ Bottleneck → channel attention (SE block) │ │
+│ │ Decoder → sub-pixel shuffle (ESPCN-style) │ │
+│ │ Skip → direct bilinear upsample bypass │ │
+│ │ │ │
+│ │ Output: upscaled color (3ch) at W_hi × H_hi │ │
+│ └─────────────────────┬───────────────────────────┘ │
+│ │ │
+│ ▼ │
+│ ┌─────────────────────────────────────────────────┐ │
+│ │ PASS 3: Sharpening + History Update │ │
+│ │ │ │
+│ │ • Adaptive CAS (contrast-adaptive sharpening) │ │
+│ │ • Write output to display target │ │
+│ │ • Copy output → history buffer H_n │ │
+│ └─────────────────────────────────────────────────┘ │
+│ │
+│ FALLBACK PATH (no neural weights): │
+│ Pass 1 reprojection → Catmull-Rom upsample + TAA blend │
+│ (No neural inference, ~0.3 ms at 4K on mid-range GPU) │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -89,7 +89,7 @@
 For frame index `n`, the jitter in clip-space is:
 
 ```
-J_n = ( Halton(n, base=2) − 0.5,  Halton(n, base=3) − 0.5 )
+J_n = ( Halton(n, base=2) − 0.5, Halton(n, base=3) − 0.5 )
 ```
 
 This is added to the projection matrix *before* rasterization / ray generation:
@@ -105,13 +105,13 @@ Where `T(tx, ty, 0)` is a translation in NDC that shifts by sub-pixel amounts.
 Given pixel `p = (x, y)` in the current low-res frame with motion vector `MV(p)`:
 
 ```
-p_prev = p + MV(p)       (screen-space, low-res coordinates)
+p_prev = p + MV(p) (screen-space, low-res coordinates)
 ```
 
 To sample the high-res history buffer:
 
 ```
-p_hi = p_prev · r + 0.5 · (r − 1)    (upscale to high-res pixel coords)
+p_hi = p_prev · r + 0.5 · (r − 1) (upscale to high-res pixel coords)
 ```
 
 The reprojected history sample is obtained via **bicubic Catmull-Rom** filtering of `H_{n-1}` at `p_hi`:
@@ -143,8 +143,8 @@ H_clamped(p) = clamp( H_reproj(p), AABB_min, AABB_max )
 This operates in **YCoCg** color space for perceptual correctness:
 
 ```
-Y  = 0.25·R + 0.50·G + 0.25·B
-Co = 0.50·R           − 0.50·B
+Y = 0.25·R + 0.50·G + 0.25·B
+Co = 0.50·R − 0.50·B
 Cg = −0.25·R + 0.50·G − 0.25·B
 ```
 
@@ -159,9 +159,9 @@ A pixel is disoccluded (no valid history) when:
 The confidence mask `α(p) ∈ [0, 1]`:
 
 ```
-α(p) = 1.0                        if none triggered
-α(p) = max(0, 1 − |Δ_depth|/τ)   if depth mismatch
-α(p) = 0.0                        if out-of-screen
+α(p) = 1.0 if none triggered
+α(p) = max(0, 1 − |Δ_depth|/τ) if depth mismatch
+α(p) = 0.0 if out-of-screen
 ```
 
 ### 2.5 Temporal blend (fallback / pre-neural)
@@ -198,31 +198,31 @@ The network is deliberately small for real-time inference at 4K output (~2ms tar
 
 ```
 Layer 0 — Input Projection
-  Conv2D 3×3, 12 → 32 channels, ReLU
-  (depthwise-separable: 12→12 DW 3×3, then 12→32 PW 1×1)
+ Conv2D 3×3, 12 → 32 channels, ReLU
+ (depthwise-separable: 12→12 DW 3×3, then 12→32 PW 1×1)
 
 Layer 1 — Feature Extraction Block A
-  Conv2D 3×3, 32 → 32, ReLU (depthwise-sep)
-  Conv2D 3×3, 32 → 32, ReLU (depthwise-sep)
-  + Residual skip
+ Conv2D 3×3, 32 → 32, ReLU (depthwise-sep)
+ Conv2D 3×3, 32 → 32, ReLU (depthwise-sep)
+ + Residual skip
 
 Layer 2 — Feature Extraction Block B
-  Conv2D 3×3, 32 → 32, ReLU (depthwise-sep)
-  Conv2D 3×3, 32 → 32, ReLU (depthwise-sep)
-  + Residual skip
+ Conv2D 3×3, 32 → 32, ReLU (depthwise-sep)
+ Conv2D 3×3, 32 → 32, ReLU (depthwise-sep)
+ + Residual skip
 
 Layer 3 — Channel Attention (SE Block)
-  GlobalAvgPool → 32
-  FC 32 → 8, ReLU
-  FC 8 → 32, Sigmoid
-  Scale features element-wise
+ GlobalAvgPool → 32
+ FC 32 → 8, ReLU
+ FC 8 → 32, Sigmoid
+ Scale features element-wise
 
 Layer 4 — Sub-pixel Reconstruction
-  Conv2D 3×3, 32 → 3·r², no activation
-  PixelShuffle(r)  →  3 channels at W_hi × H_hi
+ Conv2D 3×3, 32 → 3·r², no activation
+ PixelShuffle(r) → 3 channels at W_hi × H_hi
 
 Layer 5 — Residual Addition
-  Output = PixelShuffle_output + BilinearUpsample(current_color)
+ Output = PixelShuffle_output + BilinearUpsample(current_color)
 ```
 
 **Parameter count (r=2):**
@@ -274,7 +274,7 @@ Augmentation:
 **Primary loss — Charbonnier (smooth L1):**
 
 ```
-L_char = sqrt( ||O − G||² + ε² ),   ε = 1e-3
+L_char = sqrt( ||O − G||² + ε² ), ε = 1e-3
 ```
 
 Better than L1 at preserving sharp edges; better than L2 at avoiding over-smoothing.
@@ -282,7 +282,7 @@ Better than L1 at preserving sharp edges; better than L2 at avoiding over-smooth
 **Perceptual loss (LPIPS-like, using a frozen feature extractor):**
 
 ```
-L_perc = Σ_l  w_l · || φ_l(O) − φ_l(G) ||₁
+L_perc = Σ_l w_l · || φ_l(O) − φ_l(G) ||₁
 ```
 
 Where `φ_l` are features from layers {conv1, conv2, conv3} of a small VGG-style classifier. Weights `w_l = {0.1, 0.1, 0.05}`.
@@ -341,48 +341,48 @@ Runtime loads this blob into a `VkBuffer` with `VK_BUFFER_USAGE_STORAGE_BUFFER_B
 
 ```
 Set 0 (Temporal Reprojection):
-  binding 0: combined image sampler — color_lo
-  binding 1: combined image sampler — depth_lo
-  binding 2: combined image sampler — motion_vec
-  binding 3: combined image sampler — history_hi
-  binding 4: storage image          — reproj_hi (output)
-  binding 5: storage image          — confidence (output)
+ binding 0: combined image sampler — color_lo
+ binding 1: combined image sampler — depth_lo
+ binding 2: combined image sampler — motion_vec
+ binding 3: combined image sampler — history_hi
+ binding 4: storage image — reproj_hi (output)
+ binding 5: storage image — confidence (output)
 
 Set 1 (Neural Upscale):
-  binding 0: combined image sampler — color_lo
-  binding 1: storage image          — reproj_hi (input)
-  binding 2: storage image          — confidence (input)
-  binding 3: combined image sampler — depth_lo
-  binding 4: combined image sampler — motion_vec
-  binding 5: storage buffer         — weights_buf
-  binding 6: storage image          — output_hi
+ binding 0: combined image sampler — color_lo
+ binding 1: storage image — reproj_hi (input)
+ binding 2: storage image — confidence (input)
+ binding 3: combined image sampler — depth_lo
+ binding 4: combined image sampler — motion_vec
+ binding 5: storage buffer — weights_buf
+ binding 6: storage image — output_hi
 
 Set 2 (Sharpen + History Copy):
-  binding 0: storage image — output_hi (input)
-  binding 1: storage image — history_hi (output, for next frame)
-  binding 2: storage image — display_target
+ binding 0: storage image — output_hi (input)
+ binding 1: storage image — history_hi (output, for next frame)
+ binding 2: storage image — display_target
 ```
 
 ### 5.3 Compute dispatch
 
 ```
 Pass 1 (Reprojection):
-  Workgroup: 16×16
-  Dispatch: ceil(W_hi/16) × ceil(H_hi/16) × 1
+ Workgroup: 16×16
+ Dispatch: ceil(W_hi/16) × ceil(H_hi/16) × 1
 
-  ── Image barrier: reproj_hi, confidence → SHADER_READ ──
+ ── Image barrier: reproj_hi, confidence → SHADER_READ ──
 
 Pass 2 (Neural Upscale):
-  Workgroup: 16×16
-  Dispatch: ceil(W_hi/16) × ceil(H_hi/16) × 1
+ Workgroup: 16×16
+ Dispatch: ceil(W_hi/16) × ceil(H_hi/16) × 1
 
-  ── Image barrier: output_hi → SHADER_READ ──
+ ── Image barrier: output_hi → SHADER_READ ──
 
 Pass 3 (Sharpen + History Write):
-  Workgroup: 16×16
-  Dispatch: ceil(W_hi/16) × ceil(H_hi/16) × 1
+ Workgroup: 16×16
+ Dispatch: ceil(W_hi/16) × ceil(H_hi/16) × 1
 
-  ── Image barrier: history_hi → SHADER_READ (for next frame) ──
+ ── Image barrier: history_hi → SHADER_READ (for next frame) ──
 ```
 
 ### 5.4 Memory barriers between passes
@@ -390,23 +390,23 @@ Pass 3 (Sharpen + History Write):
 ```c
 // After Pass 1, before Pass 2:
 VkImageMemoryBarrier barriers[] = {
-    { // reproj_hi
-        .oldLayout = VK_IMAGE_LAYOUT_GENERAL,
-        .newLayout = VK_IMAGE_LAYOUT_GENERAL,
-        .srcAccessMask = VK_ACCESS_SHADER_WRITE_BIT,
-        .dstAccessMask = VK_ACCESS_SHADER_READ_BIT,
-    },
-    { // confidence
-        .oldLayout = VK_IMAGE_LAYOUT_GENERAL,
-        .newLayout = VK_IMAGE_LAYOUT_GENERAL,
-        .srcAccessMask = VK_ACCESS_SHADER_WRITE_BIT,
-        .dstAccessMask = VK_ACCESS_SHADER_READ_BIT,
-    },
+ { // reproj_hi
+ .oldLayout = VK_IMAGE_LAYOUT_GENERAL,
+ .newLayout = VK_IMAGE_LAYOUT_GENERAL,
+ .srcAccessMask = VK_ACCESS_SHADER_WRITE_BIT,
+ .dstAccessMask = VK_ACCESS_SHADER_READ_BIT,
+ },
+ { // confidence
+ .oldLayout = VK_IMAGE_LAYOUT_GENERAL,
+ .newLayout = VK_IMAGE_LAYOUT_GENERAL,
+ .srcAccessMask = VK_ACCESS_SHADER_WRITE_BIT,
+ .dstAccessMask = VK_ACCESS_SHADER_READ_BIT,
+ },
 };
 vkCmdPipelineBarrier(cmd,
-    VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
-    VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
-    0, 0, NULL, 0, NULL, 2, barriers);
+ VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
+ VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
+ 0, 0, NULL, 0, NULL, 2, barriers);
 ```
 
 ### 5.5 Async compute
@@ -415,10 +415,10 @@ The upscale pipeline can run on a dedicated **async compute queue** overlapping 
 
 ```
 Frame N:
-  Graphics Queue:  [G-buffer render N] ──────────────────▶ [G-buffer render N+1]
-  Compute Queue:             [Upscale N (Pass 1→2→3)] ──▶
-                                                   ↑
-                                         semaphore signal from graphics
+ Graphics Queue: [G-buffer render N] ────────────────── [G-buffer render N+1]
+ Compute Queue: [Upscale N (Pass 1→2→3)] ──
+ ↑
+ semaphore signal from graphics
 ```
 
 Use `VkSemaphore` to synchronize: graphics queue signals after low-res render completes, compute queue waits on that semaphore before starting upscale.
@@ -466,9 +466,9 @@ The upscale ratio `r` can change per-frame:
 - At init, allocate `history_hi` and `output_hi` at maximum display resolution
 - Push constant `r`, `W_lo`, `H_lo` change per frame
 - Weight set supports continuous `r` via the PixelShuffle layer reinterpretation:
-  - For `r=2`: 32 → 12 channels, shuffle 2×2
-  - For `r=1.5`: render at `ceil(W_hi/1.5)`, pad, shuffle 2×2, crop
-  - For `r=1.33` (Quality): same strategy
+ - For `r=2`: 32 → 12 channels, shuffle 2×2
+ - For `r=1.5`: render at `ceil(W_hi/1.5)`, pad, shuffle 2×2, crop
+ - For `r=1.33` (Quality): same strategy
 
 ---
 
@@ -511,7 +511,7 @@ For specular highlights that move faster than geometry:
 L_curr = Luminance(C_n(p))
 L_hist = Luminance(H_reproj(p))
 if |L_curr − L_hist| / max(L_curr, L_hist, 0.001) > 0.5:
-    α(p) *= 0.5   // reduce history confidence for this pixel
+ α(p) *= 0.5 // reduce history confidence for this pixel
 ```
 
 **7.2.6 Neural safety net**

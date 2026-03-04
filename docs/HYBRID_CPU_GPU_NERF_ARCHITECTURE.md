@@ -7,37 +7,37 @@
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│                    Frame Start                           │
+│ Frame Start │
 └────────────┬────────────────────────────────────┬────────┘
-             │                                    │
-      ┌──────▼──────┐                    ┌───────▼────────┐
-      │ CPU Thread  │                    │ GPU Thread     │
-      │ (NeRF SIMD) │                    │ (Mesh/FX)      │
-      └──────┬──────┘                    └───────┬────────┘
-             │                                    │
-        ┌────▼────┐                         ┌────▼──────┐
-        │ Ray      │                         │ Mesh      │
-        │ Batching │                         │ Raster    │
-        │ (SIMD)   │                         │           │
-        └────┬─────┘                         └────┬──────┘
-             │                                    │
-        ┌────▼─────────┐                    ┌────▼──────┐
-        │ Hashgrid +   │                    │ Shadow +   │
-        │ MLP (AVX2)   │                    │ Lighting   │
-        └────┬─────────┘                    └────┬──────┘
-             │                                    │
-        ┌────▼────────┐                    ┌────▼──────┐
-        │ Composite   │                    │ Denoise   │
-        │ (RGB+Alpha) │                    │           │
-        └────┬────────┘                    └────┬──────┘
-             │                                   │
-      ┌──────▼───────────────────────────────────▼──────┐
-      │    Framebuffer Sync + Blend (CPU reads GPU)     │
-      └─────────────────────────────────────────────────┘
-             │
-      ┌──────▼──────────┐
-      │  Display        │
-      └─────────────────┘
+ │ │
+ ┌──────▼──────┐ ┌───────▼────────┐
+ │ CPU Thread │ │ GPU Thread │
+ │ (NeRF SIMD) │ │ (Mesh/FX) │
+ └──────┬──────┘ └───────┬────────┘
+ │ │
+ ┌────▼────┐ ┌────▼──────┐
+ │ Ray │ │ Mesh │
+ │ Batching │ │ Raster │
+ │ (SIMD) │ │ │
+ └────┬─────┘ └────┬──────┘
+ │ │
+ ┌────▼─────────┐ ┌────▼──────┐
+ │ Hashgrid + │ │ Shadow + │
+ │ MLP (AVX2) │ │ Lighting │
+ └────┬─────────┘ └────┬──────┘
+ │ │
+ ┌────▼────────┐ ┌────▼──────┐
+ │ Composite │ │ Denoise │
+ │ (RGB+Alpha) │ │ │
+ └────┬────────┘ └────┬──────┘
+ │ │
+ ┌──────▼───────────────────────────────────▼──────┐
+ │ Framebuffer Sync + Blend (CPU reads GPU) │
+ └─────────────────────────────────────────────────┘
+ │
+ ┌──────▼──────────┐
+ │ Display │
+ └─────────────────┘
 ```
 
 ---
@@ -57,7 +57,7 @@ Problem: GPU MLP is broken. CPU stalls.
 ```
 CPU: Generate rays → SIMD NeRF inference → Write to shared buffer
 GPU: Rasterize mesh → Lighting → Denoise
-     (simultaneously, no wait)
+ (simultaneously, no wait)
 Final: CPU+GPU results merge in framebuffer
 ```
 **Benefit**: Both work in parallel. No stalling.
@@ -73,14 +73,14 @@ Final: CPU+GPU results merge in framebuffer
 
 ```
 CPU Memory:
-  ├─ Hashgrid: 50 MB (fits in L3 cache, warm after 1st batch)
-  ├─ MLP weights: 2 MB (fits in L2)
-  └─ Ray batches: 1 KB/batch (L1 cache)
+ ├─ Hashgrid: 50 MB (fits in L3 cache, warm after 1st batch)
+ ├─ MLP weights: 2 MB (fits in L2)
+ └─ Ray batches: 1 KB/batch (L1 cache)
 
 GPU Memory:
-  ├─ Mesh buffers (separate)
-  ├─ Depth/Normal textures
-  └─ No contention with CPU NeRF
+ ├─ Mesh buffers (separate)
+ ├─ Depth/Normal textures
+ └─ No contention with CPU NeRF
 ```
 
 No memory bandwidth conflict.
@@ -104,8 +104,8 @@ pthread_create(&gpu_mesh_thread, NULL, render_mesh_worker, frame_ctx);
 
 // Both work in parallel...
 
-pthread_join(cpu_nerf_thread, NULL);   // Wait for NeRF CPU
-pthread_join(gpu_mesh_thread, NULL);   // Wait for Mesh GPU
+pthread_join(cpu_nerf_thread, NULL); // Wait for NeRF CPU
+pthread_join(gpu_mesh_thread, NULL); // Wait for Mesh GPU
 
 // Synchronization point: both outputs ready
 framebuffer_blend(nerf_output, mesh_output);
@@ -115,20 +115,20 @@ framebuffer_blend(nerf_output, mesh_output);
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                  SharedFrameContext                          │
+│ SharedFrameContext │
 ├─────────────────────────────────────────────────────────────┤
-│  Input:                                                      │
-│  ├─ camera (shared read-only)                               │
-│  ├─ nerf_hashgrid.bin (shared read-only)                    │
-│  ├─ mesh (shared read-only)                                 │
-│                                                              │
-│  Output (separate):                                         │
-│  ├─ cpu_framebuffer[width×height] = {rgb, alpha}           │
-│  └─ gpu_framebuffer[width×height] = {rgb, depth}           │
-│                                                              │
-│  Synchronization:                                           │
-│  ├─ cpu_fence (pthread_barrier)                             │
-│  └─ gpu_fence (Vulkan semaphore)                            │
+│ Input: │
+│ ├─ camera (shared read-only) │
+│ ├─ nerf_hashgrid.bin (shared read-only) │
+│ ├─ mesh (shared read-only) │
+│ │
+│ Output (separate): │
+│ ├─ cpu_framebuffer[width×height] = {rgb, alpha} │
+│ └─ gpu_framebuffer[width×height] = {rgb, depth} │
+│ │
+│ Synchronization: │
+│ ├─ cpu_fence (pthread_barrier) │
+│ └─ gpu_fence (Vulkan semaphore) │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -137,18 +137,18 @@ framebuffer_blend(nerf_output, mesh_output);
 After both complete:
 ```c
 for (int py = 0; py < height; py++) {
-    for (int px = 0; px < width; px++) {
-        vec3 nerf_rgb = cpu_framebuffer[py][px].rgb;
-        float nerf_alpha = cpu_framebuffer[py][px].alpha;
-        
-        vec3 mesh_rgb = gpu_framebuffer[py][px].rgb;
-        float mesh_depth = gpu_framebuffer[py][px].depth;
-        
-        // Over composite: NeRF on top of mesh
-        vec3 final = mix(mesh_rgb, nerf_rgb, nerf_alpha);
-        
-        framebuffer[py][px] = final;
-    }
+ for (int px = 0; px < width; px++) {
+ vec3 nerf_rgb = cpu_framebuffer[py][px].rgb;
+ float nerf_alpha = cpu_framebuffer[py][px].alpha;
+ 
+ vec3 mesh_rgb = gpu_framebuffer[py][px].rgb;
+ float mesh_depth = gpu_framebuffer[py][px].depth;
+ 
+ // Over composite: NeRF on top of mesh
+ vec3 final = mix(mesh_rgb, nerf_rgb, nerf_alpha);
+ 
+ framebuffer[py][px] = final;
+ }
 }
 ```
 
@@ -158,29 +158,29 @@ for (int py = 0; py < height; py++) {
 
 ### Phase 1: CPU NeRF (Weeks 1-2)
 
-✅ **Create `nerf_simd.c`** with:
+ **Create `nerf_simd.c`** with:
 - `ysu_hashgrid_lookup_batch()` — SIMD feature extraction
 - `ysu_mlp_inference_batch()` — Batched matrix multiply
 - `ysu_volume_integrate_batch()` — Ray marching
 
-✅ **Modify `render.c`** to:
+ **Modify `render.c`** to:
 - Add ray batching loop (8 rays per batch)
 - Call SIMD NeRF functions instead of ray-by-ray
 - Write to separate `cpu_framebuffer`
 
-✅ **Benchmark**:
+ **Benchmark**:
 - Target: 1080p @ 30-60 FPS with 4-8 core CPU
 
 ### Phase 2: GPU Mesh (parallel to Phase 1)
 
-✅ **Existing GPU already does mesh** (`tri.comp`)
+ **Existing GPU already does mesh** (`tri.comp`)
 - Keep current mesh rendering intact
 - Just output to separate `gpu_framebuffer`
 - Add synchronization point
 
 ### Phase 3: Parallel Execution
 
-✅ **Combine both threads**:
+ **Combine both threads**:
 ```c
 // In main loop:
 pthread_t nerf_thread = launch_cpu_nerf_render();
@@ -192,7 +192,7 @@ blend_framebuffers();
 display();
 ```
 
-✅ **Synchronization**:
+ **Synchronization**:
 - CPU writes to `cpu_fb[y][x]` (no GPU access)
 - GPU writes to `gpu_fb[y][x]` (no CPU access)
 - Main thread blends (read-only access to both)
@@ -200,12 +200,12 @@ display();
 
 ### Phase 4: Optimization
 
-✅ **Load Balancing**:
+ **Load Balancing**:
 - If CPU finishes first → start next frame's rays
 - If GPU finishes first → CPU keeps processing current rays
 - Adaptive workload distribution
 
-✅ **Memory Optimization**:
+ **Memory Optimization**:
 - Cache hashgrid in CPU L3
 - Prefetch MLP weights per-batch
 - GPU textures stay on device
@@ -218,22 +218,22 @@ display();
 
 ```
 CPU (8-core):
-  ├─ NeRF SIMD: 40 ms (1920×1080 rays, batched by 8)
-  ├─ Per-ray cost: ~8 µs (hashgrid + MLP + volume)
-  └─ Throughput: 200k rays/sec
+ ├─ NeRF SIMD: 40 ms (1920×1080 rays, batched by 8)
+ ├─ Per-ray cost: ~8 µs (hashgrid + MLP + volume)
+ └─ Throughput: 200k rays/sec
 
 GPU:
-  ├─ Mesh rasterization: 5 ms
-  ├─ Lighting: 3 ms
-  ├─ Denoise: 2 ms
-  └─ Total: 10 ms
+ ├─ Mesh rasterization: 5 ms
+ ├─ Lighting: 3 ms
+ ├─ Denoise: 2 ms
+ └─ Total: 10 ms
 
 Parallel Execution:
-  ├─ CPU runs [0-40ms]   (NeRF)
-  ├─ GPU runs [0-10ms]   (Mesh, finishes early)
-  ├─ GPU idle [10-40ms]  (waits for CPU)
-  └─ Blend: 1 ms
-  
+ ├─ CPU runs [0-40ms] (NeRF)
+ ├─ GPU runs [0-10ms] (Mesh, finishes early)
+ ├─ GPU idle [10-40ms] (waits for CPU)
+ └─ Blend: 1 ms
+ 
 Total Frame: 41 ms → **24 FPS** (CPU-bound)
 ```
 
@@ -243,12 +243,12 @@ Total Frame: 41 ms → **24 FPS** (CPU-bound)
 
 ```
 CPU (8-core):
-  ├─ NeRF: 1280×720 = ~920k rays at batched speed
-  ├─ Time: 920k / 200k rays/sec = 4.6 ms
-  
+ ├─ NeRF: 1280×720 = ~920k rays at batched speed
+ ├─ Time: 920k / 200k rays/sec = 4.6 ms
+ 
 GPU:
-  ├─ Mesh: 2 ms
-  
+ ├─ Mesh: 2 ms
+ 
 Total: max(4.6, 2) = 4.6 ms → **217 FPS** (over-budget)
 ```
 
@@ -262,13 +262,13 @@ Total: max(4.6, 2) = 4.6 ms → **217 FPS** (over-budget)
 
 ```c
 typedef struct {
-    vec3 *rgb;      // [width × height]
-    float *alpha;   // [width × height]
+ vec3 *rgb; // [width × height]
+ float *alpha; // [width × height]
 } CPUFramebuffer;
 
 typedef struct {
-    vec3 *rgb;
-    float *depth;
+ vec3 *rgb;
+ float *depth;
 } GPUFramebuffer;
 
 // Allocate separately, no contention
@@ -281,24 +281,24 @@ gpu_fb = gpu_create_texture(...);
 ```c
 // Current (serial):
 for (int py = 0; py < height; py++) {
-    for (int px = 0; px < width; px++) {
-        Ray r = camera_ray(cam, px, py);
-        color = render_ray(r);  // Single ray
-        framebuffer[py][px] = color;
-    }
+ for (int px = 0; px < width; px++) {
+ Ray r = camera_ray(cam, px, py);
+ color = render_ray(r); // Single ray
+ framebuffer[py][px] = color;
+ }
 }
 
 // New (batched):
 RayBatch batch = {0};
 for (int py = 0; py < height; py++) {
-    for (int px = 0; px < width; px++) {
-        batch.rays[batch.count++] = camera_ray(cam, px, py);
-        
-        if (batch.count == 8 || end_of_image) {
-            ysu_nerf_render_batch(&batch, nerf, cpu_fb);
-            batch.count = 0;
-        }
-    }
+ for (int px = 0; px < width; px++) {
+ batch.rays[batch.count++] = camera_ray(cam, px, py);
+ 
+ if (batch.count == 8 || end_of_image) {
+ ysu_nerf_render_batch(&batch, nerf, cpu_fb);
+ batch.count = 0;
+ }
+ }
 }
 ```
 
@@ -312,19 +312,19 @@ pthread_barrier_t frame_barrier;
 pthread_barrier_init(&frame_barrier, NULL, 2);
 
 void *nerf_worker(void *ctx) {
-    ysu_nerf_render_batch(...);
-    pthread_barrier_wait(&frame_barrier);  // Signal done
+ ysu_nerf_render_batch(...);
+ pthread_barrier_wait(&frame_barrier); // Signal done
 }
 
 void *mesh_worker(void *ctx) {
-    gpu_render_mesh(...);
-    pthread_barrier_wait(&frame_barrier);  // Signal done
+ gpu_render_mesh(...);
+ pthread_barrier_wait(&frame_barrier); // Signal done
 }
 
 // Main:
 pthread_create(&t1, NULL, nerf_worker, ...);
 pthread_create(&t2, NULL, mesh_worker, ...);
-pthread_barrier_wait(&frame_barrier);  // Wait both
+pthread_barrier_wait(&frame_barrier); // Wait both
 
 blend_framebuffers();
 ```
@@ -383,18 +383,18 @@ blend_framebuffers();
 
 ```
 NEW:
-  nerf_simd.h           — Declarations for SIMD functions
-  nerf_simd.c           — Batched NeRF (hashgrid + MLP + integrate)
-  nerf_simd_profile.c   — Benchmarking utilities
+ nerf_simd.h — Declarations for SIMD functions
+ nerf_simd.c — Batched NeRF (hashgrid + MLP + integrate)
+ nerf_simd_profile.c — Benchmarking utilities
 
 MODIFY:
-  render.c              — Ray batching loop, threading
-  ysu_main.c            — Thread management, parallel setup
-  gpu_vulkan_demo.c     — Framebuffer sync/blend
+ render.c — Ray batching loop, threading
+ ysu_main.c — Thread management, parallel setup
+ gpu_vulkan_demo.c — Framebuffer sync/blend
 
 REFERENCE (read-only):
-  nerf_train_export.py  — NeRF binary format
-  tri.comp              — GPU mesh rendering (unchanged)
+ nerf_train_export.py — NeRF binary format
+ tri.comp — GPU mesh rendering (unchanged)
 ```
 
 ---
@@ -410,4 +410,3 @@ REFERENCE (read-only):
 
 This is a **pragmatic, production-grade approach** used in real game engines (Unreal, Unity) for hybrid CPU+GPU workloads.
 
-Want me to generate the complete `nerf_simd.c` implementation right now?

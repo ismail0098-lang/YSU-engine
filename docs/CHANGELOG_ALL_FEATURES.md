@@ -12,28 +12,28 @@ Implemented all 10 missing GPU ray tracer features in one comprehensive sprint.
 #### 1. `shaders/tri.comp` (core ray tracer)
 **Additions**: ~100 lines
 - **Lines 58-81**: Color space conversion functions
-  - `srgb_to_linear()` - Convert input sRGB to linear for math
-  - `linear_to_srgb()` - Convert linear back to sRGB for output
-  - `linear_luminance()` - Perceptually correct luminance
+ - `srgb_to_linear()` - Convert input sRGB to linear for math
+ - `linear_to_srgb()` - Convert linear back to sRGB for output
+ - `linear_luminance()` - Perceptually correct luminance
 
 - **Lines 88-131**: Material shader variants (Feature 5, 10)
-  - `shade_metallic()` - High specularity
-  - `shade_plastic()` - Moderate specularity
-  - `shade_matte()` - Pure diffuse
-  - `shade_dielectric()` - Glass/translucent
-  - `shade_material()` - Dispatcher function
+ - `shade_metallic()` - High specularity
+ - `shade_plastic()` - Moderate specularity
+ - `shade_matte()` - Pure diffuse
+ - `shade_dielectric()` - Glass/translucent
+ - `shade_material()` - Dispatcher function
 
 - **Lines 235-250**: Stochastic sampling & adaptive jitter (Features 1, 4)
-  - Wang hash RNG for per-pixel seed
-  - 3×3 variance calculation
-  - Adaptive jitter radius: `1.0 + min(variance * 5.0, 1.0)`
+ - Wang hash RNG for per-pixel seed
+ - 3×3 variance calculation
+ - Adaptive jitter radius: `1.0 + min(variance * 5.0, 1.0)`
 
 - **Lines 364-370**: Material dispatch in main shading
-  - Calls `shade_material()` with distance-based selection
+ - Calls `shade_material()` with distance-based selection
 
 - **Lines 375-390**: Temporal filtering (Feature 2)
-  - EMA accumulation: `mix(prev_accum, col, pc.alpha)`
-  - Running average alternative
+ - EMA accumulation: `mix(prev_accum, col, pc.alpha)`
+ - Running average alternative
 
 **Features Implemented**: 1, 2, 4, 5, 6, 10
 
@@ -42,17 +42,17 @@ Implemented all 10 missing GPU ray tracer features in one comprehensive sprint.
 #### 2. `shaders/tonemap.comp` (color grading)
 **Additions**: ~50 lines
 - **Lines 25-35**: ACES tone mapping (Feature 3)
-  - Academy Color Encoding System
-  - Industry-standard color grading
+ - Academy Color Encoding System
+ - Industry-standard color grading
 
 - **Lines 43-75**: Anti-aliasing filter (Feature 9)
-  - `blackman_harris_1d()` - 1D window function
-  - `apply_aa_filter()` - 2D separable filter
-  - 3×3 kernel with adaptive weighting
-  - Reduces high-frequency aliasing
+ - `blackman_harris_1d()` - 1D window function
+ - `apply_aa_filter()` - 2D separable filter
+ - 3×3 kernel with adaptive weighting
+ - Reduces high-frequency aliasing
 
 - **Main output**: Integrated ACES → sRGB conversion
-  - Proper color space flow
+ - Proper color space flow
 
 **Features Implemented**: 3, 6, 9
 
@@ -61,26 +61,26 @@ Implemented all 10 missing GPU ray tracer features in one comprehensive sprint.
 #### 3. `ysu_viewport.c` (raylib editor)
 **Additions**: ~60 lines
 - **Lines 4-7**: GPU context declarations
-  - `ysu_gpu_init()` - Initialize GPU rendering
-  - `ysu_gpu_render_frame()` - Render one frame
-  - `ysu_gpu_shutdown()` - Cleanup
-  - `ysu_gpu_get_framebuffer()` - Access GPU output
+ - `ysu_gpu_init()` - Initialize GPU rendering
+ - `ysu_gpu_render_frame()` - Render one frame
+ - `ysu_gpu_shutdown()` - Cleanup
+ - `ysu_gpu_get_framebuffer()` - Access GPU output
 
 - **Lines 25-26**: GPU initialization on startup
-  - Detects GPU availability
-  - Falls back to CPU if unavailable
+ - Detects GPU availability
+ - Falls back to CPU if unavailable
 
 - **Lines 47-50**: GPU rendering toggle
-  - 'G' key switches between GPU and CPU rendering
-  - Visual feedback in UI
+ - 'G' key switches between GPU and CPU rendering
+ - Visual feedback in UI
 
 - **Lines 92-115**: GPU rendering branch
-  - Camera synchronization
-  - Framebuffer upload to texture
-  - Display via raylib
+ - Camera synchronization
+ - Framebuffer upload to texture
+ - Display via raylib
 
 - **Lines 130-132**: Cleanup
-  - GPU shutdown on exit
+ - GPU shutdown on exit
 
 **Features Implemented**: 8
 
@@ -92,16 +92,16 @@ Implemented all 10 missing GPU ray tracer features in one comprehensive sprint.
 **Size**: 75 lines
 - Compute shader for parallel BVH construction
 - **Features**:
-  - Local size 256 threads for parallelism
-  - SAH (Surface Area Heuristic) support
-  - AABB computation via parallel reduction
-  - Atomic counters for synchronization
-  - Triangle partitioning framework
+ - Local size 256 threads for parallelism
+ - SAH (Surface Area Heuristic) support
+ - AABB computation via parallel reduction
+ - Atomic counters for synchronization
+ - Triangle partitioning framework
 
 - **Key Functions**:
-  - `blackman_harris_1d()` - Parallel AABB
-  - `compute_sah_cost()` - Splitting metric
-  - Main kernel: Parallel tree building
+ - `blackman_harris_1d()` - Parallel AABB
+ - `compute_sah_cost()` - Splitting metric
+ - Main kernel: Parallel tree building
 
 **Features Implemented**: 7
 
@@ -112,10 +112,10 @@ Implemented all 10 missing GPU ray tracer features in one comprehensive sprint.
 - Comprehensive test suite for all 10 features
 - Tests GPU rendering pipeline
 - Analyzes output for:
-  - Color management (luminance)
-  - Anti-aliasing quality (edge smoothness)
-  - Material shading (unique colors)
-  - Sampling effectiveness (luminance distribution)
+ - Color management (luminance)
+ - Anti-aliasing quality (edge smoothness)
+ - Material shading (unique colors)
+ - Sampling effectiveness (luminance distribution)
 - Generates detailed report
 
 ---
@@ -207,22 +207,22 @@ Implemented all 10 missing GPU ray tracer features in one comprehensive sprint.
 
 ### Build Status
 ```
-✅ shaders/tri.comp - 0 errors
-✅ shaders/tonemap.comp - 0 errors
-✅ shaders/bvh_build.comp - 0 errors
-✅ shaders/fill.comp - 0 errors (existing)
-✅ shaders/present.frag - 0 errors (existing)
+ shaders/tri.comp - 0 errors
+ shaders/tonemap.comp - 0 errors
+ shaders/bvh_build.comp - 0 errors
+ shaders/fill.comp - 0 errors (existing)
+ shaders/present.frag - 0 errors (existing)
 ```
 
 ### Test Results
 ```
 [640×360 @ 8 frames with denoiser]:
-✅ Rendered successfully
-✅ Output: 1024×512 RGBA32F
-✅ Mean luminance: 0.8468
-✅ Unique colors: 199
-✅ Edge strength (AA): 0.000794
-✅ Convergence: Smooth
+ Rendered successfully
+ Output: 1024×512 RGBA32F
+ Mean luminance: 0.8468
+ Unique colors: 199
+ Edge strength (AA): 0.000794
+ Convergence: Smooth
 ```
 
 ---
@@ -264,10 +264,10 @@ Implemented all 10 missing GPU ray tracer features in one comprehensive sprint.
 ---
 
 ## Summary
-✅ **All 10 Features Complete**
-✅ **All Shaders Compile**
-✅ **All Tests Pass**
-✅ **Production Ready**
+ **All 10 Features Complete**
+ **All Shaders Compile**
+ **All Tests Pass**
+ **Production Ready**
 
 **Total additions**: ~250 lines of shader code + 60 lines of C code
 **New files**: 4 (1 shader, 3 documentation)

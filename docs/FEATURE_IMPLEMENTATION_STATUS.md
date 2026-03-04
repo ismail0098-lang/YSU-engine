@@ -1,8 +1,8 @@
 # YSU ENGINE - 10 FEATURE ENHANCEMENT ROADMAP
 
-## ✅ COMPLETED (1-5)
+## COMPLETED (1-5)
 
-### [1/10] STOCHASTIC SAMPLING ✅
+### [1/10] STOCHASTIC SAMPLING 
 **What**: Per-pixel random jitter on ray directions
 **File**: shaders/tri.comp (main() function)
 **Implementation**: 
@@ -17,7 +17,7 @@ float u = (float(pix.x) + 0.5 + jitter_x) / float(pc.W);
 
 ---
 
-### [2/10] TEMPORAL FILTERING ✅
+### [2/10] TEMPORAL FILTERING 
 **What**: Multi-frame accumulation (EMA or running average)
 **File**: shaders/tri.comp (end of main())
 **Implementation**:
@@ -31,14 +31,14 @@ final_accum = mix(prev_accum, col, pc.alpha);
 
 ---
 
-### [3/10] ADVANCED TONE MAPPING ✅
+### [3/10] ADVANCED TONE MAPPING 
 **What**: ACES tone mapping + sRGB color space conversion
 **File**: shaders/tonemap.comp
 **Implementation**:
 ```glsl
 vec3 tonemap_aces(vec3 x){
-    const float a=2.51, b=0.03, c=2.43, d=0.59, e=0.14;
-    return clamp((x*(a*x+b))/(x*(c*x+d)+e), 0.0, 1.0);
+ const float a=2.51, b=0.03, c=2.43, d=0.59, e=0.14;
+ return clamp((x*(a*x+b))/(x*(c*x+d)+e), 0.0, 1.0);
 }
 // + sRGB conversion for proper color space
 ```
@@ -47,13 +47,13 @@ vec3 tonemap_aces(vec3 x){
 
 ---
 
-### [4/10] ADAPTIVE SAMPLING ✅
+### [4/10] ADAPTIVE SAMPLING 
 **What**: Per-pixel jitter scaled by local variance
 **File**: shaders/tri.comp (main() function)
 **Implementation**:
 ```glsl
 // Calculate neighborhood variance
-float variance = ...;  // 3x3 neighborhood
+float variance = ...; // 3x3 neighborhood
 float jitter_scale = 1.0 + min(variance * 5.0, 1.0);
 // Use jitter_scale in stochastic sampling
 ```
@@ -62,7 +62,7 @@ float jitter_scale = 1.0 + min(variance * 5.0, 1.0);
 
 ---
 
-### [5/10] MATERIAL VARIANTS ✅
+### [5/10] MATERIAL VARIANTS 
 **What**: Basic PBR-inspired shading (diffuse + fresnel)
 **File**: shaders/tri.comp (color calculation)
 **Implementation**:
@@ -76,7 +76,7 @@ vec3 col = base_color * (lambert * factor + ambient) + fresnel * spec;
 
 ---
 
-## 🔲 REMAINING (6-10)
+## REMAINING (6-10)
 
 ### [6/10] COLOR MANAGEMENT
 **What**: Full sRGB<->linear conversions throughout pipeline
@@ -127,8 +127,8 @@ vec3 col = base_color * (lambert * factor + ambient) + fresnel * spec;
 All 5 completed features compiled successfully:
 ```bash
 cd shaders
-glslc tri.comp -o tri.comp.spv       ✓ 
-glslc tonemap.comp -o tonemap.comp.spv  ✓
+glslc tri.comp -o tri.comp.spv 
+glslc tonemap.comp -o tonemap.comp.spv 
 ```
 
 Test configuration:
@@ -136,8 +136,8 @@ Test configuration:
 set YSU_GPU_W=320
 set YSU_GPU_H=180
 set YSU_GPU_OBJ=TestSubjects/3M.obj
-set YSU_GPU_FRAMES=8              # See temporal accumulation
-set YSU_NEURAL_DENOISE=1          # Denoiser works with variance
+set YSU_GPU_FRAMES=8 # See temporal accumulation
+set YSU_NEURAL_DENOISE=1 # Denoiser works with variance
 gpu_demo.exe
 ```
 

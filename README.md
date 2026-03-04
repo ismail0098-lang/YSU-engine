@@ -1,6 +1,8 @@
 # YSU Engine
 
-A from-scratch C11 path tracer with Vulkan GPU compute, real-time NeRF inference via hand-written AVX2/AVX-512 kernels, a Blender-style mesh editor, and nuclear reactor physics — all in ~31,000 lines of C.
+A from-scratch C11 path tracer with Vulkan GPU compute, real-time NeRF inference via hand-written AVX2/AVX-512 kernels, a Blender-style mesh editor, and nuclear reactor physics — all in ~40,000 lines of C.
+
+YSU (Your Simulated Universe) is an MIT-licensed, from-scratch rendering and physics simulation engine built for solo developers and researchers who need a serious raytracer without corporate strings attached. Most high-quality rendering engines are proprietary, paywalled, or too coupled to specific pipelines to adapt. YSU is none of those — it's a single codebase covering CPU path tracing, GPU Vulkan compute, real-time NeRF inference, and nuclear/quantum physics visualization, free to use, modify, and build on for any scientific or creative purpose. Built by one person, designed to be understood and extended by one person.
 
 ---
 
@@ -131,4 +133,8 @@ models/        — pretrained NeRF model binaries
 
 ## License
 
-Solo project — see repo for details.
+MIT License
+
+## Author
+
+Umut Korkmaz — 16-year-old solo developer.

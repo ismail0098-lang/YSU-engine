@@ -4,10 +4,10 @@
 Window mode crashes during vkCmdDispatch with new push constants (112 bytes including camera basis vectors). This appears to be a driver/validation issue when recording command buffers in windowed mode.
 
 ## Current Status
-- ✅ Headless mode works perfectly (143 FPS with denoise skip=4)
-- ❌ Window mode crashes on first dispatch
-- ✅ Shaders compiled successfully
-- ✅ Push constants within Vulkan limits (112/128 bytes)
+- Headless mode works perfectly (143 FPS with denoise skip=4)
+- Window mode crashes on first dispatch
+- Shaders compiled successfully
+- Push constants within Vulkan limits (112/128 bytes)
 
 ## Workaround Options
 

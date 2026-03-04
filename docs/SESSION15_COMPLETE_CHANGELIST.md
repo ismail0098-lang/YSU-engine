@@ -6,12 +6,12 @@
 
 #### Edit 1: Added sm_blend shader module variable
 - **Line**: ~1636
-- **Change**: `VkShaderModule sm_blend = VK_NULL_HANDLE;  // temporal blend shader`
+- **Change**: `VkShaderModule sm_blend = VK_NULL_HANDLE; // temporal blend shader`
 - **Type**: Variable declaration
 
 #### Edit 2: Added pipe_blend pipeline variable
 - **Line**: ~1643
-- **Change**: `VkPipeline pipe_blend = VK_NULL_HANDLE;  // temporal blend pipeline`
+- **Change**: `VkPipeline pipe_blend = VK_NULL_HANDLE; // temporal blend pipeline`
 - **Type**: Variable declaration
 
 #### Edit 3: Added blend descriptor variables
@@ -27,10 +27,10 @@
 #### Edit 5: Added temporal denoise parameters
 - **Line**: ~1651-1653
 - **Changes**:
-  ```c
-  int temporal_denoise_enabled = ysu_env_bool("YSU_GPU_TEMPORAL_DENOISE", 1);
-  float temporal_denoise_weight = ysu_env_float("YSU_GPU_TEMPORAL_DENOISE_WEIGHT", 0.7f);
-  ```
+ ```c
+ int temporal_denoise_enabled = ysu_env_bool("YSU_GPU_TEMPORAL_DENOISE", 1);
+ float temporal_denoise_weight = ysu_env_float("YSU_GPU_TEMPORAL_DENOISE_WEIGHT", 0.7f);
+ ```
 - **Type**: Parameter parsing
 
 #### Edit 6: Added denoise skip parameter
@@ -41,8 +41,8 @@
 #### Edit 7: Enhanced denoiser logging
 - **Line**: ~1663-1667
 - **Changes**:
-  - Updated main log to include skip parameter
-  - Added conditional log for temporal denoise status
+ - Updated main log to include skip parameter
+ - Added conditional log for temporal denoise status
 - **Type**: Logging enhancement
 
 #### Edit 8: Created denoise history image
@@ -55,10 +55,10 @@
 #### Edit 9: Added denoise skip conditional
 - **Line**: ~1968-1970
 - **Changes**:
-  ```c
-  int should_denoise = (denoise_skip <= 1) || ((frame_id % denoise_skip) == 0);
-  if(gpu_denoise_enabled && pipe_denoise != VK_NULL_HANDLE && should_denoise) {
-  ```
+ ```c
+ int should_denoise = (denoise_skip <= 1) || ((frame_id % denoise_skip) == 0);
+ if(gpu_denoise_enabled && pipe_denoise != VK_NULL_HANDLE && should_denoise) {
+ ```
 - **Type**: Logic modification (Option 1)
 
 #### Edit 10: Enhanced denoiser dispatch logging
@@ -83,7 +83,7 @@
 - Exponential moving average blending
 
 **Lines**: ~40 lines
-**Status**: ✅ Complete
+**Status**: Complete
 
 ### 3. Documentation Files Created (4 new files)
 
@@ -140,28 +140,28 @@
 ### Option 1: Denoise Skip
 ```
 YSU_GPU_DENOISE_SKIP=<int>
-  Default: 1 (every frame)
-  Range: 1-16 (recommended)
-  Meaning: Denoise every Nth frame
+ Default: 1 (every frame)
+ Range: 1-16 (recommended)
+ Meaning: Denoise every Nth frame
 ```
 
 ### Option 2: Temporal Denoising
 ```
 YSU_GPU_TEMPORAL_DENOISE=<0|1>
-  Default: 1 (enabled)
-  Meaning: Enable temporal blending of denoised frames
+ Default: 1 (enabled)
+ Meaning: Enable temporal blending of denoised frames
 
 YSU_GPU_TEMPORAL_DENOISE_WEIGHT=<float>
-  Default: 0.7
-  Range: 0.0-1.0
-  Meaning: 0.7 = 70% history, 30% current (high smoothing)
-           0.5 = 50% history, 50% current (balanced)
-           0.0 = 0% history, 100% current (no temporal)
+ Default: 0.7
+ Range: 0.0-1.0
+ Meaning: 0.7 = 70% history, 30% current (high smoothing)
+ 0.5 = 50% history, 50% current (balanced)
+ 0.0 = 0% history, 100% current (no temporal)
 ```
 
 ## Backward Compatibility
 
-✅ **Full backward compatibility maintained**:
+ **Full backward compatibility maintained**:
 - Option 1 default (skip=1) = no denoiser skipping (existing behavior)
 - Option 2 default (enabled=1) = temporal blending enabled
 - All new parameters are optional and have sensible defaults
@@ -178,17 +178,17 @@ YSU_GPU_TEMPORAL_DENOISE_WEIGHT=<float>
 ### New
 - **shaders/blend.comp** needs compilation to **shaders/blend.comp.spv**
 - Build command (example):
-  ```bash
-  glslc -c shaders/blend.comp -o shaders/blend.comp.spv
-  ```
+ ```bash
+ glslc -c shaders/blend.comp -o shaders/blend.comp.spv
+ ```
 
 ## Testing Checklist
 
 ### Pre-Build
-- ✅ Syntax verification of C code
-- ✅ Variable declarations checked
-- ✅ Image/memory allocation patterns verified
-- ✅ Shader syntax verified
+- Syntax verification of C code
+- Variable declarations checked
+- Image/memory allocation patterns verified
+- Shader syntax verified
 
 ### Post-Build (Pending)
 - ⏳ Vulkan compilation success
@@ -201,18 +201,18 @@ YSU_GPU_TEMPORAL_DENOISE_WEIGHT=<float>
 ## Integration Status
 
 ### With Session 12 (Temporal Accumulation)
-- ✅ Compatible - temporal blend works with frame batching
-- ✅ Synergistic - masked temporal artifacts from denoise skip
+- Compatible - temporal blend works with frame batching
+- Synergistic - masked temporal artifacts from denoise skip
 
 ### With Session 13 (Render Scale)
-- ✅ Compatible - all work on scaled resolution
-- ✅ Multiplicative - skip + scale = significant speedup
+- Compatible - all work on scaled resolution
+- Multiplicative - skip + scale = significant speedup
 
 ### With Current Vulkan Implementation
-- ✅ Descriptor sets compatible
-- ✅ Pipeline patterns follow existing code
-- ✅ Memory management consistent
-- ✅ Error handling uniform
+- Descriptor sets compatible
+- Pipeline patterns follow existing code
+- Memory management consistent
+- Error handling uniform
 
 ## Next Session Work Items
 
@@ -247,11 +247,11 @@ YSU_GPU_TEMPORAL_DENOISE_WEIGHT=<float>
 ## Revision History
 
 ### Current Session (Session 15)
-- ✅ Option 1: Denoise Skip - COMPLETE
-- 🔄 Option 2: Temporal Denoising - 60% complete (infrastructure ready)
-- 📚 Created 5 comprehensive documentation files
-- 📝 Modified 1 main source file (gpu_vulkan_demo.c)
-- 🎯 Roadmap established for Options 3-7
+- Option 1: Denoise Skip - COMPLETE
+- Option 2: Temporal Denoising - 60% complete (infrastructure ready)
+- Created 5 comprehensive documentation files
+- Modified 1 main source file (gpu_vulkan_demo.c)
+- Roadmap established for Options 3-7
 
 ### Previous Sessions
 - Session 13: Render Scale (0.5, 4x speedup)

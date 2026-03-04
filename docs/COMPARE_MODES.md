@@ -4,17 +4,17 @@ This project now supports three runtime render modes for comparison:
 
 ## Modes
 - **0 = Mesh** (default)
-  - Pure mesh ray tracing (current pipeline).
+ - Pure mesh ray tracing (current pipeline).
 - **1 = Probe (placeholder)**
-  - Procedural sky probe for baseline comparison. No mesh traversal.
+ - Procedural sky probe for baseline comparison. No mesh traversal.
 - **2 = Hybrid (mesh + NeRF proxy)**
-  - Mesh ray tracing blended with a lightweight volumetric proxy.
+ - Mesh ray tracing blended with a lightweight volumetric proxy.
 
 ## Environment Variables
 - `YSU_RENDER_MODE`:
-  - `0` = mesh
-  - `1` = probe placeholder
-  - `2` = hybrid
+ - `0` = mesh
+ - `1` = probe placeholder
+ - `2` = hybrid
 - `YSU_NERF_PROXY` (optional): set to `1` to enable proxy even if render mode is 0
 - `YSU_NERF_BLEND`: 0..1 blend factor (0 = mesh only, 1 = proxy only)
 - `YSU_NERF_STRENGTH`: proxy intensity multiplier

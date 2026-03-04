@@ -10,25 +10,25 @@ This document details the GPU-side optimizations applied to the NeRF volumetric 
 - **After:** Precomputed w_base and b_base offsets; FMA intrinsic for all weights
 - **Impact:** Reduced instruction latency, better instruction-level parallelism
 - **Code Pattern:**
-  ```glsl
-  uint out_w_base = offset;
-  uint out_b_base = offset + uint(hidden * out_dim * 2);
-  for(int o = 0; o < out_dim && o < 4; o++){
-      float sum = nerf_half(out_b_base + uint(o * 2));  // Bias
-      for(int j = 0; j < hidden; j++){
-          uint w_off = out_w_base + uint((j * out_dim + o) * 2);
-          sum = fma(nerf_half(w_off), cur[j], sum);  // FMA: faster than separate ops
-      }
-      outv[o] = sum;
-  }
-  ```
+ ```glsl
+ uint out_w_base = offset;
+ uint out_b_base = offset + uint(hidden * out_dim * 2);
+ for(int o = 0; o < out_dim && o < 4; o++){
+ float sum = nerf_half(out_b_base + uint(o * 2)); // Bias
+ for(int j = 0; j < hidden; j++){
+ uint w_off = out_w_base + uint((j * out_dim + o) * 2);
+ sum = fma(nerf_half(w_off), cur[j], sum); // FMA: faster than separate ops
+ }
+ outv[o] = sum;
+ }
+ ```
 
 ### 2. **Volume Integration Optimization** (nerf_buffer_integrate)
 - **Precomputed density scaling:** `dens_scale = pc.nerfDensity * step` computed once
 - **Ray stepping optimization:** Reuse `step_ray = rd * step` to reduce per-iteration multiplications
 - **Polynomial alpha approximation:** Replaces `exp(-x)` with `1 - max(0, 1 - x + 0.5*x²)`
-  - Avoids expensive transcendental function per ray sample
-  - Accurate to within ±2% for typical density values
+ - Avoids expensive transcendental function per ray sample
+ - Accurate to within ±2% for typical density values
 - **Early termination threshold:** Increased from `0.01` to `0.005` → better accuracy without extra steps
 - **Impact:** ~3-5% faster volume integration, especially for high-density scenes
 
@@ -36,21 +36,21 @@ This document details the GPU-side optimizations applied to the NeRF volumetric 
 - **Precomputed trilinear weights:** Computed once per level instead of per-corner
 - **Weight array:** Pre-unrolled 8-corner weights to avoid redundant `mix()` calls
 - **FMA-friendly accumulation:** Linear weighted sum instead of cascading mix() operations
-  ```glsl
-  float val = v0 * wg[0] + v1 * wg[1] + v2 * wg[2] + v3 * wg[3] +
-             v4 * wg[4] + v5 * wg[5] + v6 * wg[6] + v7 * wg[7];
-  ```
+ ```glsl
+ float val = v0 * wg[0] + v1 * wg[1] + v2 * wg[2] + v3 * wg[3] +
+ v4 * wg[4] + v5 * wg[5] + v6 * wg[6] + v7 * wg[7];
+ ```
 - **Impact:** ~5-7% faster embedding lookup (critical path for NeRF)
 
 ### 4. **Occupancy Sampling Optimization** (occ_sample)
 - **Precomputed grid dimensions:** Avoid redundant modulo operations in `occ_get()`
 - **Optimized interpolation:** Changed from cascading `mix()` to sequential binary interpolation
-  ```glsl
-  float v0x = mix(v000, v100, w.x);  // x-direction first
-  float v1x = mix(v010, v110, w.x);
-  float v01 = mix(v0x, v1x, w.y);    // y-direction second
-  // Then z-direction on reduced data
-  ```
+ ```glsl
+ float v0x = mix(v000, v100, w.x); // x-direction first
+ float v1x = mix(v010, v110, w.x);
+ float v01 = mix(v0x, v1x, w.y); // y-direction second
+ // Then z-direction on reduced data
+ ```
 - **Impact:** ~2-3% faster occupancy checks, reduced register pressure
 
 ## Benchmark Results
