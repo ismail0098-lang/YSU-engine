@@ -137,4 +137,4 @@ MIT License
 
 ## Author
 
-Umut Korkmaz — 16-year-old solo developer.
+Umut Korkmaz — 16-year-old solo developer. :)
