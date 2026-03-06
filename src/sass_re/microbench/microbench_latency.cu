@@ -246,7 +246,11 @@ k_shfl(volatile int *sink, volatile long long *out) {
     asm volatile("mov.u64 %0, %%clock64;" : "=l"(t0));
     #pragma unroll
     for (int i = 0; i < N; i++)
+#if __CUDA_ARCH__ >= 700
         x = __shfl_xor_sync(0xFFFFFFFF, x, 1);
+#else
+        x = __shfl_xor(x, 1);
+#endif
     asm volatile("mov.u64 %0, %%clock64;" : "=l"(t1));
     sink[3] = x;   /* keep live */
     if (threadIdx.x == 0) { out[0] = t1 - t0; out[1] = N; }
@@ -419,11 +423,19 @@ int main() {
     for (int i = 0; i < n; i++)
         printf("%-20s %14.2f\n", r[i].name, r[i].cyc);
 
-    printf("\n--- Expected (Ada / SM 8.9) ---\n");
-    printf("FP32 arith  : ~4 cyc    INT32 arith  : ~4-5 cyc\n");
-    printf("MUFU (SFU)  : ~4-8 cyc  Bitwise      : ~1-4 cyc\n");
-    printf("SHFL        : ~2-4 cyc  F2I/I2F      : ~4-6 cyc\n");
-    printf("LDS (L0)    : ~20-28    LDG (L1 hit) : ~33-36\n");
+    if (prop.major >= 8) {
+        printf("\n--- Expected (Ada / SM 8.x) ---\n");
+        printf("FP32 arith  : ~4 cyc    INT32 arith  : ~4-5 cyc\n");
+        printf("MUFU (SFU)  : ~4-8 cyc  Bitwise      : ~1-4 cyc\n");
+        printf("SHFL        : ~2-4 cyc  F2I/I2F      : ~4-6 cyc\n");
+        printf("LDS (L0)    : ~20-28    LDG (L1 hit) : ~33-36\n");
+    } else {
+        printf("\n--- Expected (Pascal / SM 6.x) ---\n");
+        printf("FP32 arith  : ~6 cyc    INT32 arith  : ~6 cyc\n");
+        printf("MUFU (SFU)  : ~8 cyc    Bitwise      : ~6 cyc\n");
+        printf("SHFL        : ~2-5 cyc  F2I/I2F      : ~6-8 cyc\n");
+        printf("LDS (L0)    : ~22-28    LDG (L1 hit) : ~80-200\n");
+    }
 
     cudaFree(d_out); cudaFree(d_fv); cudaFree(d_iv); cudaFree(d_uv);
     return 0;

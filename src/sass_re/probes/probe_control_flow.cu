@@ -145,9 +145,13 @@ probe_vote(int *out, const int *a) {
     // VOTE.BALLOT: returns bitmask of which threads have predicate true
     unsigned ballot = __ballot_sync(0xFFFFFFFF, x > 0);  // VOTE.BALLOT
 
+#if __CUDA_ARCH__ >= 700
     // MATCH: true if all active threads have the same value
-    // (Ada Lovelace feature)
+    // (Volta+ feature — uses MATCH instruction)
     unsigned match = __match_all_sync(0xFFFFFFFF, x, NULL);  // MATCH.ALL
+#else
+    unsigned match = 0;  // MATCH not available on SM < 7.0
+#endif
 
     out[i] = all + any + (int)ballot + (int)match;
 }

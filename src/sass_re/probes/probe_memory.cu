@@ -9,8 +9,6 @@
  * LDGSTS: async global->shared copy (Ada Lovelace hardware DMA).
  */
 
-#include <cuda_pipeline.h>
-
 // LDG: global memory load (various widths)
 extern "C" __global__ void __launch_bounds__(32)
 probe_ldg(float *out, const float *a, const float2 *b, const float4 *c) {

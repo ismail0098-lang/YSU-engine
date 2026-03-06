@@ -4,32 +4,77 @@
   
 .DESCRIPTION
   For each .cu file in probes/:
-    1. nvcc -arch=sm_89 -cubin -> .cubin   (binary object)
+    1. nvcc -arch=<sm_XX> -cubin -> .cubin  (binary object)
     2. cuobjdump -sass          -> .sass    (human-readable SASS)
-    3. nvdisasm -raw -binary SM89 -> .raw   (raw encoding with hex)
+    3. nvdisasm -hex -raw        -> .raw    (raw encoding with hex)
     4. nvdisasm -cfg             -> .dot    (control flow graph)
   
-  Results go to results/ directory with timestamps.
+  Results go to results/<gpu_tag>_<timestamp>/ directory.
+
+.PARAMETER Arch
+  SM architecture target (e.g. sm_89, sm_61). Default: sm_89
+
+.PARAMETER GpuTag
+  Short name for the GPU (e.g. "4070TiS", "1050Ti"). Used in output dir name.
+  Default: auto-detected from Arch.
 
 .NOTES
   Run from src/sass_re/ directory.
 #>
+param(
+    [string]$Arch     = "sm_89",
+    [string]$GpuTag   = "",
+    [string]$CudaPath = ""   # Override CUDA bin dir (e.g. for older toolkit)
+)
 
 $ErrorActionPreference = "Continue"
+
+# Auto-detect GPU tag from architecture if not provided
+if (-not $GpuTag) {
+    $archTags = @{
+        "sm_50" = "Maxwell"
+        "sm_61" = "Pascal_GTX1050Ti"
+        "sm_75" = "Turing"
+        "sm_80" = "Ampere_GA100"
+        "sm_86" = "Ampere_GA10x"
+        "sm_89" = "Ada_RTX4070TiS"
+        "sm_90" = "Hopper"
+    }
+    $GpuTag = if ($archTags.ContainsKey($Arch)) { $archTags[$Arch] } else { $Arch }
+}
 
 $ScriptDir  = Split-Path -Parent $MyInvocation.MyCommand.Path
 $ProbeDir   = Join-Path $ScriptDir "..\probes"
 $ResultDir  = Join-Path $ScriptDir "..\results"
 $Timestamp  = Get-Date -Format "yyyyMMdd_HHmmss"
-$RunDir     = Join-Path $ResultDir $Timestamp
+$RunDir     = Join-Path $ResultDir "${GpuTag}_${Timestamp}"
 
 # Create output directory
 New-Item -ItemType Directory -Path $RunDir -Force | Out-Null
 
-$Arch = "sm_89"  # Ada Lovelace (RTX 4070 Ti Super)
-
-# Tool paths (CUDA 13.1)
-$CudaBin    = "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v13.1\bin"
+# Tool paths — auto-detect or use override
+if ($CudaPath) {
+    $CudaBin = $CudaPath
+} else {
+    # Pick the right CUDA version: sm_61 needs CUDA 12.x, sm_75+ can use 13.x
+    $smNum = [int]($Arch -replace 'sm_', '')
+    $cuda12  = "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.6\bin"
+    $cuda121 = "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.8\bin"
+    $cuda13  = "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v13.1\bin"
+    if ($smNum -lt 75 -and (Test-Path (Join-Path $cuda12 "nvcc.exe"))) {
+        $CudaBin = $cuda12
+        Write-Host "NOTE: Using CUDA 12.6 for $Arch (SM < 7.5 dropped from CUDA 13.x)" -ForegroundColor DarkYellow
+    } elseif ($smNum -lt 75 -and (Test-Path (Join-Path $cuda121 "nvcc.exe"))) {
+        $CudaBin = $cuda121
+        Write-Host "NOTE: Using CUDA 12.8 for $Arch (SM < 7.5 dropped from CUDA 13.x)" -ForegroundColor DarkYellow
+    } elseif (Test-Path (Join-Path $cuda13 "nvcc.exe")) {
+        $CudaBin = $cuda13
+    } else {
+        # Fallback: try to find any CUDA
+        $CudaBin = (Get-ChildItem "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA" -Directory | 
+            Sort-Object Name -Descending | Select-Object -First 1).FullName + "\bin"
+    }
+}
 $Nvcc       = Join-Path $CudaBin "nvcc.exe"
 $CuObjDump  = Join-Path $CudaBin "cuobjdump.exe"
 $NvDisasm   = Join-Path $CudaBin "nvdisasm.exe"
@@ -42,6 +87,15 @@ Write-Host "Output dir:   $RunDir"
 Write-Host ""
 
 $probes = Get-ChildItem -Path $ProbeDir -Filter "*.cu"
+
+# Skip tensor probe on architectures without tensor cores (< sm_70)
+$smNum = [int]($Arch -replace 'sm_', '')
+if ($smNum -lt 70) {
+    $probes = $probes | Where-Object { $_.Name -ne "probe_tensor.cu" }
+    Write-Host "NOTE: Skipping probe_tensor.cu (no tensor cores on $Arch)" -ForegroundColor DarkYellow
+    Write-Host ""
+}
+
 $total = $probes.Count
 $idx = 0
 
@@ -115,7 +169,8 @@ $summary = Join-Path $RunDir "SUMMARY.md"
 $sb = [System.Text.StringBuilder]::new()
 [void]$sb.AppendLine("# SASS Disassembly Report")
 [void]$sb.AppendLine("Date: $Timestamp")
-[void]$sb.AppendLine("Architecture: $Arch (Ada Lovelace)")
+[void]$sb.AppendLine("GPU: $GpuTag")
+[void]$sb.AppendLine("Architecture: $Arch")
 [void]$sb.AppendLine("")
 [void]$sb.AppendLine("## Instruction Frequency")
 [void]$sb.AppendLine("")
