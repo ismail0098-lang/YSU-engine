@@ -1,21 +1,106 @@
 # Instant-NGP SASS Kernels — Learning Guide
 
-*For programmers who want to understand GPU optimization. Assumes you know basic programming (variables, loops, functions) but not GPU architecture.*
+*For anyone who wants to understand GPU optimization from the ground up. No GPU knowledge needed — just curiosity.*
 
 ---
 
 ## Table of Contents
 
-1. [Background: How GPUs Execute Code](#background-how-gpus-execute-code)
-2. [The NeRF Pipeline](#the-nerf-pipeline)
-3. [Kernel 1: Hash Grid Encoding — Deep Dive](#kernel-1-hash-grid-encoding)
-4. [Kernel 2: MLP Forward Pass — Deep Dive](#kernel-2-mlp-forward-pass)
-5. [Kernel 3: Volume Rendering — Deep Dive](#kernel-3-volume-rendering)
-6. [Key Concepts Glossary](#key-concepts-glossary)
+1. [Start Here: What Even IS Assembly?](#start-here-what-even-is-assembly)
+2. [Why GPUs Are Different (And Why That Matters)](#why-gpus-are-different)
+3. [The Memory Problem: Why Fast Code Is Hard](#the-memory-problem)
+4. [Reading Real SASS: A Guided Tour](#reading-real-sass-a-guided-tour)
+5. [The NeRF Pipeline](#the-nerf-pipeline)
+6. [Kernel 1: Hash Grid Encoding — Deep Dive](#kernel-1-hash-grid-encoding)
+7. [Kernel 2: MLP Forward Pass — Deep Dive](#kernel-2-mlp-forward-pass)
+8. [Kernel 3: Volume Rendering — Deep Dive](#kernel-3-volume-rendering)
+9. [How to Think About Performance](#how-to-think-about-performance)
+10. [Key Concepts Glossary](#key-concepts-glossary)
 
 ---
 
-## Background: How GPUs Execute Code
+## Start Here: What Even IS Assembly?
+
+### Every computer runs on numbers
+
+At the very bottom layer, a computer processor (CPU or GPU) doesn't understand Python, C++, or English. It understands **numbers**. Specifically, it reads a stream of binary instructions — patterns of 1s and 0s — and each pattern means "do something specific."
+
+For example, the number `0x823F0004000780FF` might mean:
+
+> "Multiply the value in register 0 by the value in register 1, add the value in register 2, and store the result back in register 0."
+
+That's one **machine instruction**. Your GPU might execute 10 billion of these per second.
+
+### What's a register?
+
+A **register** is a tiny storage slot *inside* the processor itself. Think of it like a sticky note on your desk — you can read it and write on it instantly (0 cycles), but you only have a few of them.
+
+On our GPU (RTX 4070 Ti Super), each thread gets up to **255 registers**, each holding one 32-bit number (an integer or a floating-point number like `3.14`).
+
+Contrast this with **memory** (VRAM), which is a huge storage space (16 GB) but takes 200-400 clock cycles to access — imagine walking to a warehouse across town to get a piece of paper, vs reading the sticky note right in front of you.
+
+### So what is "assembly language"?
+
+Assembly is a human-readable version of those machine instructions. Instead of remembering that `0x823F...` means "multiply-add," we write:
+
+```
+FFMA R0, R1, R2, R0     ← "R0 = R1 * R2 + R0"
+```
+
+Same instruction. Same binary. Just written with names instead of numbers so humans can read it.
+
+**SASS** (Shader ASSembly) is NVIDIA's name for their GPU assembly language. Every GPU has its own — Intel calls theirs "EU ISA," AMD calls theirs "RDNA ISA." They're all the same idea: the real instructions the hardware executes.
+
+### The compilation chain
+
+When you write a program in a high-level language, it goes through layers of translation:
+
+```
+┌───────────────────────────────────────────────────────────────────┐
+│ Level 1: CUDA C++ (what humans write)                             │
+│                                                                   │
+│   float result = a * b + c;                                       │
+│                                                                   │
+│         │  nvcc compiler (translates to PTX)                      │
+│         ▼                                                         │
+│ Level 2: PTX (virtual assembly — portable across GPU generations) │
+│                                                                   │
+│   fma.rn.f32   %f3, %f1, %f2, %f3;                               │
+│                                                                   │
+│         │  ptxas assembler (translates to SASS)                   │
+│         ▼                                                         │
+│ Level 3: SASS (real assembly — what the silicon actually runs)    │
+│                                                                   │
+│   FFMA R3, R1, R2, R3;                                            │
+│                                                                   │
+│         │  hardware decoder                                       │
+│         ▼                                                         │
+│ Level 4: Binary (electrical signals in silicon)                   │
+│                                                                   │
+│   0x823F0004000780FF                                              │
+└───────────────────────────────────────────────────────────────────┘
+```
+
+Most programmers work at Level 1 and never look lower. We work at Levels 2 and 3 — writing PTX by hand and checking the SASS output to make sure the hardware is doing exactly what we want.
+
+### Why would anyone write assembly by hand?
+
+**Because the compiler isn't always right.**
+
+The compiler is a program that translates high-level code to machine instructions. It's *very* good — decades of research have gone into it. But it has to be **safe**. It won't make assumptions. It won't take risks. It's like a translator who always uses formal, correct, but sometimes clunky phrasing.
+
+A human who understands the hardware can sometimes write instructions that are:
+- **More efficient**: using specialized instructions the compiler doesn't know about
+- **Better scheduled**: ordering instructions to keep the hardware busy instead of idle
+- **Leaner**: cutting out defensive code the compiler adds "just in case"
+
+That's what this project does. Three specific GPU programs (kernels), rewritten at the assembly level, running faster than the compiler's version.
+
+> **Think about it**: Every game, every AI model, every video you watch on your GPU runs SASS instructions. The kernel you're about to learn about executes ~770 SASS instructions per thread, 262,144 threads in parallel. That's 200 million instructions per frame. Understanding what those instructions actually *do* is understanding what the GPU actually *does*.
+
+---
+
+## Why GPUs Are Different
 
 ### CPU vs GPU — The Factory Analogy
 
@@ -34,38 +119,205 @@ Threads are grouped:
 - **Block** (64-1024 threads): A group of warps that share fast "shared memory" and can synchronize with each other.
 - **Grid**: All blocks launched for a kernel.
 
-### The Memory Hierarchy
+> **Think about it**: When you hear "my GPU has 8,448 cores," that doesn't mean 8,448 independent processors like a CPU. It means 264 warps can execute simultaneously, each running 32 threads in lockstep. One instruction controls 32 threads at once. That's fundamentally different from a CPU, and it's why GPU programming requires a different way of thinking.
 
-This is **critical** for understanding our optimizations. GPU memory has multiple levels, each faster but smaller:
+### What makes a GPU fast (and what makes it slow)
+
+A GPU is **unbelievably fast** at one thing: doing the same math on millions of data points simultaneously. If you need to multiply 262,144 numbers by 2, a GPU does it in microseconds.
+
+A GPU is **terrible** at:
+- **Branching** (if/else): when some threads in a warp take the `if` path and others take the `else`, *both* paths execute — the threads on the wrong path just sit idle. This is called **divergence**.
+- **Sequential work**: each individual thread is much slower than a CPU core. The power comes from parallelism.
+- **Random memory access**: accessing scattered, unpredictable memory locations is the single biggest performance killer.
+
+Every optimization in this project tackles one of these weaknesses.
+
+---
+
+## The Memory Problem
+
+This is **the single most important concept** for understanding GPU optimization. If you understand this section, you understand 80% of why our code is fast.
+
+### The speed gap
 
 ```
-                Access Time     Size
-                ───────────     ────
-Registers       ~0 cycles       256 KB per SM (fastest, per-thread)
-Shared Memory   ~23 cycles      100 KB per SM (shared within a block)
-L1 Cache        ~33 cycles      128 KB per SM (automatic)
-L2 Cache        ~200 cycles     48 MB (shared across all SMs)
-Global Memory   ~400 cycles     16 GB (VRAM — slowest, largest)
+                Access Time     Size          Analogy
+                ───────────     ────          ──────
+Registers       ~0 cycles       256 KB/SM     Sticky note on your desk
+Shared Memory   ~23 cycles      100 KB/SM     Filing cabinet in your office
+L1 Cache        ~33 cycles      128 KB/SM     Bookshelf down the hall
+L2 Cache        ~200 cycles     48 MB         Library across campus
+Global Memory   ~400 cycles     16 GB         Warehouse in another city
 ```
 
-The **most common performance bottleneck** is waiting for data from global memory. A single load from L2 takes ~200 cycles — during which the math unit could have done ~200 floating-point operations. Our optimizations focus heavily on hiding this latency.
+Look at those numbers. A register access is **instant**. A global memory access takes **400 cycles**. During those 400 cycles, the math unit could have performed **400 multiply-add operations**, but instead it's just... waiting.
 
-### What is SASS?
+This is like asking a brilliant mathematician to solve problems, but every time they need a number, they have to drive to a warehouse 2 hours away and drive back. They spend 99% of their time driving, 1% doing math.
 
-NVIDIA GPUs execute **SASS** (Shader Assembly) instructions. The hierarchy:
+### Latency hiding: the GPU's trick
+
+The GPU's solution is genius: **don't wait. Work on something else.**
+
+A GPU doesn't have 1 mathematician. It has 48 mathematicians (warps) squeezed into each department (SM). When mathematician #1 is waiting for data, the GPU switches to mathematician #2, who already has their data. When #2 needs data, switch to #3. By the time it cycles back to #1, their data has arrived.
+
+This is called **latency hiding** — keeping the hardware busy by interleaving work from many threads.
 
 ```
-CUDA C/C++  →  (nvcc compiler)  →  PTX  →  (ptxas assembler)  →  SASS
- (human)                         (virtual)                     (hardware)
+Warp 0:  load A ────── waiting 200 cycles ──────── use A
+Warp 1:         load B ────── waiting 200 cycles ──────── use B
+Warp 2:                load C ────── waiting 200 cycles ──────── use C
+...                                                              
+         ↑                                                       
+         The GPU switches between warps every cycle               
+         At least one warp always has data ready!                 
 ```
 
-- **CUDA**: High-level, like regular C++
-- **PTX**: An intermediate representation — like a "virtual" assembly language. Each PTX instruction maps to roughly one SASS instruction.
-- **SASS**: The actual binary the GPU executes. Instruction opcodes, register numbers, scheduling bits — everything.
+**But here's the catch**: this only works if the compiler is allowed to *reorder* instructions within each warp — issuing loads early, doing math while waiting, and consuming data later. If you prevent reordering (like we did with `asm volatile` in v1), the GPU *cannot hide latency*, and performance collapses.
 
-We write **inline PTX** inside CUDA code. This gives us control over which instructions are used, while letting the compiler (ptxas) handle register allocation and scheduling.
+> **Think about it**: Our hash grid kernel loads 768 bytes from L2 cache per thread. At 200 cycles per load, that's ~19,200 cycles of waiting if done serially. But the total math (XOR, multiply, interpolation) is only ~850 cycles. The kernel is 95% waiting, 5% computing. Any optimization that reduces that waiting time — even a little — has a huge impact.
 
-### Key SASS Instructions We Use
+### Memory-bound vs compute-bound
+
+Every GPU kernel has a **bottleneck** — the thing that limits its speed:
+
+- **Memory-bound**: The kernel spends most of its time waiting for data. More math wouldn't help. Faster memory would. *Example: our hash grid kernel.*
+- **Compute-bound**: The kernel spends most of its time doing math. The data arrives fast enough, but there's just too much computation. Faster math units would help. *Example: our MLP neural network kernel.*
+
+Knowing which bottleneck you're dealing with determines **which optimizations are useful**:
+
+| Bottleneck | What helps | What doesn't help |
+|-----------|-----------|-------------------|
+| Memory-bound | Fewer loads, wider loads, better caching, load reordering | More math tricks (math is free time already) |
+| Compute-bound | Fewer instructions, ILP (instruction-level parallelism), hardware special functions | Memory tricks (data arrives fast enough) |
+
+Our three kernels have different bottlenecks — that's why each one needs different optimizations.
+
+---
+
+## Reading Real SASS: A Guided Tour
+
+This is where many guides lose people — they show you SASS and expect you to "just get it." Let's go slow. We'll take real instructions from our kernels and decode them piece by piece.
+
+### Anatomy of a SASS instruction
+
+Here's a real instruction from our MLP kernel:
+
+```
+/*0090*/   FFMA R8, R12, R5, R8;
+```
+
+Let's break down every piece:
+
+| Part | Meaning |
+|------|---------|
+| `/*0090*/` | **Address** — where this instruction lives in memory (byte offset `0x0090` = instruction #18). Like a line number. |
+| `FFMA` | **Opcode** — what to do. FFMA = **F**used **F**loat **M**ultiply-**A**dd |
+| `R8` | **Destination** — where to store the result (register 8) |
+| `R12` | **Source 1** — first input (register 12) |
+| `R5` | **Source 2** — second input (register 5) |
+| `R8` | **Source 3** — third input (register 8, same as destination!) |
+
+So this instruction means: **R8 = R12 × R5 + R8**
+
+That's one neuron's accumulation step: multiply a weight (`R12`) by an input (`R5`), add it to the running total (`R8`).
+
+Notice `R8` appears twice — as both destination and source 3. That's an **accumulator pattern**: the register accumulates (adds up) results across many iterations.
+
+### A longer example — loading from memory
+
+```
+/*0048*/   LDG.E.64.CONSTANT R22, [R4.64+0x100];
+```
+
+| Part | Meaning |
+|------|---------|
+| `LDG` | **L**oa**D** from **G**lobal memory |
+| `.E` | **E**xtended address (64-bit pointer) |
+| `.64` | Load 64 bits (8 bytes = two floats) |
+| `.CONSTANT` | Use the CONSTANT cache path (optimized for read-only data) |
+| `R22` | Destination — result goes into `R22` (and `R23`, since it's 64 bits) |
+| `[R4.64+0x100]` | Address: take the 64-bit pointer in `R4:R5`, add offset `0x100` (256 bytes) |
+
+This loads two floats from the hash table. The `.CONSTANT` hint tells the cache "this data is read-only" so it can cache it more aggressively.
+
+**Why does 64-bit load fill TWO registers?** Because each register is 32 bits. A 64-bit load needs two registers side by side: `R22` gets the first float, `R23` gets the second. The hardware always uses consecutive register pairs for wide loads.
+
+### The logic instruction — LOP3
+
+```
+/*0070*/   LOP3.LUT R16, R10, R14, R18, 0x96, !PT;
+```
+
+| Part | Meaning |
+|------|---------|
+| `LOP3` | **L**ogic **OP**eration with **3** inputs |
+| `.LUT` | Uses a **L**ook**U**p **T**able to define the operation |
+| `R16` | Destination |
+| `R10, R14, R18` | Three input registers |
+| `0x96` | The truth table — this specific value means XOR(a, XOR(b, c)) |
+| `!PT` | Predicate: always execute (no condition) |
+
+**The `0x96` magic number**: LOP3 can compute *any* 3-input boolean function using an 8-bit truth table. `0x96` in binary is `10010110`. If you write out the XOR truth table for 3 inputs, you get exactly that pattern. It's a clever hardware trick — instead of having separate AND, OR, XOR instructions, one instruction handles all of them depending on the look-up table value.
+
+```
+Inputs (a,b,c) → XOR result → Truth table bit
+   0,0,0       →     0       → bit 0 = 0
+   0,0,1       →     1       → bit 1 = 1
+   0,1,0       →     1       → bit 2 = 1
+   0,1,1       →     0       → bit 3 = 0
+   1,0,0       →     1       → bit 4 = 1
+   1,0,1       →     0       → bit 5 = 0
+   1,1,0       →     0       → bit 6 = 0
+   1,1,1       →     1       → bit 7 = 1
+                               ─────────
+                Reading bottom-to-top: 10010110 = 0x96
+```
+
+So `LOP3.LUT R16, R10, R14, R18, 0x96` means: **R16 = R10 XOR R14 XOR R18** — but any boolean function could be selected just by changing `0x96` to a different number.
+
+### Special functions — MUFU
+
+```
+/*00B0*/   MUFU.EX2 R20, R19;
+```
+
+| Part | Meaning |
+|------|---------|
+| `MUFU` | **M**ulti-**F**unction **U**nit — hardware special math |
+| `.EX2` | Compute 2^x (two to the power of x) |
+| `R20` | Destination |
+| `R19` | Input |
+
+So: **R20 = 2^(R19)**
+
+The MUFU unit is a dedicated piece of silicon on the GPU that computes transcendental functions (2^x, log2, sin, cos, reciprocal) in hardware. It's approximate (~22 bits of precision instead of 24), but it's **incredibly fast** — one instruction instead of 20-30 instructions for a software implementation.
+
+We use this to compute `exp(-x)` by rewriting it as `2^(-x × log2(e))`. One multiply + one MUFU.EX2 = 2 instructions. The standard `expf()` function needs ~20+ instructions because it does a polynomial approximation in software.
+
+### Predicates — conditional execution without branching
+
+```
+/*00D0*/   FSETP.LT.AND P0, PT, R6, 0.001, PT;
+/*00D8*/   @P0 BRA 0x120;
+```
+
+| Part | Meaning |
+|------|---------|
+| `FSETP` | **F**loat **SET** **P**redicate — compare two floats and set a true/false flag |
+| `.LT` | **L**ess **T**han |
+| `.AND` | Combine with another predicate using AND |
+| `P0` | Destination predicate register |
+| `PT` | "True" predicate (second output, usually unused) |
+| `R6` | The float to test (transmittance) |
+| `0.001` | The threshold |
+| `PT` | Pre-condition: always (PT = always true) |
+| `@P0 BRA 0x120` | If P0 is true, jump (branch) to instruction at address 0x120 |
+
+This is our **early exit**: "If transmittance < 0.001, skip to the end." Predicate registers (`P0` through `P6`) are 1-bit true/false flags. You set them with comparison instructions, then use `@P0` to conditionally execute any instruction.
+
+> **Think about it**: After reading these examples, go back and look at the instruction table below. Each instruction should now feel familiar — not just "FFMA does multiply-add" but "FFMA R8, R12, R5, R8 accumulates a weight×input product into a running sum, and P0 can conditionally skip it." That's the difference between *reading* SASS and *understanding* it.
+
+### The complete SASS instruction reference (for this project)
 
 | SASS Instruction | What it does | Latency | Example |
 |-----------------|-------------|---------|---------|
@@ -77,6 +329,11 @@ We write **inline PTX** inside CUDA code. This gives us control over which instr
 | **IMAD** | Integer multiply-add: `d = a*b + c` | ~4 cycles | Address calculation, hashing |
 | **MUFU.EX2** | Hardware 2^x approximation (special function unit) | ~6 cycles | Fast exp(), sigmoid |
 | **FMNMX** | Float min/max | ~4 cycles | ReLU activation |
+| **FSETP** | Float compare → set predicate flag | ~4 cycles | Early exit test |
+| **IADD3** | 3-input integer add | ~4 cycles | Address arithmetic |
+| **SHF** | Funnel shift (bit manipulation) | ~4 cycles | Address computation |
+| **F2I** | Float → integer conversion | ~4 cycles | Grid coordinate floor |
+| **SELP** | Select based on predicate | ~4 cycles | Conditional value pick |
 
 ---
 
@@ -155,6 +412,8 @@ After all 12 levels: 12 × 2 = 24 output features.
 This kernel is **memory-bound**. Each level does 8 random lookups into a 12MB hash table. "Random" means the addresses are scattered (not sequential), so the GPU cache can't help much. Each lookup takes ~200 cycles to reach L2 cache.
 
 The compute is cheap (a few multiplies, some XORs, interpolation). The bottleneck is waiting for data.
+
+> **Think about it**: 12 levels × 8 corners × 200 cycles = 19,200 cycles just waiting for memory *if* done one at a time. The total math work is ~850 cycles. That means the hardware spends **95% of its time sitting idle**, waiting for data. The actual calculations take only 5% of the time. This is why "making the math faster" wouldn't help this kernel — the math is already basically free.
 
 ### Our optimizations explained
 
@@ -341,6 +600,8 @@ for (pair = 0; pair < 6; pair++) {
 
 **The lesson**: For memory-bound kernels, the compiler's instruction scheduler is your *ally*, not your enemy. Use inline asm surgically (for instructions C can't express), and let the compiler handle the rest.
 
+> **Think about it**: This journey is the most important lesson in the entire project. It's tempting to think "I'll write everything in assembly and it'll be faster." v1 proves that's wrong. The compiler's scheduler is an incredibly powerful tool — it was written by people who've spent decades optimizing GPU instruction ordering. The winning strategy isn't "replace the compiler" — it's "help the compiler where it's weak, and stay out of its way everywhere else." We added exactly 2 things the compiler can't do (LOP3 and float2 loads) and let it handle the other ~700 instructions.
+
 ---
 
 ## Kernel 2: MLP Forward Pass
@@ -367,6 +628,8 @@ Layer 1: 64 × 64 = **4,096 multiply-adds**.
 Output: 4 × 64 = **256 multiply-adds**.
 
 Total: ~6,080 multiply-adds per sample. At 262K samples, that's 1.6 billion operations.
+
+> **Think about it**: 1.6 billion operations sounds insane, but the RTX 4070 Ti Super can do 337,920 multiply-adds *per clock cycle* across all SMs. At 2640 MHz boost clock, that's ~892 billion multiply-adds per second. So 1.6 billion takes about 1.8 milliseconds — *if* the pipeline is fully utilized. The question is: can we keep all those math units fed?
 
 ### Why this kernel is fast (3.16x speedup)
 
@@ -401,6 +664,8 @@ acc[0] += w1_0 * x1     ← cycle 8 (no stall! acc[0] was ready at cycle 5)
 ```
 
 The compiler *could* theoretically do this but doesn't — it's conservative about register usage and instruction reordering. We manually force it.
+
+> **Think about it**: Why doesn't the compiler do 8-wide ILP on its own? Because it's a **tradeoff**. 8 accumulators means 8 registers just for those running totals, plus registers for weights, inputs, and temporaries. If you use too many registers, the SM can't fit as many threads, which hurts latency hiding for memory loads. The compiler plays it safe — it uses fewer registers to keep occupancy high. But for this kernel, the bottleneck is math throughput, not memory latency, so the tradeoff is worth it. This is exactly the kind of judgment call a human can make but a compiler can't — we know *which* bottleneck matters.
 
 **In SASS**: The kernel generates 6,249 FFMA instructions — nearly everything is fused multiply-add.
 
@@ -530,6 +795,97 @@ STG.E.128  [out], {r, g, b, alpha}    // store 4 floats at once
 
 **1.53x speedup**, max error 2.98 × 10^-7 (from MUFU.EX2 approximation error accumulating over 64 steps — still visually identical).
 
+> **Think about it**: The volume renderer's 1.53x speedup is "free performance" — we didn't change the algorithm at all. Same front-to-back compositing, same early exit, same formula. We just replaced the *implementation* of `exp()` with a 2-instruction hardware version and reused a value we already computed. This is pure assembly-level optimization: the algorithm is identical, but the instructions are better chosen.
+
+---
+
+## How to Think About Performance
+
+If you've read this far, you understand each kernel's optimizations. But how do you develop the *instinct* to know what to optimize? Here's the mental framework.
+
+### Step 1: Find the bottleneck
+
+Before optimizing anything, ask: **"What is the hardware waiting on?"**
+
+- Is it waiting for **data from memory**? → Memory-bound. Optimize loads.
+- Is it waiting for **math to finish**? → Compute-bound. Optimize instructions.
+- Is it waiting for **threads to reconverge after a branch**? → Divergence-bound. Remove branches.
+
+You can often figure this out with napkin math:
+
+```
+Bytes loaded per thread × number of threads = total memory traffic
+Total memory traffic ÷ memory bandwidth = minimum time (memory)
+
+Math ops per thread × number of threads = total compute
+Total compute ÷ peak compute throughput = minimum time (compute)
+
+Whichever minimum is LARGER → that's your bottleneck
+```
+
+For the hash grid:
+- Memory: 768 bytes × 262,144 threads = 201 MB. At 672 GB/s bandwidth → 0.30 ms
+- Compute: 852 ops × 262,144 threads = 223M ops. At 892 billion ops/s → 0.00025 ms
+- Memory time is **1,200x larger** → clearly memory-bound
+
+For the MLP:
+- Memory: 124 bytes × 262,144 threads = 32.5 MB → 0.048 ms
+- Compute: 6,080 ops × 262,144 threads = 1.6B ops → 1.8 ms
+- Compute time is **37x larger** → clearly compute-bound
+
+### Step 2: Know what the hardware can do
+
+Once you know the bottleneck, look at what hardware features you're *not* using:
+
+- **Not using wide loads?** Switch from `float` to `float2`/`float4`.
+- **Not using shared memory?** If many threads read the same data, load it into shared memory once.
+- **Not using special functions?** MUFU can do `exp`, `log`, `sin`, `cos`, `sqrt`, `rcp` in 1-2 instructions.
+- **Not using ILP?** If your code is a long serial dependency chain, break it into independent chains.
+- **The compiler missing a trick?** Check the SASS — is it using 2 instructions where 1 would do (like LOP3 for 3-way XOR)?
+
+### Step 3: Check the SASS
+
+The final truth is always in the SASS. Compile your kernel, run `cuobjdump -sass`, and look at what the hardware will actually execute:
+
+```powershell
+# Generate just the binary
+nvcc -arch=sm_89 -O2 -cubin -o kernel.cubin source.cu
+
+# Disassemble to readable SASS
+cuobjdump -sass kernel.cubin > output.sass
+```
+
+Things to look for:
+- **LDG count**: How many global loads? Can any be combined (32→64 bit)?
+- **FFMA count**: Is the math fully fused? (separate MUL + ADD = missed opportunity)
+- **LDL/STL**: These are "local memory" spills — the compiler ran out of registers and is dumping to slow memory. Very bad.
+- **BRA instructions**: Branches. Every branch is a potential divergence point.
+- **Instruction interleaving**: Are LDG instructions clustered at the top (good: loads issued early) or scattered between uses (bad: loads issued just-in-time)?
+
+### Step 4: Measure, don't guess
+
+Always benchmark. Our v1 hash grid *felt* like it should be fast (we wrote every instruction!), but it was 31% slower. The only way to know is to measure:
+
+```c
+cudaEvent_t start, stop;
+cudaEventCreate(&start);
+cudaEventCreate(&stop);
+
+cudaEventRecord(start);
+for (int i = 0; i < 100; i++)
+    my_kernel<<<grid, block>>>(...);
+cudaEventRecord(stop);
+cudaEventSynchronize(stop);
+
+float ms;
+cudaEventElapsedTime(&ms, start, stop);
+printf("Average: %.3f ms\n", ms / 100.0f);
+```
+
+100 iterations, averaged. Discard 10 warmup runs (the GPU needs time to ramp up its clock speed). Compare against the reference kernel compiled in the *same binary* with the *same flags* — otherwise you're measuring compiler differences, not code differences.
+
+> **Think about it**: The entire optimization process is a cycle: **profile → identify bottleneck → hypothesize fix → implement → measure → verify in SASS → repeat**. At no point do you guess. You look at the hardware, look at the numbers, and make a targeted change based on evidence. That discipline — not raw knowledge — is what separates a GPU optimization engineer from someone who just knows what SASS instructions are.
+
 ---
 
 ## Key Concepts Glossary
@@ -566,12 +922,33 @@ STG.E.128  [out], {r, g, b, alpha}    // store 4 floats at once
 
 ---
 
-## Further Reading
+## Where to Go From Here
 
-- **NVIDIA PTX ISA docs**: Search "PTX ISA 8.x" — the official reference for every PTX instruction
-- **CUDA C Programming Guide**: Chapter on shared memory and occupancy
-- **Instant-NGP paper**: "Instant Neural Graphics Primitives with a Multiresolution Hash Encoding" (Muller et al., 2022)
-- **NeRF paper**: "NeRF: Representing Scenes as Neural Radiance Fields" (Mildenhall et al., 2020)
+If you've read and understood this guide, you now know more about GPU assembly than 99% of programmers. Here's how to keep going:
+
+### Practice: read SASS yourself
+
+1. Write a simple CUDA kernel (add two arrays, multiply a matrix).
+2. Compile it: `nvcc -arch=sm_89 -O2 -cubin -o test.cubin test.cu`
+3. Disassemble: `cuobjdump -sass test.cubin > test.sass`
+4. Read the SASS. Match each instruction back to your source code.
+5. Try changing your code and see how the SASS changes.
+
+This builds the muscle memory of "when I write *this* C code, the GPU executes *those* instructions."
+
+### Resources
+
+- **NVIDIA PTX ISA docs**: Search "PTX ISA 8.x" — the official reference for every PTX instruction. Dense but authoritative.
+- **CUDA C Programming Guide**: Start with chapters on shared memory, occupancy, and the execution model.
+- **Instant-NGP paper**: "Instant Neural Graphics Primitives with a Multiresolution Hash Encoding" (Muller et al., 2022) — the algorithm we optimized.
+- **NeRF paper**: "NeRF: Representing Scenes as Neural Radiance Fields" (Mildenhall et al., 2020) — the original technique.
+- **Our SASS RE toolkit**: See `src/sass_re/` in this repo — 9 probe kernels and microbenchmarks for measuring real instruction latencies on your own GPU.
+
+### The most important thing
+
+Assembly isn't about memorizing opcodes. It's about building a **mental model** of what the hardware is doing — so when you look at high-level code, you can see the instructions underneath, the memory accesses, the stalls, the wasted cycles. Once you have that mental model, you can see optimizations that are invisible to everyone else.
+
+You don't need to write assembly every day. But understanding it changes how you write *everything*.
 
 ---
 
