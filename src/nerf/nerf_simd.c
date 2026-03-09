@@ -403,8 +403,12 @@ void ysu_hashgrid_lookup_batch(
     const float *hashgrid_data,
     float features_out[SIMD_BATCH_SIZE][24]
 ) {
-    /* For each level, look up features per position with trilinear interpolation */
-    uint32_t batch_levels = config->num_levels < 12 ? config->num_levels : 12; /* output array is [24]=12*2 */
+    /* For each level, look up features per position with trilinear interpolation.
+     * Output array is features_out[SIMD_BATCH_SIZE][24], so we must ensure
+     * batch_levels * features_per_entry <= 24 to avoid out-of-bounds writes. */
+    uint32_t fpe = config->features_per_entry > 0 ? config->features_per_entry : 2;
+    uint32_t max_levels = 24 / fpe;   /* max levels that fit in the [24] output */
+    uint32_t batch_levels = config->num_levels < max_levels ? config->num_levels : max_levels;
     for (uint32_t level = 0; level < batch_levels; level++) {
         /* Match Python: res = int(base_res * (per_level_scale ** l)) */
         float res = (float)(int)(config->base_res * powf(config->per_level_scale, (float)level));
@@ -655,6 +659,17 @@ void ysu_mlp_inference_single(
     uint32_t hidden_dim = config->mlp_hidden_dim;
     uint32_t out_dim = config->mlp_out_dim;
 
+    /* Guard: hidden[] and hidden2[] are stack arrays of size 128.
+     * Also out_acc[] is size 16. Reject configs that would overflow. */
+    if (hidden_dim > 128) {
+        fprintf(stderr, "[NeRF] ERROR: hidden_dim=%u exceeds single inference limit (128)\n", hidden_dim);
+        return;
+    }
+    if (out_dim > 16) {
+        fprintf(stderr, "[NeRF] ERROR: mlp_out_dim=%u exceeds single inference limit (16)\n", out_dim);
+        return;
+    }
+
     /* Warn if the saved model has a depth we can't handle correctly. */
     if (config->mlp_num_layers != 2) {
         fprintf(stderr, "[NeRF] WARNING: mlp_num_layers=%u but single inference is hardcoded for 2 hidden layers\n",
@@ -848,6 +863,10 @@ void ysu_volume_integrate_batch(
     float density_scale,
     float bounds_max
 ) {
+    /* Early return if num_steps is zero — avoids division by zero in base_step
+     * and a degenerate ray-march with no samples. */
+    if (num_steps == 0) return;
+
     /* Process each ray independently within batch */
     /* Precompute level scales to avoid repeated pow() calls.
      * Use 20 slots — enough for any foreseeable instant-NGP config (default=16). */
