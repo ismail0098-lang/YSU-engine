@@ -196,7 +196,7 @@ I'm looking for:
 - **Code review from GPU engineers** — if you work on compiler backends, ISA design, or neural graphics and see something wrong (or right) in the SASS analysis, I want to hear it.
 - **Collaboration on kernel optimization** — the methodology generalizes beyond Instant-NGP. Any memory-bound or compute-bound CUDA kernel can be profiled with this toolkit and hand-tuned the same way.
 
-Reach me at: **ismail0098@gmail.com** · [GitHub Issues](https://github.com/ismail0098-lang/YSU-engine/issues)
+Reach me at: **umut7korkmaz@gmail.com** · [GitHub Issues](https://github.com/ismail0098-lang/YSU-engine/issues)
 
 ## Author
 
