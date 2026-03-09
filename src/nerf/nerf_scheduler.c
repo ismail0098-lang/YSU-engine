@@ -31,7 +31,11 @@ void nerf_schedule_split(const NerfScheduleConfig* cfg,
     for(uint32_t i = 0; i < frame_rays->count; i++){
         const int to_gpu = ((i & 1u) == 0u);
         NerfRayBatch* dst = to_gpu ? &out->gpu : &out->cpu;
-        if(dst->count >= dst->capacity) continue;
+        if(dst->count >= dst->capacity){
+            fprintf(stderr, "[NERF] scheduler: %s queue full (%u/%u), ray %u dropped\n",
+                    to_gpu ? "GPU" : "CPU", dst->count, dst->capacity, i);
+            continue;
+        }
 
         uint32_t j = dst->count++;
         dst->pix[j] = frame_rays->pix[i];

@@ -458,21 +458,27 @@ VkResult ysu_upscale_load_weights(YsuUpscaleCtx* ctx, const char* path) {
      * In practice the caller should use a staging buffer. For simplicity,
      * we provide a HOST_VISIBLE path: */
 
-    /* ---- Simplified upload via host-visible buffer ---- */
-    /* Real engine: staging buffer + vkCmdCopyBuffer. This version uses
-     * VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT for portability in this scaffold. */
-    {
-        /* We need physDevice — retrieve from ctx... we'll need to store it. */
-        /* For now, search all memory types from memReqs alone. */
-        /* This is a known limitation of the scaffold — production code should
-         * store VkPhysicalDevice in YsuUpscaleCtx. */
-    }
-
-    /* The init function stores physDevice, use it via a helper: */
-    /* (Added field to ctx: we add phys_device below in init) */
+    /* ---- Weight buffer memory binding ----
+     * NOTE: This scaffold cannot complete the Vulkan memory allocation because
+     * VkPhysicalDevice is not stored in YsuUpscaleCtx.  Until that is added,
+     * mark the buffer as NOT usable so downstream code doesn't try to bind a
+     * descriptor to an unbound buffer (which would crash the GPU).  The weight
+     * buffer was created above but has no backing memory yet.
+     *
+     * TODO(production): store phys_device in YsuUpscaleCtx at init, then:
+     *   1. vkGetPhysicalDeviceMemoryProperties(phys_device, &memProps)
+     *   2. find HOST_VISIBLE memory type from mreq.memoryTypeBits
+     *   3. vkAllocateMemory
+     *   4. vkBindBufferMemory
+     *   5. vkMapMemory + memcpy(data) + vkUnmapMemory
+     */
+    vkDestroyBuffer(ctx->device, ctx->weight_buf, ctx->alloc);
+    ctx->weight_buf = VK_NULL_HANDLE;
 
     free(data);
-    ctx->has_neural_weights = 1;
+    ctx->has_neural_weights = 0;  /* NOT ready — buffer has no backing memory */
+    fprintf(stderr, "[ysu_upscale] WARNING: weight buffer created but memory binding not implemented.\n"
+                    "  Neural upscaling is DISABLED until VkPhysicalDevice is plumbed through.\n");
     fprintf(stderr, "[ysu_upscale] Loaded %u neural params (%.1f KB FP16)\n",
             hdr.param_count, (float)data_bytes / 1024.0f);
     return VK_SUCCESS;

@@ -928,8 +928,21 @@ int main(void){
             if(nerf_occ.hdr.magic != NERF_OCC_MAGIC){
                 fprintf(stderr, "[NERF] occ magic mismatch (0x%08X)\n", nerf_occ.hdr.magic);
             } else {
-                fprintf(stderr, "[NERF] occupancy loaded: dim=%u threshold=%.3f\n",
-                        nerf_occ.hdr.dim, nerf_occ.hdr.threshold);
+                /* Validate that the file is large enough for 16-byte header + dim^3 voxels.
+                 * Without this check, a truncated file would cause occ_sample_cpu to
+                 * read out of bounds. */
+                uint32_t od = nerf_occ.hdr.dim;
+                size_t expected = (size_t)16 + (size_t)od * od * od;
+                if(nerf_occ.bytes < expected){
+                    fprintf(stderr, "[NERF] occupancy file truncated: %zu < %zu (dim=%u)\n",
+                            nerf_occ.bytes, expected, od);
+                    free(nerf_occ.data);
+                    nerf_occ.data = NULL;
+                    nerf_occ.bytes = 0;
+                } else {
+                    fprintf(stderr, "[NERF] occupancy loaded: dim=%u threshold=%.3f\n",
+                            nerf_occ.hdr.dim, nerf_occ.hdr.threshold);
+                }
             }
         } else {
             fprintf(stderr, "[NERF] failed to read occupancy: %s\n", nerf_occ_path);
