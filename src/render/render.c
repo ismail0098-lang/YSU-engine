@@ -822,17 +822,22 @@ void render_nerf_cpu(Vec3 *pixels,
         norm_pos.z = (test_pos.z - nerf_data->config.center.z) / nerf_data->config.scale;
         
         float feat[27] = {0};
-        for (uint32_t level = 0; level < nerf_data->config.num_levels && level < 12; level++) {
+        /* Bug fix: was `level < 12` (OOB for 16-level configs) and `level * 2`
+         * hardcoded stride (wrong when features_per_entry != 2). */
+        uint32_t dbg_fpe = nerf_data->config.features_per_entry;
+        uint32_t dbg_max_level = nerf_data->config.num_levels < 20 ? nerf_data->config.num_levels : 20;
+        for (uint32_t level = 0; level < dbg_max_level; level++) {
             float level_scale = nerf_data->config.base_res * powf(nerf_data->config.per_level_scale, (float)level);
             int32_t x = (int32_t)floorf(norm_pos.x * level_scale);
             int32_t y = (int32_t)floorf(norm_pos.y * level_scale);
             int32_t z = (int32_t)floorf(norm_pos.z * level_scale);
             uint32_t hash = ((uint32_t)x * 73856093u) ^ ((uint32_t)y * 19349663u) ^ ((uint32_t)z * 83492791u);
             hash = hash % nerf_data->config.hashmap_size;
-            uint32_t offset = level * nerf_data->config.hashmap_size * nerf_data->config.features_per_entry;
-            offset += hash * nerf_data->config.features_per_entry;
-            feat[level * 2 + 0] = nerf_data->hashgrid_data[offset + 0];
-            feat[level * 2 + 1] = nerf_data->hashgrid_data[offset + 1];
+            uint32_t offset = level * nerf_data->config.hashmap_size * dbg_fpe;
+            offset += hash * dbg_fpe;
+            for (uint32_t f = 0; f < dbg_fpe && (level * dbg_fpe + f) < 24; f++) {
+                feat[level * dbg_fpe + f] = nerf_data->hashgrid_data[offset + f];
+            }
         }
         feat[24] = 0.5f; feat[25] = 0.5f; feat[26] = 0.0f;
         

@@ -36,7 +36,8 @@ void ysu_nerf_init(const char *hashgrid_path, const char *occ_path, uint32_t wid
     /* Allocate framebuffer */
     g_nerf_framebuffer.width = width;
     g_nerf_framebuffer.height = height;
-    g_nerf_framebuffer.pixels = (NeRFPixel*)malloc(width * height * sizeof(NeRFPixel));
+    /* Cast to size_t first to prevent uint32_t overflow at large dimensions. */
+    g_nerf_framebuffer.pixels = (NeRFPixel*)malloc((size_t)width * (size_t)height * sizeof(NeRFPixel));
     
     if (!g_nerf_framebuffer.pixels) {
         fprintf(stderr, "[NeRF] ERROR: Failed to allocate framebuffer\n");
@@ -78,8 +79,9 @@ void ysu_render_nerf_frame(
         return;
     }
     
-    /* Clear framebuffer */
-    for (uint32_t i = 0; i < width * height; i++) {
+    /* Clear framebuffer — use size_t loop counter to avoid uint32_t overflow. */
+    size_t fb_pixel_count = (size_t)width * (size_t)height;
+    for (size_t i = 0; i < fb_pixel_count; i++) {
         g_nerf_framebuffer.pixels[i].rgb.x = 0.0f;
         g_nerf_framebuffer.pixels[i].rgb.y = 0.0f;
         g_nerf_framebuffer.pixels[i].rgb.z = 0.0f;
@@ -90,7 +92,7 @@ void ysu_render_nerf_frame(
     RayBatch batch = {0};
     batch.count = 0;
     
-    uint64_t start_time = clock();
+    clock_t start_time = clock();
     uint32_t ray_count = 0;
     
     for (uint32_t py = 0; py < height; py++) {
@@ -138,14 +140,16 @@ void ysu_render_nerf_frame(
         }
     }
     
-    uint64_t end_time = clock();
-    double elapsed_ms = (double)(end_time - start_time) / CLOCKS_PER_SEC * 1000.0;
+    clock_t end_time = clock();
+    double elapsed_ms = (start_time != (clock_t)-1 && end_time != (clock_t)-1)
+        ? ((double)(end_time - start_time) / CLOCKS_PER_SEC * 1000.0)
+        : 0.0;
     
     printf("[NeRF] Rendered %u rays in %.2f ms (%.1f rays/ms)\n",
            ray_count, elapsed_ms, ray_count / elapsed_ms);
 
-    /* Always write debug images for now (hardcoded for debugging) */
-    {
+    /* Debug PNG dump: gated behind YSU_NERF_DEBUG_PNG (matches render_nerf_cpu pattern). */
+    if (getenv("YSU_NERF_DEBUG_PNG")) {
         const char *exp_s = getenv("YSU_NERF_EXPOSURE");
         float exposure = exp_s ? atof(exp_s) : 1.0f;
         printf("[NeRF] Writing debug PNGs (exposure=%.2f)...\n", exposure);
@@ -200,7 +204,7 @@ void ysu_render_nerf_frame(
             printf("[NeRF] Wrote nerf_alpha.png\n");
             free(a8);
         }
-    }
+    } /* end YSU_NERF_DEBUG_PNG */
 }
 
 /* ===== Framebuffer Export ===== */

@@ -95,8 +95,15 @@ unsigned char* image_rgb_from_hdr(const Vec3 *pixels, int width, int height) {
 
     PostFX fx;
     fx.exposure         = ysu_env_float("YSU_EXPOSURE",        1.0f);
-    printf("[image] POSTFX=%s BLOOM=%s EXPOSURE=%s (fx.exposure=%.3f)\n",
-       getenv("YSU_POSTFX"), getenv("YSU_BLOOM"), getenv("YSU_EXPOSURE"), fx.exposure);
+    {
+        /* getenv() returns NULL when the variable is unset; passing NULL to
+         * printf("%s") is UB and crashes on MSVC. Use fallback strings. */
+        const char *pfx = getenv("YSU_POSTFX");  if (!pfx) pfx = "unset";
+        const char *blm = getenv("YSU_BLOOM");   if (!blm) blm = "unset";
+        const char *exp = getenv("YSU_EXPOSURE"); if (!exp) exp = "unset";
+        printf("[image] POSTFX=%s BLOOM=%s EXPOSURE=%s (fx.exposure=%.3f)\n",
+               pfx, blm, exp, fx.exposure);
+    }
        
     fx.bloom_threshold  = ysu_env_float("YSU_BLOOM_THRESHOLD", 1.2f);
     fx.bloom_knee       = ysu_env_float("YSU_BLOOM_KNEE",      0.6f);
