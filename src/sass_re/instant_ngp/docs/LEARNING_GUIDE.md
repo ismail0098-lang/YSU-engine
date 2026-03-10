@@ -396,6 +396,39 @@ The "wait 10 minutes" is the stall cycle count. You have to tell it explicitly; 
 
 If you ever see stall=15 (the maximum) between two instructions that should only need 4 cycles, it means the compiler is being conservative — often because of aliased pointers or `asm volatile` barriers that prevent it from tracking the real latency.
 
+**Example 1 — correct vs wrong stall on a dependent FFMA:**
+
+```
+// WRONG: stall = 0 on a dependent FFMA
+/*0090*/    FFMA R8, R12, R5, RZ;      // writes R8  (latency: ~4.5 cycles)
+/*0098*/    FFMA R9, R8,  R6, RZ;      // reads R8 — if stall=0, R8 hasn't been
+                                       // written yet → result in R9 is GARBAGE
+
+// CORRECT: stall = 4
+/*0090*/    FFMA R8, R12, R5, RZ;      // writes R8  (stall=4 in control word)
+/*0098*/    FFMA R9, R8,  R6, RZ;      // issued 4 cycles later — R8 safely ready
+```
+
+**Example 2 — MUFU.EX2 has an 18-cycle latency, so stall = 17:**
+
+```
+// Naive: 17 stall cycles sit idle between MUFU and its consumer
+/*00A0*/    FMUL R19, R20, -1.4427;    // multiply by -log2(e),  stall=4
+/*00A8*/    MUFU.EX2 R20, R19;         // hardware 2^x,          stall=17  ← wasted!
+/*00C8*/    FADD R21, 1.0, R20;        // uses R20 — issued 17 cycles later
+
+// Better: insert independent work so stall reduces to 0 on the consumer
+/*00A0*/    FMUL R19, R20, -1.4427;    // stall=4
+/*00A8*/    MUFU.EX2 R20, R19;         // stall=4 — just enough gap before unrelated work
+/*00B0*/    IMAD R24, R10, R11, RZ;    // independent address calc (fills ~4 cycles)
+/*00B8*/    FFMA R8,  R12, R5, R8;     // independent dot-product step  (~4 cycles)
+/*00C0*/    FFMA R9,  R13, R5, R9;     // independent dot-product step  (~4 cycles)
+/*00C8*/    FFMA R10, R14, R5, R10;    // independent dot-product step  (~4 cycles)
+/*00D0*/    FADD R21, 1.0, R20;        // stall=0 — 17 cycles have now passed, R20 ready
+```
+
+Those four independent instructions between the MUFU and its consumer are doing *real work* — computing other neurons' dot products. Zero cycles wasted.
+
 ---
 
 ### The Yield Flag
@@ -416,6 +449,40 @@ Without yield hints, the scheduler may keep pumping instructions into the same w
 **What yield does NOT mean:** It doesn't force a context switch. It's a *hint*. If no other warp is ready, the scheduler simply continues with the current one.
 
 **In SASS**, the yield bit lives inside the raw control word hex. `cuobjdump` doesn't print a human-readable "Y" label, but you can spot yield-friendly code by looking at the control word's upper nibble pattern. The key thing to understand functionally is: if a kernel with lots of LDG loads is underperforming, and you check the SASS and every LDG is followed by code that *immediately uses* the loaded value without any intervening independent work, that's a sign the compiler scheduled the yield opportunities poorly (and also didn't hide the latency).
+
+**Example — without yield vs with yield (timeline view):**
+
+```
+// WITHOUT yield after LDG:
+// Cycle  0  — Warp 0: LDG R22, [addr]   ← load issued (takes ~200 cycles)
+// Cycle  1  — Warp 0: LOP3 ...           ← independent, runs
+// Cycle  2  — Warp 0: IMAD ...           ← independent, runs
+// Cycle  3  — Warp 0: FFMA R2, R22 ...  ← STALL: R22 not back yet
+// Cycle  3–199: Warp 0 sits idle         ← Warps 1-47 never ran during these cycles
+// Cycle 200  — Warp 0: FFMA R2, R22 ... ← finally issues
+
+// WITH yield set on the LDG:
+// Cycle  0  — Warp 0: LDG R22, [addr]   ← load issued, yield bit set → SWITCH
+// Cycle  1  — Warp 1: (runs its instructions for ~50 cycles)
+// Cycle 50  — Warp 2: (runs for ~50 cycles)
+// Cycle 100 — Warp 3: (runs for ~50 cycles)
+// Cycle 150 — Warp 4: (runs for ~50 cycles)
+// Cycle 200 — Warp 0: FFMA R2, R22 ... ← R22 already arrived — 0 stall cycles
+```
+
+**Example — SASS snippet where yield is set after a long-latency load:**
+
+```
+/*0048*/    LDG.E.64.CONSTANT R22, [R4.64+0x100];   /* 0x...  0x0c4...  ← yield bit SET */
+            // After issuing this load, the warp cooperatively yields.
+            // Another ready warp takes over the SM for ~200 cycles.
+
+/*0058*/    LOP3.LUT R16, R10, R14, R18, 0x96, !PT; // warp 0 resumes here, ~200 cycles later
+            // R22 has arrived; no stall when we use it below
+/*0068*/    FFMA R2, R22, R24, R2;                  // R22 consumed — 0 stall cycles
+```
+
+The warp scheduler sees the yield bit and says: "This warp is going to be waiting anyway — let's use those cycles productively elsewhere." The result is that *all* warps make progress instead of one warp hogging the SM while waiting.
 
 ---
 
@@ -453,6 +520,44 @@ Think of it like road construction:
 This is exactly what our hash grid v2 and v3 exploit: by removing `asm volatile`, the compiler is free to insert independent ALU instructions (LOP3, IMAD) between the LDG issues and their consumers — the barriers handle the stall without wasting cycles.
 
 **The 6-barrier limit:** The hardware has only six scoreboard slots. If you issue more than six outstanding loads before consuming any, the compiler inserts explicit `DEPBAR` stall instructions instead — it ran out of bookkeeping space. Keeping the in-flight load count ≤ 6 is a real design constraint. Our hash grid kernel processes level *pairs* partly for this reason: 8 loads per pair, consumed before the next pair starts, staying within budget.
+
+**Example 1 — what happens with NO barrier (dangerous):**
+
+```
+// No barrier — the load result is read before it has arrived:
+/*0048*/    LDG R22, [addr];          // issues load (returns in ~200 cycles)
+/*0050*/    FFMA R2, R22, R24, R2;   // reads R22 immediately!
+                                     // R22 not written yet → GARBAGE result
+
+// With a barrier — safe:
+/*0048*/    LDG R22, [addr];          // SB0 allocated: "R22 will be written"
+/*0050*/    LOP3 R16, R10, R14, R18, 0x96, !PT;   // independent — runs freely
+/*0058*/    IMAD R20, R10, R11, RZ;               // independent — fills dead time
+/*0060*/    FFMA R2, R22, R24, R2;   // scoreboard: SB0 still pending? STALL.
+                                     // once SB0 clears (load complete): issue
+                                     // SB0 freed here — slot available for next load
+```
+
+**Example 2 — hitting the 6-barrier limit triggers an explicit `DEPBAR`:**
+
+```
+// 6 concurrent loads — all 6 scoreboard slots now occupied:
+/*0048*/    LDG R22, [addr+0x00];    // SB0
+/*0050*/    LDG R26, [addr+0x08];    // SB1
+/*0058*/    LDG R30, [addr+0x10];    // SB2
+/*0060*/    LDG R34, [addr+0x18];    // SB3
+/*0068*/    LDG R38, [addr+0x20];    // SB4
+/*0070*/    LDG R42, [addr+0x28];    // SB5 ← all 6 slots taken
+
+// Compiler can't allocate SB6 — it doesn't exist.
+// Instead it inserts an explicit stall until SB0 finishes:
+/*0078*/    DEPBAR.LE SB0, 0x1;      // "wait until at most 1 op in SB0 is pending"
+                                     // = wait for the first load to complete
+/*0080*/    LDG R46, [addr+0x30];    // SB0 recycled — slot is free again
+/*0088*/    FFMA R2, R22, R24, R2;   // SB0 cleared: R22 is safe to read
+```
+
+The `DEPBAR` is a **perf red flag** — it's a forced stall the compiler had to insert because it ran out of scoreboard slots. If you see many `DEPBAR` instructions in your SASS, you're issuing too many in-flight loads at once without consuming any. The fix is to process smaller batches (consume some loads before issuing more).
 
 ---
 
@@ -495,6 +600,45 @@ acc[7] += w_row7 * x0          // register file read, no cache
 7 register-file reads replaced with 7 cache hits *per input value*, across 27 inputs. That's ~189 register-file reads saved per thread in the inner dot product alone. At 262,144 threads running simultaneously, the power difference is measurable.
 
 **What to check in your own kernels:** Look for tight FFMA loops where the same register (`R5`, `R6`, etc.) repeats across many consecutive instructions. It should show `.reuse`. If it doesn't, the compiler may have lost track of the reuse pattern — common when an unrolled loop is too long or when conditionals break the consecutive-instruction requirement (the reuse buffer only carries a value to the *immediately* next instruction, not across gaps).
+
+**Example 1 — without vs with `.reuse` (register-file traffic):**
+
+```
+// WITHOUT .reuse: 4 instructions, each reads R5 from the register file (4 reads total)
+/*0090*/    FFMA R8,  R12, R5, R8;     // reg-file read: R12, R5, R8
+/*0098*/    FFMA R9,  R13, R5, R9;     // reg-file read: R13, R5, R9   ← R5 read again
+/*00A0*/    FFMA R10, R14, R5, R10;    // reg-file read: R14, R5, R10  ← R5 read again
+/*00A8*/    FFMA R11, R15, R5, R11;    // reg-file read: R15, R5, R11  ← R5 read again
+// R5 = same value each time, but the register file is accessed 4 times
+
+// WITH .reuse on R5: register file accessed once, buffer serves the rest
+/*0090*/    FFMA R8,  R12, R5.reuse, R8;    // reads R5 from reg file → buffers it
+/*0098*/    FFMA R9,  R13, R5.reuse, R9;    // reuse buffer hit — no reg-file read
+/*00A0*/    FFMA R10, R14, R5.reuse, R10;   // reuse buffer hit
+/*00A8*/    FFMA R11, R15, R5,       R11;   // last use — no .reuse (buffer freed)
+// R5: 1 register-file read instead of 4. Saves 3 reads in this group.
+```
+
+At 8-wide ILP across 27 inputs, this adds up to ~189 register-file reads saved per thread in the MLP inner loop.
+
+**Example 2 — `.reuse` breaks when there is a gap (even one unrelated instruction):**
+
+```
+// .reuse ONLY carries the value to the immediately next instruction.
+// A gap breaks the chain:
+
+/*0090*/    FFMA R8,  R12, R5.reuse, R8;    // buffers R5 for the next instruction
+/*0098*/    IMAD R16, R10, R11, RZ;          // ← uses different registers
+                                             //   buffer for R5 is CLEARED after this
+/*00A0*/    FFMA R9,  R13, R5,       R9;    // R5 NOT in buffer — full reg-file read
+// Result: .reuse on /*0090*/ had no effect on /*00A0*/ — the gap killed it.
+
+// Fix: keep the reusing instructions consecutive:
+/*0090*/    FFMA R8,  R12,        R5.reuse, R8;    // buffers R5
+/*0098*/    FFMA R9,  R13,        R5.reuse, R9;    // buffer hit
+/*00A0*/    FFMA R10, R14,        R5,       R10;   // last use — no gap, buffer works
+/*00A8*/    IMAD R16, R10, R11, RZ;                // independent work after the group
+```
 
 ---
 
