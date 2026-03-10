@@ -24,9 +24,13 @@
 
 /* ─────────── Constants ─────────── */
 #define NR_MAX_NUCLEONS     300      /* U-236 = 236 + incoming neutron + products */
-#define NR_SIGMA_FM         0.55f    /* Gaussian width per nucleon (fm) */
-#define NR_R0_FM            1.25f    /* Nuclear radius constant (fm) */
-#define NR_MIN_SEP_FM       1.4f     /* Minimum nucleon separation */
+#define NR_SIGMA_FM         0.55f    /* Gaussian width per nucleon (fm)
+                                      * [Hofstadter, Rev. Mod. Phys. 28 (1956) 214;
+                                      *  proton rms charge radius ~0.87fm → σ≈0.55fm] */
+#define NR_R0_FM            1.25f    /* Nuclear radius constant r₀ (fm) in R=r₀·A^(1/3)
+                                      * [Krane, Introductory Nuclear Physics (1988) §3.1] */
+#define NR_MIN_SEP_FM       1.4f     /* Minimum nucleon separation (fm)
+                                      * [Reid, Ann. Phys. 50 (1968) 411 — hard-core range] */
 
 /* ─────────── Nucleon (CPU + GPU, 32-byte aligned) ─────────── */
 typedef struct {

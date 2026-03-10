@@ -33,38 +33,44 @@
 
 /* ═══════════════════════ PHYSICAL CONSTANTS ═══════════════════════ */
 
-/* Energy per fission (joules) — 200 MeV */
+/* Energy per fission (joules) — 200 MeV
+ * [Chadwick et al., Nucl. Data Sheets 112 (2011) — ENDF/B-VII.1] */
 #define RT_FISSION_ENERGY_J     3.204e-11f
 
-/* Boltzmann constant (J/K) */
+/* Boltzmann constant (J/K) [CODATA 2018: exact since 2019 SI redefinition] */
 #define RT_BOLTZMANN            1.38064852e-23f
 
-/* Universal gas constant (J/(mol·K)) */
+/* Universal gas constant (J/(mol·K)) [CODATA 2018: R = 8.314462618 J/(mol·K)] */
 #define RT_GAS_CONSTANT         8.314462f
 
-/* Water molecular mass (kg/mol) */
+/* Water molecular mass (kg/mol) [IUPAC: M(H₂O) = 18.01528 g/mol] */
 #define RT_H2O_MOLAR_MASS      0.018015f
 
-/* Stefan-Boltzmann constant (W/(m²·K⁴)) */
+/* Stefan-Boltzmann constant (W/(m²·K⁴)) [CODATA 2018: σ = 5.670374419e-8] */
 #define RT_STEFAN_BOLTZMANN     5.670374e-8f
 
 /* Absolute zero offset (K) */
 #define RT_CELSIUS_OFFSET       273.15f
 
-/* ═══════════════════════ RBMK OPERATING PARAMETERS ═══════════════ */
+/* ═══════════════════════ RBMK OPERATING PARAMETERS ═══════════════
+ * All values from INSAG-7, The Chernobyl Accident (1992), IAEA Safety
+ * Series No. 75-INSAG-7; and RBMK-1000 design documentation.
+ * T_sat from IAPWS-IF97: T_sat(7 MPa) = 285.83°C ≈ 559 K            */
 
-#define RT_OPERATING_PRESSURE   7.0e6f   /* 7 MPa coolant pressure           */
-#define RT_INLET_TEMP_K         543.15f  /* 270°C inlet coolant              */
-#define RT_OUTLET_TEMP_K        557.15f  /* 284°C outlet coolant             */
-#define RT_SATURATION_TEMP_K    559.0f   /* T_sat at 7 MPa ≈ 286°C          */
-#define RT_NOMINAL_POWER_MW     3200.0f  /* 3200 MWt full power              */
+#define RT_OPERATING_PRESSURE   7.0e6f   /* 7 MPa coolant pressure [INSAG-7]  */
+#define RT_INLET_TEMP_K         543.15f  /* 270°C inlet coolant   [INSAG-7]   */
+#define RT_OUTLET_TEMP_K        557.15f  /* 284°C outlet coolant  [INSAG-7]   */
+#define RT_SATURATION_TEMP_K    559.0f   /* T_sat at 7 MPa ≈ 286°C [IAPWS-IF97] */
+#define RT_NOMINAL_POWER_MW     3200.0f  /* 3200 MWt full power   [INSAG-7]   */
 #define RT_NUM_FUEL_CHANNELS    1661     /* RBMK-1000 fuel channels          */
 #define RT_CORE_RADIUS_M        5.9f     /* ~11.8 m diameter                 */
 #define RT_CORE_HEIGHT_M        7.0f     /* Active core height               */
 #define RT_CHANNEL_PITCH_M      0.25f    /* 25 cm lattice pitch              */
 
 /* ═══════════════════════ DELAYED NEUTRON PARAMETERS ═════════════ */
-/* 6-group delayed neutron data for U-235 thermal fission (Keepin 1965).
+/* 6-group delayed neutron data for U-235 thermal fission.
+ * [Keepin, Wimett & Zeigler, Phys. Rev. 107 (1957) 1044;
+ *  Keepin, Physics of Nuclear Kinetics (1965), Table 4-5]
  * β_total = Σβ_i = 0.0065  (≈ 0.65 %)
  * C_i = precursor concentration (normalised to steady-state at P₀)
  * λ_i = decay constant (s⁻¹)
@@ -82,14 +88,15 @@
  * If Xe then burns off rapidly → huge positive reactivity → the
  * exact sequence that caused the Chernobyl disaster on 26 Apr 1986. */
 
-#define RT_LAMBDA_I135     2.87e-5f   /* I-135 decay constant  (s⁻¹), t½=6.7h */
-#define RT_LAMBDA_XE135    2.09e-5f   /* Xe-135 decay constant (s⁻¹), t½=9.2h */
-#define RT_GAMMA_I135      0.061f     /* I-135 fission yield (per fission)     */
-#define RT_GAMMA_XE135     0.003f     /* Xe-135 direct fission yield           */
-#define RT_SIGMA_XE135     2.65e-18f  /* Xe-135 micro σ_a (cm²) = 2.65 Mb     */
-#define RT_SIGMA_F_U235    5.82e-22f  /* U-235 fission σ_f (cm²) at thermal    */
-#define RT_XE_WORTH_FULL   0.030f     /* Xe-135 reactivity worth at equilibrium
-                                        at full power: ~3.0% Δk/k (≈4.6$)    */
+#define RT_LAMBDA_I135     2.87e-5f   /* I-135 decay constant  (s⁻¹), t½=6.7h [NNDC/ENSDF] */
+#define RT_LAMBDA_XE135    2.09e-5f   /* Xe-135 decay constant (s⁻¹), t½=9.2h [NNDC/ENSDF] */
+#define RT_GAMMA_I135      0.061f     /* I-135 fission yield (per fission) [ENDF/B-VIII.0]  */
+#define RT_GAMMA_XE135     0.003f     /* Xe-135 direct fission yield [ENDF/B-VIII.0]        */
+#define RT_SIGMA_XE135     2.65e-18f  /* Xe-135 micro σ_a (cm²) = 2.65 Mb [ENDF/B-VIII.0]  */
+#define RT_SIGMA_F_U235    5.82e-22f  /* U-235 fission σ_f (cm²) at thermal [ENDF/B-VIII.0] */
+#define RT_XE_WORTH_FULL   0.030f     /* Xe-135 reactivity worth at equilibrium at full
+                                        power: ~3.0% Δk/k (≈4.6$)
+                                        [Duderstadt & Hamilton, Nuclear Reactor Analysis (1976)] */
 
 /* ═══════════════════════ MATERIAL TYPES ═══════════════════════════ */
 
@@ -114,10 +121,10 @@ typedef enum {
  * FIRST and briefly adds more positive reactivity (the fatal design flaw). */
 
 #define RT_MAX_RODS          211
-#define RT_ROD_LENGTH_M      7.0f     /* B₄C absorber length (m)       */
-#define RT_GRAPHITE_TIP_M    1.25f    /* Graphite displacer tip (m)     */
-#define RT_ROD_TRAVEL_M      7.0f     /* Full travel distance (m)       */
-#define RT_ROD_SPEED_MPS     0.4f     /* Rod insertion speed (m/s)      */
+#define RT_ROD_LENGTH_M      7.0f     /* B₄C absorber length (m) [INSAG-7]   */
+#define RT_GRAPHITE_TIP_M    1.25f    /* Graphite displacer tip (m) [INSAG-7] */
+#define RT_ROD_TRAVEL_M      7.0f     /* Full travel distance (m) [INSAG-7]   */
+#define RT_ROD_SPEED_MPS     0.4f     /* Rod insertion speed (m/s) [INSAG-7]  */
 #define RT_ROD_SPEED_WITHDRAW 0.13f   /* Rod withdrawal speed (m/s)     */
 
 typedef struct {

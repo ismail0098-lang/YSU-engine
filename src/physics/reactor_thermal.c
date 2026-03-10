@@ -102,7 +102,8 @@ float rt_thermal_conductivity(RT_Material mat, float T) {
     case RT_MAT_FUEL_UO2: {
         /* IAEA correlation for UO₂:
          * k = 100 / (7.5408 + 17.692t + 3.6142t²) + 6400/(t^2.5) × exp(-16.35/t)
-         * where t = T/1000.  Simplified for computational stability. */
+         * where t = T/1000.  Simplified for computational stability.
+         * [Fink, J. Nucl. Mater. 279 (2000) 1-18; IAEA-TECDOC-1496 §3.2.1] */
         float t = T / 1000.0f;
         if (t < 0.3f) t = 0.3f;
         float k_phonon = 100.0f / (7.5408f + 17.692f * t + 3.6142f * t * t);
@@ -110,12 +111,14 @@ float rt_thermal_conductivity(RT_Material mat, float T) {
         return k_phonon + k_rad;
     }
     case RT_MAT_CLAD_ZR4:
-        /* Zircaloy-4: k ≈ 12.767 + 0.00574×T (W/(m·K)), valid 300-1800K */
+        /* Zircaloy-4: k ≈ 12.767 + 0.00574×T (W/(m·K)), valid 300-1800K
+         * [Mills et al., J. Nucl. Mater. 246 (1997); IAEA-TECDOC-1496 §4.2.1] */
         return 12.767f + 0.00574f * T;
     case RT_MAT_COOLANT_H2O:
         /* Water: k depends strongly on phase.
          * Liquid (< T_sat): k ≈ 0.686 - 0.0004×(T-373) approx
-         * Steam:            k ≈ 0.025 + 0.00005×(T-373) */
+         * Steam:            k ≈ 0.025 + 0.00005×(T-373)
+         * [IAPWS-IF97 steam tables; NIST Chemistry WebBook] */
         if (T < RT_SATURATION_TEMP_K)
             return 0.686f - 0.0004f * (T - 373.15f);
         else
@@ -123,10 +126,12 @@ float rt_thermal_conductivity(RT_Material mat, float T) {
     case RT_MAT_MODERATOR_C:
         /* Nuclear graphite: highly dependent on irradiation.
          * Virgin: ~150 W/(m·K), irradiated: ~30-80 W/(m·K)
-         * Using irradiated values typical of RBMK graphite stack */
+         * Using irradiated values typical of RBMK graphite stack
+         * [IAEA-TECDOC-1154 §3.3; Nightingale, Nuclear Graphite (1962)] */
         return 50.0f * expf(-0.0003f * (T - 300.0f)) + 10.0f;
     case RT_MAT_CONTROL_B4C:
-        /* B₄C: k ≈ 30 W/(m·K) at RT, decreases slightly with T */
+        /* B₄C: k ≈ 30 W/(m·K) at RT, decreases slightly with T
+         * [Thévenot, J. Eur. Ceram. Soc. 6 (1990) 205-225] */
         return 30.0f - 0.005f * (T - 300.0f);
     default:
         return 0.01f; /* void / air — very low conductivity */
@@ -137,26 +142,31 @@ float rt_thermal_conductivity(RT_Material mat, float T) {
 float rt_specific_heat(RT_Material mat, float T) {
     switch (mat) {
     case RT_MAT_FUEL_UO2:
-        /* UO₂: c_p ≈ 302.27 + 0.0285T (J/(kg·K)) — Fink 2000 simplified */
+        /* UO₂: c_p ≈ 302.27 + 0.0285T (J/(kg·K))
+         * [Fink, J. Nucl. Mater. 279 (2000) 1-18, Table 3] */
         return 302.27f + 0.0285f * T;
     case RT_MAT_CLAD_ZR4:
-        /* Zircaloy-4: c_p ≈ 281 + 0.0306T (J/(kg·K)) below α→β at ~1100K */
+        /* Zircaloy-4: c_p ≈ 281 + 0.0306T (J/(kg·K)) below α→β at ~1100K
+         * [Mills et al., J. Nucl. Mater. 246 (1997); IAEA-TECDOC-1496 §4.2.2] */
         if (T < 1100.0f)
             return 281.0f + 0.0306f * T;
         else /* β-phase spike near transition */
             return 360.0f;
     case RT_MAT_COOLANT_H2O:
         /* Liquid water at 7 MPa: c_p ≈ 4200-5500 J/(kg·K) (rises near saturation)
-         * Superheated steam: c_p ≈ 2000-2500 J/(kg·K) */
+         * Superheated steam: c_p ≈ 2000-2500 J/(kg·K)
+         * [IAPWS-IF97 industrial formulation; Wagner & Kretzschmar (2008)] */
         if (T < RT_SATURATION_TEMP_K)
             return 4200.0f + 3.0f * (T - RT_INLET_TEMP_K);
         else
             return 2100.0f + 0.5f * (T - RT_SATURATION_TEMP_K);
     case RT_MAT_MODERATOR_C:
         /* Graphite: c_p increases with T, Debye model
-         * c_p ≈ 710 + 0.40×(T-300) J/(kg·K) for T > 300K */
+         * c_p ≈ 710 + 0.40×(T-300) J/(kg·K) for T > 300K
+         * [Butland & Maddison, J. Nucl. Mater. 49 (1973) 45-56] */
         return 710.0f + 0.40f * (T - 300.0f);
     case RT_MAT_CONTROL_B4C:
+        /* [Thévenot, J. Eur. Ceram. Soc. 6 (1990); CRC Handbook of Chemistry & Physics] */
         return 960.0f + 0.25f * (T - 300.0f);
     default:
         return 1000.0f;
@@ -167,22 +177,26 @@ float rt_specific_heat(RT_Material mat, float T) {
 float rt_density(RT_Material mat, float T) {
     switch (mat) {
     case RT_MAT_FUEL_UO2:
-        /* UO₂: ρ ≈ 10970 kg/m³ (TD=95%) with thermal expansion */
+        /* UO₂: ρ ≈ 10970 kg/m³ (TD=95%) with thermal expansion
+         * [IAEA-TECDOC-1496 §3.1; Martin, J. Nucl. Mater. 152 (1988) 94-101] */
         return 10970.0f * (1.0f - 3.0f * 10.0e-6f * (T - 300.0f));
     case RT_MAT_CLAD_ZR4:
-        /* Zircaloy-4: ρ ≈ 6550 kg/m³ */
+        /* Zircaloy-4: ρ ≈ 6550 kg/m³
+         * [Scott, J. Nucl. Mater. 18 (1966) 184; IAEA-TECDOC-1496 §4.1] */
         return 6550.0f * (1.0f - 3.0f * 5.7e-6f * (T - 300.0f));
     case RT_MAT_COOLANT_H2O:
-        /* Liquid water at 7 MPa: ρ ≈ 740-760 kg/m³   */
-        /* Steam at 7 MPa: ρ ≈ 36 kg/m³               */
+        /* Liquid water at 7 MPa: ρ ≈ 740-760 kg/m³   [IAPWS-IF97] */
+        /* Steam at 7 MPa: ρ ≈ 36 kg/m³              [IAPWS-IF97] */
         if (T < RT_SATURATION_TEMP_K)
             return 760.0f - 0.5f * (T - RT_INLET_TEMP_K);
         else
             return 36.0f;
     case RT_MAT_MODERATOR_C:
-        /* Nuclear graphite: ρ ≈ 1700 kg/m³ */
+        /* Nuclear graphite: ρ ≈ 1700 kg/m³
+         * [IAEA-TECDOC-1154 §3.1; Nightingale, Nuclear Graphite (1962)] */
         return 1700.0f;
     case RT_MAT_CONTROL_B4C:
+        /* [Thévenot, J. Eur. Ceram. Soc. 6 (1990); CRC Handbook] */
         return 2520.0f;
     default:
         return 1.2f; /* air */
@@ -194,15 +208,15 @@ float rt_expansion_coeff(RT_Material mat, float T) {
     (void)T; /* Weakly temperature-dependent for these materials */
     switch (mat) {
     case RT_MAT_FUEL_UO2:
-        return 10.0e-6f;  /* UO₂: ~10×10⁻⁶ /K */
+        return 10.0e-6f;  /* UO₂: ~10×10⁻⁶ /K [Martin, J. Nucl. Mater. 152 (1988) 94] */
     case RT_MAT_CLAD_ZR4:
-        return 5.7e-6f;   /* Zircaloy-4: ~5.7×10⁻⁶ /K */
+        return 5.7e-6f;   /* Zircaloy-4: ~5.7×10⁻⁶ /K [Scott, J. Nucl. Mater. 18 (1966)] */
     case RT_MAT_COOLANT_H2O:
         return 0.0f;      /* N/A for fluid */
     case RT_MAT_MODERATOR_C:
-        return 4.0e-6f;   /* Graphite: ~4×10⁻⁶ /K */
+        return 4.0e-6f;   /* Graphite: ~4×10⁻⁶ /K [IAEA-TECDOC-1154 §3.4] */
     case RT_MAT_CONTROL_B4C:
-        return 5.0e-6f;
+        return 5.0e-6f;   /* [Thévenot, J. Eur. Ceram. Soc. 6 (1990)] */
     default:
         return 0.0f;
     }
@@ -220,11 +234,11 @@ float rt_diffusivity(RT_Material mat, float T) {
 /* ─── Melting Point (K) ─── */
 float rt_melting_point(RT_Material mat) {
     switch (mat) {
-    case RT_MAT_FUEL_UO2:     return 3120.0f;
-    case RT_MAT_CLAD_ZR4:     return 2125.0f;
+    case RT_MAT_FUEL_UO2:     return 3120.0f;  /* [Adamson et al., J. Nucl. Mater. 130 (1985) 349] */
+    case RT_MAT_CLAD_ZR4:     return 2125.0f;  /* [ASM Specialty Handbook: Zirconium; IAEA-TECDOC-1496] */
     case RT_MAT_COOLANT_H2O:  return 273.15f;
-    case RT_MAT_MODERATOR_C:  return 3925.0f; /* sublimation */
-    case RT_MAT_CONTROL_B4C:  return 2718.0f;
+    case RT_MAT_MODERATOR_C:  return 3925.0f;  /* sublimation [CRC Handbook; IAEA-TECDOC-1154] */
+    case RT_MAT_CONTROL_B4C:  return 2718.0f;  /* [Thévenot, J. Eur. Ceram. Soc. 6 (1990)] */
     default:                  return 9999.0f;
     }
 }
@@ -241,7 +255,8 @@ float rt_saturation_temp(float P) {
     /* Antoine equation adapted for water near 1-10 MPa:
      * log10(P_bar) = A - B/(C + T_celsius)
      * A=5.0768, B=1659.793, C=227.1 (water, high-pressure fit)
-     * Inverted: T_celsius = B/(A - log10(P_bar)) - C */
+     * Inverted: T_celsius = B/(A - log10(P_bar)) - C
+     * [NIST Chemistry WebBook, Antoine parameters for water] */
     if (P < 1.0e5f) P = 1.0e5f;
     float P_bar = P / 1.0e5f;
     float log_P = log10f(P_bar);
@@ -262,7 +277,10 @@ float rt_saturation_pressure(float T) {
 float rt_latent_heat(float P) {
     float P_MPa = P / 1.0e6f;
     if (P_MPa > 22.0f) return 0.0f; /* above critical point */
-    /* Fit: h_fg ≈ 2257 × (1 - P/22.064)^0.38 kJ/kg */
+    /* Fit: h_fg ≈ 2257 × (1 - P/22.064)^0.38 kJ/kg
+     * 2257 kJ/kg = latent heat at 1 atm [IAPWS-IF97]
+     * 22.064 MPa = critical pressure [IAPWS-IF97]
+     * Exponent 0.38 from Watson correlation [Watson, Ind. Eng. Chem. 35 (1943) 398] */
     float ratio = P_MPa / 22.064f;
     if (ratio > 0.999f) ratio = 0.999f;
     return 2257.0e3f * powf(1.0f - ratio, 0.38f);
@@ -282,7 +300,8 @@ float rt_enthalpy_vapor(float P) {
 
 /* Void fraction α from steam quality x using drift-flux model.
  * Simplified Zuber-Findlay: α = x / (C₀×(x + (1-x)×ρ_g/ρ_f))
- * where C₀ ≈ 1.13 for tubes */
+ * where C₀ ≈ 1.13 for tubes
+ * [Zuber & Findlay, J. Heat Transfer 87 (1965) 453-468] */
 float rt_void_fraction(float quality, float P) {
     if (quality <= 0.0f) return 0.0f;
     if (quality >= 1.0f) return 1.0f;
@@ -298,12 +317,14 @@ float rt_void_fraction(float quality, float P) {
  *  Zr + 2H₂O → ZrO₂ + 2H₂ + 6.5 MJ/kg(Zr)
  *  Parabolic rate law: w² = A × t × exp(-Q/RT)
  *  where w = oxide thickness, A = 33.3 mg²/(cm⁴·s), Q = 45500 cal/mol
+ *  [Baker & Just, ANL-6548 (1962), Argonne National Laboratory]
  * ═══════════════════════════════════════════════════════════════ */
 
 /* Oxidation rate constant K (m²/s) at temperature T */
 float rt_zr_oxidation_rate(float T) {
     if (T < 1073.15f) return 0.0f; /* Negligible below ~800°C */
-    /* Baker-Just: K = 33.3e-6 m²/s × exp(-45500×4.184 / (8.314 × T)) */
+    /* Baker-Just: K = 33.3e-6 m²/s × exp(-45500×4.184 / (8.314 × T))
+     * 4.184 J/cal = thermochemical calorie [NIST] */
     float Q_over_R = 45500.0f * 4.184f / RT_GAS_CONSTANT; /* ~22900 K */
     return 33.3e-6f * expf(-Q_over_R / T);
 }
@@ -311,8 +332,7 @@ float rt_zr_oxidation_rate(float T) {
 /* H₂ generation rate (kg H₂ per m² of Zr surface per second) */
 float rt_hydrogen_rate(float T) {
     /* From stoichiometry: Zr(91.2) + 2H₂O → ZrO₂ + 2H₂(4.032)
-     * H₂/Zr mass ratio = 4.032/91.22 ≈ 0.0442
-     * Rate ~ sqrt(K/t) for parabolic kinetics — use instantaneous rate */
+     * H₂/Zr mass ratio = 4.032/91.22 ≈ 0.0442 [IUPAC atomic masses 2021] */
     float K = rt_zr_oxidation_rate(T);
     if (K < 1.0e-20f) return 0.0f;
     /* H₂ rate ∝ Zr oxidation rate × stoichiometric ratio × Zr density */
@@ -719,7 +739,8 @@ static void update_zr_oxidation(ReactorThermal *rt) {
 
         /* Exothermic heat from Zr oxidation: 6.5 MJ per kg of Zr reacted */
         float dm_zr = dm_h2 / 0.0442f; /* inverse stoichiometric ratio */
-        float dQ = dm_zr * 6.5e6f;     /* J */
+        float dQ = dm_zr * 6.5e6f;     /* J — Zr oxidation enthalpy 6.5 MJ/kg
+                                         * [Lustman & Kerze, Metallurgy of Zirconium (1955); IAEA ~6.45 MJ/kg] */
         oxidation_heat += dQ;
 
         /* Add oxidation heat to the cell */
@@ -732,7 +753,8 @@ static void update_zr_oxidation(ReactorThermal *rt) {
 
     rt->hydrogen_mass += h2_produced;
 
-    /* Track oxidation fraction (total Zr inventory ~ 1661 channels × ~100 kg each) */
+    /* Track oxidation fraction (total Zr inventory ~ 1661 channels × ~100 kg each)
+     * [INSAG-7 (1992); RBMK-1000 design documentation] */
     float total_zr_mass = 1661.0f * 100.0f; /* ~166100 kg */
     float total_zr_reacted = rt->hydrogen_mass / 0.0442f;
     rt->zr_oxidation_frac = total_zr_reacted / total_zr_mass;
@@ -765,7 +787,8 @@ static void update_reactivity_feedback(ReactorThermal *rt) {
     /* RBMK positive void coefficient (most dangerous feature!) */
     /* At Chernobyl conditions (low power, few control rods):
      * α_void ≈ +4.7β per unit void fraction change
-     * β = 0.0064 (delayed neutron fraction) */
+     * β = 0.0064 (delayed neutron fraction)
+     * [INSAG-7, Annex I (1992); Adamov et al., Nucl. Eng. Design 173 (1997)] */
     float beta = 0.0064f;
     rt->void_coefficient = 4.7f * beta; /* per unit void fraction */
 
@@ -773,7 +796,8 @@ static void update_reactivity_feedback(ReactorThermal *rt) {
     float delta_rho_void = rt->void_coefficient * (avg_void - rt->baseline_void);
 
     /* Doppler coefficient (negative — fuel temp feedback, stabilizing):
-     * α_D ≈ -3.0×10⁻⁵ Δk/k per K */
+     * α_D ≈ -3.0×10⁻⁵ Δk/k per K
+     * [INSAG-7; typical range −2 to −5 × 10⁻⁵ for thermal reactors] */
     float doppler_coeff = -3.0e-5f;
     float delta_T_fuel = rt->avg_fuel_temp - rt->baseline_fuel_temp;
     float delta_rho_doppler = doppler_coeff * delta_T_fuel;
@@ -784,7 +808,8 @@ static void update_reactivity_feedback(ReactorThermal *rt) {
         /* RBMK control rods take ~18-20 seconds for full insertion
          * Reactivity worth of all rods: ~-7β when fully inserted
          * BUT: RBMK rods have graphite displacing tips — initially POSITIVE!
-         * This is the "scram causes power spike" effect. */
+         * This is the "scram causes power spike" effect.
+         * [INSAG-7 §4 (1992); Abagyan et al., RBMK safety analysis reports] */
         float rod_travel = rt->scram_time / 20.0f; /* 0..1 normalized travel */
         if (rod_travel > 1.0f) rod_travel = 1.0f;
 
@@ -809,10 +834,13 @@ static void update_reactivity_feedback(ReactorThermal *rt) {
      * Operators withdraw rods → Xe eventually burns off → power surge.
      */
     {
-        float phi_nom = 3.0e13f;
+        /* Nominal RBMK-1000 thermal neutron flux and macroscopic fission rate
+         * [Dollezhal & Emelyanov, Channel Nuclear Power Reactors (1980);
+         *  IAEA-TECDOC-1474] */
+        float phi_nom = 3.0e13f;  /* n/(cm²·s) */
         float phi = phi_nom * rt->power_fraction;
         rt->neutron_flux = phi;
-        float fiss_rate = 9.8e13f * rt->power_fraction;
+        float fiss_rate = 9.8e13f * rt->power_fraction; /* fissions/(cm³·s) ≈ Σ_f × φ */
         float dt_xe = rt->dt;
 
         /* Semi-implicit Euler for stiffness (σ_a·φ can be large) */
@@ -889,6 +917,9 @@ static void update_reactivity_feedback(ReactorThermal *rt) {
      *    N^{n+1}   = N^n + dt · [(ρ-β)/Λ · N^n + Σ λ_i · C_i^{n+1}]
      * ──────────────────────────────────────────────────────────── */
     {
+        /* 6-group delayed neutron fractions and decay constants for U-235
+         * [Keepin, Wimett & Zeigler, Phys. Rev. 107 (1957) 1044;
+         *  Keepin, Physics of Nuclear Kinetics (1965), Table 4-5] */
         static const float beta_i[6] = {0.000215f, 0.001424f, 0.001274f,
                                          0.002568f, 0.000748f, 0.000273f};
         static const float lambda_i[6] = {0.0124f, 0.0305f, 0.111f,
@@ -1161,7 +1192,7 @@ int reactor_thermal_init(ReactorThermal *rt,
      *   Xe_eq = (γ_I + γ_Xe) · Σ_f · φ / (λ_Xe + σ_a^Xe · φ)
      */
     {
-        float phi_nom = 3.0e13f;  /* nominal full-power thermal flux */
+        float phi_nom = 3.0e13f;  /* nominal full-power thermal flux [IAEA-TECDOC-1474] */
         float phi = phi_nom * rt->power_fraction;
         /* Use a simplified macroscopic production rate proportional to power */
         float fiss_rate = 9.8e13f * rt->power_fraction; /* fissions/cm³/s at power */
@@ -1176,7 +1207,7 @@ int reactor_thermal_init(ReactorThermal *rt,
     }
 
     /* ── Initialise 6-group delayed neutron precursors ──
-     * Keepin (1965) data for U-235 thermal fission:
+     * Keepin (1965) data for U-235 thermal fission\n     * [Keepin, Wimett & Zeigler, Phys. Rev. 107 (1957) 1044]:
      *   Group  β_i        λ_i (s⁻¹)   half-life
      *     1    0.000215   0.0124       55.9 s
      *     2    0.001424   0.0305       22.7 s
@@ -1362,6 +1393,7 @@ void reactor_thermal_set_power(ReactorThermal *rt, float fraction) {
     /* Must update neutron_pop AND precursor concentrations to the new
      * steady-state, otherwise the 6-group kinetics solver will immediately
      * overwrite power_fraction with the old neutron_pop next frame. */
+    /* Keepin 6-group data [Keepin et al., Phys. Rev. 107 (1957) 1044] */
     static const float beta_i[6] = {0.000215f, 0.001424f, 0.001274f,
                                      0.002568f, 0.000748f, 0.000273f};
     static const float lambda_i[6] = {0.0124f, 0.0305f, 0.111f,

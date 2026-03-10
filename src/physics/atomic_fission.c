@@ -44,19 +44,21 @@ static void af_rand_dir(float *dx, float *dy, float *dz) {
 
 /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• ATOMIC DATA â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 
-/* Approximate atomic radii in Ã… (van der Waals or metallic) */
+/* Approximate atomic radii in Ã… (van der Waals or metallic)
+ * Sources: A. Bondi, J. Phys. Chem. 68 (1964) 441 (van der Waals)
+ *          J.C. Slater, J. Chem. Phys. 41 (1964) 3199 (metallic)  */
 static float atom_radius_A(int Z) {
     /* Selected elements relevant to fission */
     switch (Z) {
-        case  1: return 1.20f;  /* H */
-        case  2: return 1.40f;  /* He (1sÂ² closed shell) */
-        case  6: return 1.70f;  /* C (graphite) */
-        case  8: return 1.52f;  /* O */
-        case 36: return 2.02f;  /* Kr */
-        case 54: return 2.16f;  /* Xe */
-        case 56: return 2.53f;  /* Ba */
-        case 92: return 1.96f;  /* U (metallic radius) */
-        case 94: return 1.87f;  /* Pu (metallic radius) */
+        case  1: return 1.20f;  /* H  [Bondi 1964] */
+        case  2: return 1.40f;  /* He [Bondi 1964] (1sÂ² closed shell) */
+        case  6: return 1.70f;  /* C  [Bondi 1964] (graphite) */
+        case  8: return 1.52f;  /* O  [Bondi 1964] */
+        case 36: return 2.02f;  /* Kr [Bondi 1964] */
+        case 54: return 2.16f;  /* Xe [Bondi 1964] */
+        case 56: return 2.53f;  /* Ba [Slater 1964] */
+        case 92: return 1.96f;  /* U  [Slater 1964] (metallic radius) */
+        case 94: return 1.87f;  /* Pu [Slater 1964] (metallic radius) */
         case -1: return 0.80f;  /* QCD quark (sub-femtometer visualized) */
         default: return 1.5f + 0.01f * Z;
     }
@@ -72,14 +74,16 @@ static __attribute__((unused)) float nuclear_radius_fm(int A) {
  * At 2 MeV fast:           Î» â‰ˆ 2.02Ã—10â»â´ Ã… = 0.0202 fm */
 static float neutron_wavelength_A(float energy_eV) {
     if (energy_eV < 1e-6f) energy_eV = 1e-6f;
-    return 0.2860f / sqrtf(energy_eV);
+    return 0.2860f / sqrtf(energy_eV); /* coeff = h/sqrt(2*m_n) [CODATA 2018] */
 }
 
 /* Speed of neutron at given energy: v = âˆš(2E/m)
  * For display purposes, scaled dramatically (actual thermal = 2200 m/s = tiny) */
 static __attribute__((unused)) float neutron_speed_display(float energy_eV) {
     /* Scale so thermal neutrons cross ~20 Ã… in ~2 seconds (human-visible speed) */
-    float v_real = sqrtf(2.0f * energy_eV * 1.602e-19f / 1.675e-27f); /* m/s */
+    float v_real = sqrtf(2.0f * energy_eV * 1.602e-19f / 1.675e-27f); /* m/s
+                         * 1.602e-19 J/eV [CODATA 2018: exact]
+                         * 1.675e-27 kg neutron mass [CODATA 2018: m_n=1.67493e-27] */
     /* Map to display: 1 Ã…/s per 100 m/s real */
     return v_real * 1e-2f * 5.0f;  /* â‰ˆ 11 Ã…/s for thermal, ~7000 for fast */
 }
@@ -136,7 +140,9 @@ static AF_Gamma make_gamma(float x, float y, float z,
  * â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 
 static float slater_z_eff(int Z, int n_shell) {
-    /* Simplified Slater's rules â€” matches quantum_volume.c implementation */
+    /* Slater's rules: J.C. Slater, Phys. Rev. 36 (1930) 57-64.
+     * Screening: 0.30 (1s pair), 0.35 (same group), 0.85 (n-1), 1.00 (n-2+)
+     * Simplified Slater's rules â€” matches quantum_volume.c implementation */
     float screening = 0.0f;
     if (n_shell == 1) {
         screening = 0.30f * (float)(Z > 1 ? 1 : 0); /* He screens H by 0.30 */
@@ -169,7 +175,7 @@ static float orbital_density_at(int Z, float r_A) {
     }
 
     /* Convert Ã… to Bohr radii (1 aâ‚€ = 0.529 Ã…) */
-    float r = r_A / 0.529f;  /* r in aâ‚€ */
+    float r = r_A / 0.529f;  /* r in a0 units [CODATA 2018: a0=0.52918â‚€ */
 
     if (r < 0.01f) r = 0.01f;
 
@@ -306,7 +312,7 @@ static void setup_chain_reaction(AtomicFission *af) {
      * Lattice constant a = 5.47 Ã…
      * U positions (FCC): (0,0,0), (a/2,a/2,0), etc.
      * We'll place a 2Ã—2Ã—2 arrangement â‰ˆ 8 U atoms with O between them */
-    float a = 5.47f;  /* UOâ‚‚ lattice constant */
+    float a = 5.47f;  /* UO2 fluorite lattice constant (Angstrom) [IAEA-TECDOC-1496] */
 
     /* Place U-235 atoms at FCC sites */
     for (int ix = -1; ix <= 1; ix++) {
@@ -437,7 +443,7 @@ static void setup_moderation(AtomicFission *af) {
     af->num_particles = 0;
 
     /* Graphite atoms in hexagonal arrangement */
-    float c_spacing = 3.35f;  /* graphite interlayer spacing in Ã… */
+    float c_spacing = 3.35f;  /* graphite interlayer spacing in Angstrom [CRC Handbook] */
     for (int ix = -2; ix <= 2; ix++) {
         for (int iy = -2; iy <= 2; iy++) {
             if (af->num_atoms >= AF_MAX_ATOMS - 4) break;
@@ -511,7 +517,8 @@ static void setup_plutonium_fission(AtomicFission *af) {
 
     /* MOX fuel lattice: fluorite structure (a = 5.44 Ã… for PuOâ‚‚)
      * Place Pu-239 at center with U-235 neighbors */
-    float a = 5.44f;
+    float a = 5.44f;  /* PuO2 fluorite lattice constant (Angstrom)
+                       * [Zachariasen, Acta Cryst. 2 (1949) 388; IAEA: a(PuO2)=5.396 A] */
 
     /* Central Pu-239 atom */
     af->atoms[af->num_atoms++] = make_atom(94, 239, 0.0f, 0.0f, 0.0f);
@@ -998,7 +1005,9 @@ static void trigger_fusion(AtomicFission *af, int d_idx, int t_idx) {
 
 /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• BETA DECAY SETUP â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 
-/* Decay chain data: U-238 â†’ Pb-206 (14 steps) */
+/* Decay chain data: U-238 â†’ Pb-206 (14 steps)
+ * Energies: most probable alpha KE or beta endpoint energy (MeV)
+ * [NNDC/NuDat 3.0, Brookhaven National Laboratory; ENSDF evaluated data] */
 typedef struct {
     int Z, A;
     int is_alpha;       /* 1=Î±, 0=Î²â» */

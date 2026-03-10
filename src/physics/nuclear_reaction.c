@@ -98,7 +98,7 @@ static int place_nucleons_sphere(NR_Nucleon *out, int max_out,
             if (!collision) {
                 NR_Nucleon *n = &out[placed];
                 n->x = x;  n->y = y;  n->z = z;
-                n->radius = 0.85f;
+                n->radius = 0.85f; /* proton rms charge radius [CODATA 2018: 0.841fm] */
                 n->type = (i < Z) ? 1 : 0;
                 n->group = group_id;
                 n->pad0 = n->pad1 = 0.0f;
@@ -302,8 +302,10 @@ static void update_fission(NuclearReaction *nr) {
 
     case NR_PHASE_DEFORM: {
         /* Quadrupole deformation: sphere → prolate → peanut
-         * β₂ increases from 0 to ~0.8 (highly deformed)
-         * β₃ (octupole) for mass-asymmetric fission */
+         * β₂ increases from 0 to ~0.85 (highly deformed at scission)
+         * β₃ (octupole) for mass-asymmetric fission
+         * [Brosa et al., Phys. Rep. 197 (1990) 167: β₂~0.6-0.9 at scission;
+         *  β₃~0.15-0.25 for asymmetric fission] */
         float p = phase_progress(nr->reactionType, phase, t);
         float beta2 = smoothstep(0.0f, 1.0f, p) * 0.85f;
         float beta3 = smoothstep(0.3f, 1.0f, p) * 0.20f;
