@@ -1,6 +1,6 @@
-/* atomic_sion.c — Atomic-scale nuclear sion visualization engine
+/* atomic_fission.c — Atomic-scale nuclear fission visualization engine
  *
- * Implements quantum-accurate visualization of U-235 sion, chain reactions,
+ * Implements quantum-accurate visualization of U-235 fission, chain reactions,
  * and Xe-135 poisoning at the atomic scale (~50 Å view).
  *
  * Each atom is rendered with its actual electron orbital wavefunction,
@@ -11,7 +11,7 @@
  * and JEFF-3.3 nuclear data libraries.
  */
 
-#include "atomic_sion.h"
+#include "atomic_fission.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

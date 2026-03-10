@@ -4,7 +4,9 @@
 #include <string.h>
 #include <stdint.h>
 
+#ifdef YSU_HAVE_ONNX
 #include "onnxruntime_c_api.h"   // third_party/onnxruntime/include
+#endif
 
 static int ysu_env_int(const char *name, int defv) {
     const char *s = getenv(name);
@@ -52,6 +54,7 @@ static void nchw_to_pixels(const float *src, Vec3 *pixels, int w, int h) {
     }
 }
 
+#ifdef YSU_HAVE_ONNX
 void ysu_neural_denoise_maybe(Vec3 *pixels, int width, int height)
 {
     if (!pixels || width <= 0 || height <= 0) return;
@@ -194,3 +197,11 @@ fail:
     if (mem)  api->ReleaseMemoryInfo(mem);
     if (env)  api->ReleaseEnv(env);
 }
+#else  /* !YSU_HAVE_ONNX */
+void ysu_neural_denoise_maybe(Vec3 *pixels, int width, int height)
+{
+    (void)pixels; (void)width; (void)height;
+    /* ONNX Runtime not available — denoise silently skipped.
+     * Build with -DYSU_HAVE_ONNX and link onnxruntime to enable. */
+}
+#endif /* YSU_HAVE_ONNX */
