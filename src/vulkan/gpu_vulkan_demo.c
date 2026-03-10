@@ -2748,7 +2748,8 @@ if(window_enabled && surface!=VK_NULL_HANDLE){
                     fov_y, aspect,
                     (const uint8_t*)nerf_occ.data, nerf_occ.hdr.dim,
                     nerf_center_x, nerf_center_y, nerf_center_z, nerf_scale,
-                    2.0f, 6.0f, 64  // t_near, t_far, coarse_steps (increased density)
+                    2.0f, 6.0f, 64, // t_near, t_far, coarse_steps (increased density)
+                    0 // merge = false (initial computation)
                 );
                 // Count how many hints have confidence > 0
                 int hit_count = 0;
@@ -2770,6 +2771,7 @@ if(window_enabled && surface!=VK_NULL_HANDLE){
                     fov_y, aspect,
                     (const uint8_t*)nerf_occ.data, nerf_occ.hdr.dim,
                     nerf_center_x, nerf_center_y, nerf_center_z, nerf_scale,
+                    2.0f, 6.0f, // t_near, t_far (same range)
                     16, // fewer coarse steps for incremental accumulation
                     1   // merge = true (accumulate)
                 );

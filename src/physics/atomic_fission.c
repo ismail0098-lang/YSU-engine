@@ -278,7 +278,7 @@ static void setup_single_fission(AtomicFission *af) {
     printf("[AF]   Thermal neutron: E=%.1f meV, Î»=%.2f Ã…\n",
            AF_THERMAL_ENERGY_EV * 1000.0f, AF_THERMAL_WAVELENGTH_A);
     printf("[AF]   Ïƒ_fission = %.0f barns, Ïƒ_capture = %.0f barns\n",
-           AF_U235_SION_XS_BARNS, AF_U235_CAPTURE_XS_BARNS);
+           AF_U235_FISSION_XS_BARNS, AF_U235_CAPTURE_XS_BARNS);
 }
 
 static void setup_chain_reaction(AtomicFission *af) {
@@ -345,7 +345,7 @@ static void setup_chain_reaction(AtomicFission *af) {
     printf("[AF] Scene: Chain Reaction in UOâ‚‚ lattice\n");
     printf("[AF]   %d U-235 atoms in fluorite structure (a=5.47 Ã…)\n", n_u);
     printf("[AF]   Ïƒ_f = %.0f barns Ã— Î½Ì„ = 2.43 â†’ criticality\n",
-           AF_U235_SION_XS_BARNS);
+           AF_U235_FISSION_XS_BARNS);
 }
 
 static void setup_xenon_poison(AtomicFission *af) {
@@ -550,7 +550,7 @@ static void setup_plutonium_fission(AtomicFission *af) {
     printf("[AF] Scene: Plutonium-239 MOX Fuel fission\n");
     printf("[AF]   Pu-239 (Z=94): [Rn] 5fâ¶ 7sÂ²\n");
     printf("[AF]   Ïƒ_f = %.1f barns (vs U-235: %.1f barns)\n",
-           AF_PU239_FISSION_XS_BARNS, AF_U235_SION_XS_BARNS);
+           AF_PU239_FISSION_XS_BARNS, AF_U235_FISSION_XS_BARNS);
     printf("[AF]   Î½Ì„ = %.2f (vs U-235: 2.43)\n", AF_PU239_NU_BAR);
     printf("[AF]   E_fission = %.0f MeV\n", AF_PU239_FISSION_ENERGY_MEV);
     printf("[AF]   Î±-emitter: tÂ½ = %.0f years â†’ warm to the touch\n",
@@ -1339,7 +1339,7 @@ static void trigger_fission(AtomicFission *af, int atom_idx) {
     AF_Atom *target = &af->atoms[atom_idx];
     float ox = target->x, oy = target->y, oz = target->z;
 
-    target->state = AF_ATOM_SIONING;
+    target->state = AF_ATOM_FISSIONING;
     target->state_time = 0.0f;
 
     /* Choose fission axis (random direction) */
@@ -1401,13 +1401,13 @@ static void trigger_fission(AtomicFission *af, int atom_idx) {
     target->state = AF_ATOM_DEAD;
 
     af->fission_count++;
-    af->total_energy_MeV += AF_U235_SION_ENERGY_MEV;
+    af->total_energy_MeV += AF_U235_FISSION_ENERGY_MEV;
     af->generation++;
 
     printf("[AF] â•â• FISSION EVENT #%d â•â•\n", af->fission_count);
     printf("[AF]   Â²Â³âµU + n â†’ Â¹â´Â¹Ba + â¹Â²Kr + %dn + Î³\n", n_prompt);
     printf("[AF]   Energy released: %.0f MeV (total: %.0f MeV)\n",
-           AF_U235_SION_ENERGY_MEV, af->total_energy_MeV);
+           AF_U235_FISSION_ENERGY_MEV, af->total_energy_MeV);
 }
 
 static void scatter_neutron(AtomicFission *af, int n_idx, int atom_idx) {
@@ -2563,8 +2563,8 @@ int atomic_fission_visualize(AtomicFission *af, VkQueue queue) {
                         rho += a->glow * expf(-r_A * 2.0f);
                     }
 
-                    /* Deformation for sioning atom (prolate stretching) */
-                    if (a->state == AF_ATOM_DEFORMING || a->state == AF_ATOM_SIONING) {
+                    /* Deformation for fissioning atom (prolate stretching) */
+                    if (a->state == AF_ATOM_DEFORMING || a->state == AF_ATOM_FISSIONING) {
                         /* Stretch along the deformation axis (x-axis for simplicity) */
                         float stretch = 1.0f + a->deformation * 2.0f;
                         float r_deformed = sqrtf((rx/stretch)*(rx/stretch) + ry*ry + rz*rz);
