@@ -1,4 +1,5 @@
 #include "nerf_scheduler.h"
+#include <stdio.h>
 #include <string.h>
 
 int nerf_scheduler_init(NerfScheduleQueues* q, uint32_t batch_size){
