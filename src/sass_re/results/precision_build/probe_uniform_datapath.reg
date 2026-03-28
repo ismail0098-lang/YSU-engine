@@ -1,0 +1,26 @@
+ptxas info    : 0 bytes gmem
+ptxas info    : Compiling entry function 'probe_s2ur' for 'sm_89'
+ptxas info    : Function properties for probe_s2ur
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 10 registers, used 0 barriers, 360 bytes cmem[0]
+ptxas info    : Compile time = 1.188 ms
+ptxas info    : Compiling entry function 'probe_uniform_bitops' for 'sm_89'
+ptxas info    : Function properties for probe_uniform_bitops
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 8 registers, used 0 barriers, 368 bytes cmem[0]
+ptxas info    : Compile time = 0.588 ms
+ptxas info    : Compiling entry function 'probe_uniform_loop' for 'sm_89'
+ptxas info    : Function properties for probe_uniform_loop
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 8 registers, used 0 barriers, 376 bytes cmem[0]
+ptxas info    : Compile time = 2.290 ms
+ptxas info    : Compiling entry function 'probe_uniform_branch' for 'sm_89'
+ptxas info    : Function properties for probe_uniform_branch
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 10 registers, used 0 barriers, 376 bytes cmem[0]
+ptxas info    : Compile time = 1.009 ms
+ptxas info    : Compiling entry function 'probe_uniform_address' for 'sm_89'
+ptxas info    : Function properties for probe_uniform_address
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 10 registers, used 0 barriers, 376 bytes cmem[0]
+ptxas info    : Compile time = 0.538 ms
