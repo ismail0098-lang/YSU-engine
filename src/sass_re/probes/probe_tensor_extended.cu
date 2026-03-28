@@ -1,6 +1,6 @@
 /*
  * SASS RE Probe: Extended Tensor Core Coverage
- * Isolates: TF32 (HMMA.16168), BF16, INT8 (IMMA.16816), INT4 (HMMA.8832.S4)
+ * Isolates: TF32 (HMMA.1684.F32.TF32), BF16, INT8 (IMMA.16816.S8.S8), INT4 (IMMA.8832.S4.S4)
  *
  * The existing probe_tensor.cu covers only FP16 HMMA via WMMA.
  * This probe extends coverage to all Ada Lovelace tensor core precisions.
@@ -14,10 +14,10 @@
  *
  * Key SASS instructions:
  *   HMMA.16816.F32    -- FP16 MMA
- *   HMMA.16168.F32    -- TF32 MMA (different shape: 16x16x8)
+ *   HMMA.1684.F32.TF32 -- TF32 MMA (different shape: 16x16x8)
  *   HMMA.16816.F32.BF -- BF16 MMA
- *   IMMA.16816        -- INT8 MMA -> INT32 accumulator
- *   IMMA.8832.S4      -- INT4 (signed 4-bit) MMA -> INT32 accumulator
+ *   IMMA.16816.S8.S8  -- INT8 MMA -> INT32 accumulator
+ *   IMMA.8832.S4.S4   -- INT4 (signed 4-bit) MMA -> INT32 accumulator
  */
 
 #include <mma.h>
@@ -78,7 +78,7 @@ probe_imma_int8(int *d_D, const signed char *d_A,
 
 // INT4 tensor core (S4 experimental precision): 8x8x32 -> INT32
 // Uses experimental API: nvcuda::wmma::experimental::precision::s4
-__global__ void __launch_bounds__(32)
+extern "C" __global__ void __launch_bounds__(32)
 probe_imma_int4(int *d_D, const void *d_A, const void *d_B, const int *d_C) {
     using namespace nvcuda::wmma::experimental;
     // INT4 uses sub-byte packing: each byte holds 2 INT4 values

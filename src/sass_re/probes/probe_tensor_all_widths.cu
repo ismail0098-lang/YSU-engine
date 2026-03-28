@@ -27,6 +27,7 @@
  *   x4 = 4 independent HMMA chains -> tests maximum TC saturation
  *
  * This probe includes all confirmed formats plus throughput chains.
+ * NOTE: INT4/U4 covered in probe_tensor_extended.cu. BF16 x2/x4 chains not yet implemented.
  */
 
 #include <mma.h>
@@ -34,7 +35,7 @@ using namespace nvcuda;
 
 /* ── FP16 TC: x1, x2, x4 independent chains ──────── */
 
-__global__ void __launch_bounds__(32)
+extern "C" __global__ void __launch_bounds__(32)
 probe_tc_fp16_x1(half *d_D, const half *d_A, const half *d_B) {
     wmma::fragment<wmma::matrix_a, 16, 16, 16, half, wmma::row_major> fA;
     wmma::fragment<wmma::matrix_b, 16, 16, 16, half, wmma::col_major> fB;
@@ -53,7 +54,7 @@ probe_tc_fp16_x1(half *d_D, const half *d_A, const half *d_B) {
     wmma::store_matrix_sync(d_D, fD, 16, wmma::mem_row_major);
 }
 
-__global__ void __launch_bounds__(32)
+extern "C" __global__ void __launch_bounds__(32)
 probe_tc_fp16_x2(half *d_D, const half *d_A, const half *d_B) {
     wmma::fragment<wmma::matrix_a, 16, 16, 16, half, wmma::row_major> fA;
     wmma::fragment<wmma::matrix_b, 16, 16, 16, half, wmma::col_major> fB;
@@ -76,7 +77,7 @@ probe_tc_fp16_x2(half *d_D, const half *d_A, const half *d_B) {
     wmma::store_matrix_sync(d_D, fD, 16, wmma::mem_row_major);
 }
 
-__global__ void __launch_bounds__(32)
+extern "C" __global__ void __launch_bounds__(32)
 probe_tc_fp16_x4(half *d_D, const half *d_A, const half *d_B) {
     wmma::fragment<wmma::matrix_a, 16, 16, 16, half, wmma::row_major> fA;
     wmma::fragment<wmma::matrix_b, 16, 16, 16, half, wmma::col_major> fB;
@@ -104,7 +105,7 @@ probe_tc_fp16_x4(half *d_D, const half *d_A, const half *d_B) {
 
 /* ── TF32 TC: x1, x2, x4 ────────────────────────── */
 
-__global__ void __launch_bounds__(32)
+extern "C" __global__ void __launch_bounds__(32)
 probe_tc_tf32_x1(float *d_D, const float *d_A, const float *d_B) {
     wmma::fragment<wmma::matrix_a, 16, 16, 8, wmma::precision::tf32, wmma::row_major> fA;
     wmma::fragment<wmma::matrix_b, 16, 16, 8, wmma::precision::tf32, wmma::col_major> fB;
@@ -119,7 +120,7 @@ probe_tc_tf32_x1(float *d_D, const float *d_A, const float *d_B) {
     wmma::store_matrix_sync(d_D, fC, 16, wmma::mem_row_major);
 }
 
-__global__ void __launch_bounds__(32)
+extern "C" __global__ void __launch_bounds__(32)
 probe_tc_tf32_x4(float *d_D, const float *d_A, const float *d_B) {
     wmma::fragment<wmma::matrix_a, 16, 16, 8, wmma::precision::tf32, wmma::row_major> fA;
     wmma::fragment<wmma::matrix_b, 16, 16, 8, wmma::precision::tf32, wmma::col_major> fB;
@@ -146,7 +147,7 @@ probe_tc_tf32_x4(float *d_D, const float *d_A, const float *d_B) {
 
 /* ── INT8 TC: x1, x4 ────────────────────────────── */
 
-__global__ void __launch_bounds__(32)
+extern "C" __global__ void __launch_bounds__(32)
 probe_tc_int8_x1(int *d_D, const signed char *d_A,
                   const signed char *d_B) {
     wmma::fragment<wmma::matrix_a, 16, 16, 16, signed char, wmma::row_major> fA;
@@ -162,7 +163,7 @@ probe_tc_int8_x1(int *d_D, const signed char *d_A,
     wmma::store_matrix_sync(d_D, fC, 16, wmma::mem_row_major);
 }
 
-__global__ void __launch_bounds__(32)
+extern "C" __global__ void __launch_bounds__(32)
 probe_tc_int8_x4(int *d_D, const signed char *d_A,
                   const signed char *d_B) {
     wmma::fragment<wmma::matrix_a, 16, 16, 16, signed char, wmma::row_major> fA;
@@ -189,7 +190,7 @@ probe_tc_int8_x4(int *d_D, const signed char *d_A,
 
 /* ── BF16 TC: x1, x4 ────────────────────────────── */
 
-__global__ void __launch_bounds__(32)
+extern "C" __global__ void __launch_bounds__(32)
 probe_tc_bf16_x1(float *d_D, const __nv_bfloat16 *d_A,
                   const __nv_bfloat16 *d_B) {
     wmma::fragment<wmma::matrix_a, 16, 16, 16, __nv_bfloat16, wmma::row_major> fA;

@@ -47,6 +47,7 @@ probe_multi_warp_tile(float *out, const float *in, int n) {
 // Double-buffered tiling: overlap load and compute
 extern "C" __global__ void __launch_bounds__(128)
 probe_double_buffer_tile(float *out, const float *in, int n_tiles) {
+    if (n_tiles <= 0) return;
     __shared__ float buf[2][128];
     int tid = threadIdx.x;
 
@@ -100,9 +101,9 @@ probe_halo_exchange(float *out, const float *in, int nx, int ny, int nz) {
         smem[si] = in[gi];
 
     // Load halo faces (simplified: only x-direction for probe)
-    if (tx == 0 && gx > 0)
+    if (tx == 0 && gx > 0 && gy < ny && gz < nz)
         smem[si - 1] = in[gi - 1];
-    if (tx == 7 && gx + 1 < nx)
+    if (tx == 7 && gx + 1 < nx && gy < ny && gz < nz)
         smem[si + 1] = in[gi + 1];
 
     __syncthreads();

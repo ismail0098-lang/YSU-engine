@@ -24,7 +24,7 @@ using namespace nvcuda;
 // ── Pipeline depth: 1 to 8 independent HMMA chains ──
 
 // Depth 1: single chain (minimum ILP)
-__global__ void __launch_bounds__(32)
+extern "C" __global__ void __launch_bounds__(32)
 probe_tc_depth_1(half *d_D, const half *d_A, const half *d_B) {
     wmma::fragment<wmma::matrix_a, 16, 16, 16, half, wmma::row_major> fA;
     wmma::fragment<wmma::matrix_b, 16, 16, 16, half, wmma::col_major> fB;
@@ -40,7 +40,7 @@ probe_tc_depth_1(half *d_D, const half *d_A, const half *d_B) {
 }
 
 // Depth 2
-__global__ void __launch_bounds__(32)
+extern "C" __global__ void __launch_bounds__(32)
 probe_tc_depth_2(half *d_D, const half *d_A, const half *d_B) {
     wmma::fragment<wmma::matrix_a, 16, 16, 16, half, wmma::row_major> fA;
     wmma::fragment<wmma::matrix_b, 16, 16, 16, half, wmma::col_major> fB;
@@ -59,7 +59,7 @@ probe_tc_depth_2(half *d_D, const half *d_A, const half *d_B) {
 }
 
 // Depth 4
-__global__ void __launch_bounds__(32)
+extern "C" __global__ void __launch_bounds__(32)
 probe_tc_depth_4(half *d_D, const half *d_A, const half *d_B) {
     wmma::fragment<wmma::matrix_a, 16, 16, 16, half, wmma::row_major> fA;
     wmma::fragment<wmma::matrix_b, 16, 16, 16, half, wmma::col_major> fB;
@@ -82,7 +82,7 @@ probe_tc_depth_4(half *d_D, const half *d_A, const half *d_B) {
 }
 
 // Depth 8
-__global__ void __launch_bounds__(32)
+extern "C" __global__ void __launch_bounds__(32)
 probe_tc_depth_8(half *d_D, const half *d_A, const half *d_B) {
     wmma::fragment<wmma::matrix_a, 16, 16, 16, half, wmma::row_major> fA;
     wmma::fragment<wmma::matrix_b, 16, 16, 16, half, wmma::col_major> fB;
@@ -113,7 +113,7 @@ probe_tc_depth_8(half *d_D, const half *d_A, const half *d_B) {
 
 // ── TC + ALU overlap: interleave HMMA with FFMA ──
 
-__global__ void __launch_bounds__(32)
+extern "C" __global__ void __launch_bounds__(32)
 probe_tc_alu_overlap(half *d_D, float *d_alu_out,
                      const half *d_A, const half *d_B, const float *d_C) {
     wmma::fragment<wmma::matrix_a, 16, 16, 16, half, wmma::row_major> fA;
@@ -143,7 +143,7 @@ probe_tc_alu_overlap(half *d_D, float *d_alu_out,
 
 // ── TC-only throughput measurement ──
 
-__global__ void __launch_bounds__(32)
+extern "C" __global__ void __launch_bounds__(32)
 probe_tc_throughput_fp16(half *d_D, const half *d_A, const half *d_B,
                          volatile long long *timing) {
     wmma::fragment<wmma::matrix_a, 16, 16, 16, half, wmma::row_major> fA;
