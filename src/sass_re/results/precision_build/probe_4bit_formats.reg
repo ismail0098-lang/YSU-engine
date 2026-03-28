@@ -1,0 +1,36 @@
+ptxas info    : 0 bytes gmem, 64 bytes cmem[3]
+ptxas info    : Compiling entry function 'probe_4bit_quantization_error' for 'sm_89'
+ptxas info    : Function properties for probe_4bit_quantization_error
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 15 registers, used 0 barriers, 364 bytes cmem[0]
+ptxas info    : Compile time = 6.141 ms
+ptxas info    : Compiling entry function 'probe_int4_d3q19_collision' for 'sm_89'
+ptxas info    : Function properties for probe_int4_d3q19_collision
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 95 registers, used 0 barriers, 372 bytes cmem[0]
+ptxas info    : Compile time = 23.649 ms
+ptxas info    : Compiling entry function '_Z22probe_int4_tensor_corePiPKvS1_PKi' for 'sm_89'
+ptxas info    : Function properties for _Z22probe_int4_tensor_corePiPKvS1_PKi
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 14 registers, used 0 barriers, 384 bytes cmem[0]
+ptxas info    : Compile time = 0.836 ms
+ptxas info    : Compiling entry function 'probe_int4_encode_throughput' for 'sm_89'
+ptxas info    : Function properties for probe_int4_encode_throughput
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 12 registers, used 0 barriers, 372 bytes cmem[0]
+ptxas info    : Compile time = 0.938 ms
+ptxas info    : Compiling entry function 'probe_int4_decode_throughput' for 'sm_89'
+ptxas info    : Function properties for probe_int4_decode_throughput
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 10 registers, used 0 barriers, 372 bytes cmem[0]
+ptxas info    : Compile time = 0.906 ms
+ptxas info    : Compiling entry function 'probe_fp4_encode_throughput' for 'sm_89'
+ptxas info    : Function properties for probe_fp4_encode_throughput
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 9 registers, used 0 barriers, 372 bytes cmem[0]
+ptxas info    : Compile time = 1.747 ms
+ptxas info    : Compiling entry function 'probe_fp4_decode_throughput' for 'sm_89'
+ptxas info    : Function properties for probe_fp4_decode_throughput
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 12 registers, used 0 barriers, 372 bytes cmem[0]
+ptxas info    : Compile time = 0.828 ms

@@ -1,0 +1,26 @@
+ptxas info    : 0 bytes gmem
+ptxas info    : Compiling entry function 'probe_fp8_vectorized_load' for 'sm_89'
+ptxas info    : Function properties for probe_fp8_vectorized_load
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 12 registers, used 0 barriers, 368 bytes cmem[0]
+ptxas info    : Compile time = 1.439 ms
+ptxas info    : Compiling entry function 'probe_fp8_batch_encode' for 'sm_89'
+ptxas info    : Function properties for probe_fp8_batch_encode
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 16 registers, used 0 barriers, 368 bytes cmem[0]
+ptxas info    : Compile time = 1.691 ms
+ptxas info    : Compiling entry function 'probe_fp8_batch_decode' for 'sm_89'
+ptxas info    : Function properties for probe_fp8_batch_decode
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 25 registers, used 0 barriers, 368 bytes cmem[0]
+ptxas info    : Compile time = 1.890 ms
+ptxas info    : Compiling entry function 'probe_fp8_e5m2_convert' for 'sm_89'
+ptxas info    : Function properties for probe_fp8_e5m2_convert
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 10 registers, used 0 barriers, 368 bytes cmem[0]
+ptxas info    : Compile time = 0.532 ms
+ptxas info    : Compiling entry function 'probe_fp8_e4m3_convert' for 'sm_89'
+ptxas info    : Function properties for probe_fp8_e4m3_convert
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 10 registers, used 0 barriers, 368 bytes cmem[0]
+ptxas info    : Compile time = 0.510 ms

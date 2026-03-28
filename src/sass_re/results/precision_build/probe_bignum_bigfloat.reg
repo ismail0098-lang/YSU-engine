@@ -1,0 +1,84 @@
+ptxas /tmp/tmpxft_001134a1_00000000-6_probe_bignum_bigfloat.ptx, line 435; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_001134a1_00000000-6_probe_bignum_bigfloat.ptx, line 436; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_001134a1_00000000-6_probe_bignum_bigfloat.ptx, line 448; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_001134a1_00000000-6_probe_bignum_bigfloat.ptx, line 449; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_001134a1_00000000-6_probe_bignum_bigfloat.ptx, line 451; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_001134a1_00000000-6_probe_bignum_bigfloat.ptx, line 453; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_001134a1_00000000-6_probe_bignum_bigfloat.ptx, line 454; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_001134a1_00000000-6_probe_bignum_bigfloat.ptx, line 455; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_001134a1_00000000-6_probe_bignum_bigfloat.ptx, line 456; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_001134a1_00000000-6_probe_bignum_bigfloat.ptx, line 458; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_001134a1_00000000-6_probe_bignum_bigfloat.ptx, line 459; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_001134a1_00000000-6_probe_bignum_bigfloat.ptx, line 462; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_001134a1_00000000-6_probe_bignum_bigfloat.ptx, line 464; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_001134a1_00000000-6_probe_bignum_bigfloat.ptx, line 466; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_001134a1_00000000-6_probe_bignum_bigfloat.ptx, line 467; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_001134a1_00000000-6_probe_bignum_bigfloat.ptx, line 468; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_001134a1_00000000-6_probe_bignum_bigfloat.ptx, line 469; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_001134a1_00000000-6_probe_bignum_bigfloat.ptx, line 481; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_001134a1_00000000-6_probe_bignum_bigfloat.ptx, line 482; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_001134a1_00000000-6_probe_bignum_bigfloat.ptx, line 519; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_001134a1_00000000-6_probe_bignum_bigfloat.ptx, line 520; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_001134a1_00000000-6_probe_bignum_bigfloat.ptx, line 521; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_001134a1_00000000-6_probe_bignum_bigfloat.ptx, line 522; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_001134a1_00000000-6_probe_bignum_bigfloat.ptx, line 534; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_001134a1_00000000-6_probe_bignum_bigfloat.ptx, line 535; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_001134a1_00000000-6_probe_bignum_bigfloat.ptx, line 537; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_001134a1_00000000-6_probe_bignum_bigfloat.ptx, line 539; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_001134a1_00000000-6_probe_bignum_bigfloat.ptx, line 540; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_001134a1_00000000-6_probe_bignum_bigfloat.ptx, line 541; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_001134a1_00000000-6_probe_bignum_bigfloat.ptx, line 542; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_001134a1_00000000-6_probe_bignum_bigfloat.ptx, line 544; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_001134a1_00000000-6_probe_bignum_bigfloat.ptx, line 547; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_001134a1_00000000-6_probe_bignum_bigfloat.ptx, line 548; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_001134a1_00000000-6_probe_bignum_bigfloat.ptx, line 550; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_001134a1_00000000-6_probe_bignum_bigfloat.ptx, line 552; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_001134a1_00000000-6_probe_bignum_bigfloat.ptx, line 553; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_001134a1_00000000-6_probe_bignum_bigfloat.ptx, line 554; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_001134a1_00000000-6_probe_bignum_bigfloat.ptx, line 555; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_001134a1_00000000-6_probe_bignum_bigfloat.ptx, line 557; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_001134a1_00000000-6_probe_bignum_bigfloat.ptx, line 560; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_001134a1_00000000-6_probe_bignum_bigfloat.ptx, line 561; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_001134a1_00000000-6_probe_bignum_bigfloat.ptx, line 563; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_001134a1_00000000-6_probe_bignum_bigfloat.ptx, line 565; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_001134a1_00000000-6_probe_bignum_bigfloat.ptx, line 566; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_001134a1_00000000-6_probe_bignum_bigfloat.ptx, line 567; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_001134a1_00000000-6_probe_bignum_bigfloat.ptx, line 568; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_001134a1_00000000-6_probe_bignum_bigfloat.ptx, line 570; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_001134a1_00000000-6_probe_bignum_bigfloat.ptx, line 571; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_001134a1_00000000-6_probe_bignum_bigfloat.ptx, line 576; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_001134a1_00000000-6_probe_bignum_bigfloat.ptx, line 584; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_001134a1_00000000-6_probe_bignum_bigfloat.ptx, line 585; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_001134a1_00000000-6_probe_bignum_bigfloat.ptx, line 586; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_001134a1_00000000-6_probe_bignum_bigfloat.ptx, line 587; warning : Program is doing double precision computations.
+ptxas info    : 0 bytes gmem
+ptxas info    : Compiling entry function 'probe_bigfloat_qd_add' for 'sm_89'
+ptxas info    : Function properties for probe_bigfloat_qd_add
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 22 registers, used 0 barriers, 368 bytes cmem[0], 32 bytes cmem[2]
+ptxas info    : Compile time = 2.324 ms
+ptxas info    : Compiling entry function 'probe_bigfloat_dd_add' for 'sm_89'
+ptxas info    : Function properties for probe_bigfloat_dd_add
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 18 registers, used 0 barriers, 368 bytes cmem[0], 16 bytes cmem[2]
+ptxas info    : Compile time = 1.430 ms
+ptxas info    : Compiling entry function 'probe_bignum_1024_add' for 'sm_89'
+ptxas info    : Function properties for probe_bignum_1024_add
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 70 registers, used 0 barriers, 368 bytes cmem[0]
+ptxas info    : Compile time = 4.004 ms
+ptxas info    : Compiling entry function 'probe_bignum_512_add' for 'sm_89'
+ptxas info    : Function properties for probe_bignum_512_add
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 38 registers, used 0 barriers, 368 bytes cmem[0]
+ptxas info    : Compile time = 2.528 ms
+ptxas info    : Compiling entry function 'probe_bignum_256_add' for 'sm_89'
+ptxas info    : Function properties for probe_bignum_256_add
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 22 registers, used 0 barriers, 368 bytes cmem[0]
+ptxas info    : Compile time = 1.699 ms
+ptxas info    : Compiling entry function 'probe_bignum_128_add' for 'sm_89'
+ptxas info    : Function properties for probe_bignum_128_add
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 15 registers, used 0 barriers, 368 bytes cmem[0]
+ptxas info    : Compile time = 1.270 ms

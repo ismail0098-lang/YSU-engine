@@ -1,0 +1,27 @@
+probes/probe_mixed_precision.cu(47): warning #177-D: variable "inv_rho" was declared but never referenced
+      float inv_rho = 1.0f / rho;
+            ^
+
+Remark: The warnings can be suppressed with "-diag-suppress <warning-number>"
+
+ptxas info    : 0 bytes gmem
+ptxas info    : Compiling entry function 'probe_mixed_interleaved' for 'sm_89'
+ptxas info    : Function properties for probe_mixed_interleaved
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 38 registers, used 0 barriers, 372 bytes cmem[0]
+ptxas info    : Compile time = 2.614 ms
+ptxas info    : Compiling entry function 'probe_mixed_fp8_fp32' for 'sm_89'
+ptxas info    : Function properties for probe_mixed_fp8_fp32
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 70 registers, used 0 barriers, 364 bytes cmem[0]
+ptxas info    : Compile time = 9.713 ms
+ptxas info    : Compiling entry function 'probe_mixed_int8_fp32' for 'sm_89'
+ptxas info    : Function properties for probe_mixed_int8_fp32
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 72 registers, used 0 barriers, 364 bytes cmem[0]
+ptxas info    : Compile time = 10.130 ms
+ptxas info    : Compiling entry function 'probe_mixed_fp16_fp32' for 'sm_89'
+ptxas info    : Function properties for probe_mixed_fp16_fp32
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 68 registers, used 0 barriers, 364 bytes cmem[0]
+ptxas info    : Compile time = 7.884 ms

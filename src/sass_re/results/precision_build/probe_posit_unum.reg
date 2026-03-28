@@ -1,0 +1,16 @@
+ptxas info    : 0 bytes gmem
+ptxas info    : Compiling entry function 'probe_posit8_add' for 'sm_89'
+ptxas info    : Function properties for probe_posit8_add
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 21 registers, used 0 barriers, 380 bytes cmem[0]
+ptxas info    : Compile time = 13.304 ms
+ptxas info    : Compiling entry function 'probe_posit8_roundtrip' for 'sm_89'
+ptxas info    : Function properties for probe_posit8_roundtrip
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 19 registers, used 0 barriers, 372 bytes cmem[0]
+ptxas info    : Compile time = 9.186 ms
+ptxas info    : Compiling entry function 'probe_posit8_decode_chain' for 'sm_89'
+ptxas info    : Function properties for probe_posit8_decode_chain
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 19 registers, used 0 barriers, 368 bytes cmem[0]
+ptxas info    : Compile time = 6.521 ms

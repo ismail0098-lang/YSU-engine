@@ -1,0 +1,175 @@
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 40; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 43; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 45; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 47; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 49; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 51; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 52; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 54; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 56; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 84; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 90; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 91; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 92; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 104; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 137; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 140; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 141; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 143; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 144; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 145; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 146; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 147; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 148; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 149; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 154; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 156; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 158; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 160; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 162; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 164; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 166; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 168; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 178; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 179; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 180; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 181; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 182; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 183; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 184; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 186; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 221; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 221; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 225; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 226; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 226; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 228; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 228; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 228; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 228; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 228; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 228; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 228; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 228; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 228; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 228; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 228; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 228; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 228; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 228; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 230; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 232; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 265; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 265; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 266; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 270; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 270; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 271; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 275; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 275; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 276; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 280; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 280; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 281; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 285; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 285; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 286; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 290; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 290; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 291; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 295; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 295; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 296; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 300; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 300; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 301; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 305; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 305; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 306; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 310; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 310; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 311; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 315; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 315; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 316; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 320; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 320; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 321; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 325; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 325; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 326; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 330; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 330; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 331; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 335; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 335; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 336; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 340; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 340; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 341; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 345; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 345; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 346; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 350; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 350; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 351; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 355; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 355; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 356; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113647_00000000-6_probe_fp64_arithmetic.ptx, line 362; warning : Program is doing double precision computations.
+ptxas <macro util>, line 10; warning : Program is doing double precision computations.
+ptxas <macro util>, line 15; warning : Program is doing double precision computations.
+ptxas <macro util>, line 17; warning : Program is doing double precision computations.
+ptxas <macro util>, line 18; warning : Program is doing double precision computations.
+ptxas <macro util>, line 37; warning : Program is doing double precision computations.
+ptxas <builtin>, line 3; warning : Program is doing double precision computations.
+ptxas <macro util>, line 42; warning : Program is doing double precision computations.
+ptxas <macro util>, line 43; warning : Program is doing double precision computations.
+ptxas <macro util>, line 44; warning : Program is doing double precision computations.
+ptxas <macro util>, line 45; warning : Program is doing double precision computations.
+ptxas <macro util>, line 46; warning : Program is doing double precision computations.
+ptxas <macro util>, line 47; warning : Program is doing double precision computations.
+ptxas <macro util>, line 48; warning : Program is doing double precision computations.
+ptxas <macro util>, line 52; warning : Program is doing double precision computations.
+ptxas <macro util>, line 53; warning : Program is doing double precision computations.
+ptxas <macro util>, line 54; warning : Program is doing double precision computations.
+ptxas <macro util>, line 55; warning : Program is doing double precision computations.
+ptxas <macro util>, line 56; warning : Program is doing double precision computations.
+ptxas <macro util>, line 63; warning : Program is doing double precision computations.
+ptxas <macro util>, line 64; warning : Program is doing double precision computations.
+ptxas <builtin>, line 3; warning : Program is doing double precision computations.
+ptxas <macro util>, line 69; warning : Program is doing double precision computations.
+ptxas <macro util>, line 70; warning : Program is doing double precision computations.
+ptxas <macro util>, line 71; warning : Program is doing double precision computations.
+ptxas <macro util>, line 72; warning : Program is doing double precision computations.
+ptxas <macro util>, line 73; warning : Program is doing double precision computations.
+ptxas <macro util>, line 74; warning : Program is doing double precision computations.
+ptxas <macro util>, line 75; warning : Program is doing double precision computations.
+ptxas <macro util>, line 76; warning : Program is doing double precision computations.
+ptxas <macro util>, line 84; warning : Program is doing double precision computations.
+ptxas info    : 0 bytes gmem
+ptxas info    : Compiling entry function 'probe_fp64_mixed_accumulate' for 'sm_89'
+ptxas info    : Function properties for probe_fp64_mixed_accumulate
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 32 registers, used 0 barriers, 372 bytes cmem[0]
+ptxas info    : Compile time = 2.119 ms
+ptxas info    : Compiling entry function 'probe_fp64_conversions' for 'sm_89'
+ptxas info    : Function properties for probe_fp64_conversions
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 18 registers, used 0 barriers, 384 bytes cmem[0]
+ptxas info    : Compile time = 2.621 ms
+ptxas info    : Compiling entry function 'probe_fp64_throughput' for 'sm_89'
+ptxas info    : Function properties for probe_fp64_throughput
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 26 registers, used 0 barriers, 376 bytes cmem[0]
+ptxas info    : Compile time = 1.335 ms
+ptxas info    : Compiling entry function 'probe_fp64_dfma_chain' for 'sm_89'
+ptxas info    : Function properties for probe_fp64_dfma_chain
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 10 registers, used 0 barriers, 368 bytes cmem[0], 8 bytes cmem[2]
+ptxas info    : Compile time = 0.799 ms
+ptxas info    : Compiling entry function 'probe_fp64_arith' for 'sm_89'
+ptxas info    : Function properties for probe_fp64_arith
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 16 registers, used 0 barriers, 376 bytes cmem[0]
+ptxas info    : Compile time = 0.639 ms

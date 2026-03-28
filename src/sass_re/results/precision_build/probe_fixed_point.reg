@@ -1,0 +1,21 @@
+ptxas info    : 0 bytes gmem
+ptxas info    : Compiling entry function 'probe_fxp_lbm_equilibrium' for 'sm_89'
+ptxas info    : Function properties for probe_fxp_lbm_equilibrium
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 16 registers, used 0 barriers, 388 bytes cmem[0]
+ptxas info    : Compile time = 1.802 ms
+ptxas info    : Compiling entry function 'probe_fxp_q8_8_mul' for 'sm_89'
+ptxas info    : Function properties for probe_fxp_q8_8_mul
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 12 registers, used 0 barriers, 368 bytes cmem[0]
+ptxas info    : Compile time = 22.817 ms
+ptxas info    : Compiling entry function 'probe_fxp_q16_16_mul' for 'sm_89'
+ptxas info    : Function properties for probe_fxp_q16_16_mul
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 14 registers, used 0 barriers, 368 bytes cmem[0]
+ptxas info    : Compile time = 106.761 ms
+ptxas info    : Compiling entry function 'probe_fxp_q16_16_add' for 'sm_89'
+ptxas info    : Function properties for probe_fxp_q16_16_add
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 12 registers, used 0 barriers, 368 bytes cmem[0]
+ptxas info    : Compile time = 1.094 ms

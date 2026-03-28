@@ -1,0 +1,21 @@
+ptxas info    : 0 bytes gmem, 124 bytes cmem[3]
+ptxas info    : Compiling entry function 'probe_nf4_error' for 'sm_89'
+ptxas info    : Function properties for probe_nf4_error
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 16 registers, used 0 barriers, 388 bytes cmem[0]
+ptxas info    : Compile time = 6.880 ms
+ptxas info    : Compiling entry function 'probe_nf4_roundtrip' for 'sm_89'
+ptxas info    : Function properties for probe_nf4_roundtrip
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 10 registers, used 0 barriers, 372 bytes cmem[0]
+ptxas info    : Compile time = 1.357 ms
+ptxas info    : Compiling entry function 'probe_nf4_encode' for 'sm_89'
+ptxas info    : Function properties for probe_nf4_encode
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 10 registers, used 0 barriers, 372 bytes cmem[0]
+ptxas info    : Compile time = 1.720 ms
+ptxas info    : Compiling entry function 'probe_nf4_decode' for 'sm_89'
+ptxas info    : Function properties for probe_nf4_decode
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 12 registers, used 0 barriers, 372 bytes cmem[0]
+ptxas info    : Compile time = 0.834 ms

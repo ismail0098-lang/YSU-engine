@@ -1,0 +1,26 @@
+ptxas info    : 0 bytes gmem
+ptxas info    : Compiling entry function 'probe_half2_compare' for 'sm_89'
+ptxas info    : Function properties for probe_half2_compare
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 12 registers, used 0 barriers, 376 bytes cmem[0]
+ptxas info    : Compile time = 1.384 ms
+ptxas info    : Compiling entry function 'probe_half2_conversions' for 'sm_89'
+ptxas info    : Function properties for probe_half2_conversions
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 18 registers, used 0 barriers, 384 bytes cmem[0]
+ptxas info    : Compile time = 0.977 ms
+ptxas info    : Compiling entry function 'probe_half2_fma_chain' for 'sm_89'
+ptxas info    : Function properties for probe_half2_fma_chain
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 10 registers, used 0 barriers, 368 bytes cmem[0]
+ptxas info    : Compile time = 1.058 ms
+ptxas info    : Compiling entry function 'probe_half2_chain' for 'sm_89'
+ptxas info    : Function properties for probe_half2_chain
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 10 registers, used 0 barriers, 368 bytes cmem[0]
+ptxas info    : Compile time = 0.835 ms
+ptxas info    : Compiling entry function 'probe_half2_arith' for 'sm_89'
+ptxas info    : Function properties for probe_half2_arith
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 12 registers, used 0 barriers, 376 bytes cmem[0]
+ptxas info    : Compile time = 0.680 ms

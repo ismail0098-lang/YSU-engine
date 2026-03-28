@@ -1,0 +1,27 @@
+probes/probe_mx_microscaling.cu(108): warning #177-D: variable "elem_in_block" was declared but never referenced
+      int elem_in_block = global_idx % 32;
+          ^
+
+Remark: The warnings can be suppressed with "-diag-suppress <warning-number>"
+
+ptxas info    : 0 bytes gmem, 64 bytes cmem[3]
+ptxas info    : Compiling entry function 'probe_mxfp8_encode' for 'sm_89'
+ptxas info    : Function properties for probe_mxfp8_encode
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 16 registers, used 0 barriers, 380 bytes cmem[0]
+ptxas info    : Compile time = 6.356 ms
+ptxas info    : Compiling entry function 'probe_mxint8_decode' for 'sm_89'
+ptxas info    : Function properties for probe_mxint8_decode
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 12 registers, used 0 barriers, 380 bytes cmem[0]
+ptxas info    : Compile time = 0.940 ms
+ptxas info    : Compiling entry function 'probe_mxfp4_decode' for 'sm_89'
+ptxas info    : Function properties for probe_mxfp4_decode
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 12 registers, used 0 barriers, 380 bytes cmem[0]
+ptxas info    : Compile time = 1.173 ms
+ptxas info    : Compiling entry function 'probe_mxfp8_decode' for 'sm_89'
+ptxas info    : Function properties for probe_mxfp8_decode
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 11 registers, used 0 barriers, 380 bytes cmem[0]
+ptxas info    : Compile time = 1.469 ms

@@ -1,0 +1,11 @@
+ptxas info    : 0 bytes gmem
+ptxas info    : Compiling entry function 'probe_bcd_convert' for 'sm_89'
+ptxas info    : Function properties for probe_bcd_convert
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 14 registers, used 0 barriers, 388 bytes cmem[0]
+ptxas info    : Compile time = 2.916 ms
+ptxas info    : Compiling entry function 'probe_bcd_add_chain' for 'sm_89'
+ptxas info    : Function properties for probe_bcd_add_chain
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 18 registers, used 0 barriers, 368 bytes cmem[0]
+ptxas info    : Compile time = 2.631 ms
