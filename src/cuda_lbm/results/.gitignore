@@ -1,0 +1,7 @@
+# Ignore profiling output files
+*.ncu-rep
+*.nsys-rep
+*.csv
+*.json
+*.sqlite
+*.qdstrm

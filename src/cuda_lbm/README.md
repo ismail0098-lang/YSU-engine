@@ -25,18 +25,19 @@ Two layout families exist:
 | kernels_int16.cu            | `short`              | 2          | AoS stride=20 | 5x int2 vectorized loads; DIST_SCALE=16384         | SM 5.0   |
 | kernels_bf16.cu             | `__nv_bfloat16`      | 2          | AoS stride=20 | 8-bit exponent = FP32 range; 7-bit mantissa        | SM 8.0   |
 | kernels_fp64.cu             | `double`             | 8          | AoS stride=20 | Full IEEE-754 double; 53-bit mantissa              | SM 6.0   |
-| kernels_fp16_soa.cu         | `__half`             | 2          | i-SoA pull    | Coalesced gather+scatter; no AoS padding           | SM 7.0   |
-| kernels_fp16_soa_half2.cu   | `__half` + `__half2` | 2          | i-SoA pull    | 2 cells/thread; __half2 moment accum; +9.8% ILP    | SM 7.0   |
-| kernels_fp8_soa.cu          | FP8 e4m3             | 1          | i-SoA pull    | Coalesced gather+scatter; SM 8.9+                  | SM 8.9   |
-| kernels_fp8_e5m2_soa.cu     | FP8 e5m2             | 1          | i-SoA pull    | e5m2 variant; SM 8.9+                             | SM 8.9   |
-| kernels_int8_soa.cu         | `signed char`        | 1          | i-SoA pull    | Coalesced gather+scatter; int momentum accum       | SM 6.1   |
-| kernels_int16_soa.cu        | `short`              | 2          | i-SoA pull    | Integer load path; 3% faster than FP16 SoA        | SM 5.0   |
-| kernels_bf16_soa.cu         | `__nv_bfloat16`      | 2          | i-SoA pull    | 2x BW vs FP32; SM 8.0+                            | SM 8.0   |
-| kernels_fp32_soa_cs.cu      | `float`              | 4          | i-SoA pull    | __ldg ping reads + __stcs (L2 evict-first) writes  | SM 8.0   |
-| kernels_fp64_soa.cu         | `double`             | 8          | i-SoA pull    | FP64 coalesced; compute-bound (not BW-bound)       | SM 6.0   |
-| kernels_int4.cu             | nibble (4-bit)       | 0.5        | i-SoA nibble  | BW ceiling only; 2 cells/thread; NOT physics       | SM 6.1   |
-| kernels_fp4.cu              | FP4 E2M1 nibble      | 0.5        | i-SoA nibble  | BW ceiling only; FP4_DECODE[16] lookup; NOT physics| SM 8.9** |
-| kernels_dd.cu               | `double[2]`          | 16         | i-SoA pull    | Knuth 2-sum + Veltkamp/Dekker FMA; coalesced       | SM 6.0   |
+| kernels_fp16_soa.cu         | `__half`             | 2          | SoA pull    | Coalesced gather+scatter; no AoS padding           | SM 7.0   |
+| kernels_fp16_soa_half2.cu   | `__half` + `__half2` | 2          | SoA pull    | 2 cells/thread; __half2 moment accum; +9.8% ILP    | SM 7.0   |
+| kernels_fp8_soa.cu          | FP8 e4m3             | 1          | SoA pull    | Coalesced gather+scatter; SM 8.9+                  | SM 8.9   |
+| kernels_fp8_e5m2_soa.cu     | FP8 e5m2             | 1          | SoA pull    | e5m2 variant; SM 8.9+                             | SM 8.9   |
+| kernels_int8_soa.cu         | `signed char`        | 1          | SoA pull    | Coalesced gather+scatter; int momentum accum       | SM 6.1   |
+| kernels_int16_soa.cu        | `short`              | 2          | SoA pull    | Integer load path; 3% faster than FP16 SoA        | SM 5.0   |
+| kernels_bf16_soa.cu         | `__nv_bfloat16`      | 2          | SoA pull    | 2x BW vs FP32; SM 8.0+                            | SM 8.0   |
+| kernels_bf16_soa_bf162.cu   | `__nv_bfloat16`+`bf162` | 2       | SoA pull    | 2 cells/thread; HFMA2.BF16_V2 moment accum         | SM 8.0   |
+| kernels_fp32_soa_cs.cu      | `float`              | 4          | SoA pull    | __ldg ping reads + __stcs (L2 evict-first) writes  | SM 8.0   |
+| kernels_fp64_soa.cu         | `double`             | 8          | SoA pull    | FP64 coalesced; compute-bound (not BW-bound)       | SM 6.0   |
+| kernels_int4.cu             | nibble (4-bit)       | 0.5        | SoA nibble  | BW ceiling only; 2 cells/thread; NOT physics       | SM 6.1   |
+| kernels_fp4.cu              | FP4 E2M1 nibble      | 0.5        | SoA nibble  | BW ceiling only; FP4_DECODE[16] lookup; NOT physics| SM 8.9** |
+| kernels_dd.cu               | `double[2]`          | 16         | SoA pull    | Knuth 2-sum + Veltkamp/Dekker FMA; coalesced       | SM 6.0   |
 | kernels_tensor_core.cu      | WMMA frags           | N/A        | N/A           | WMMA proxy: TF32/FP16/BF16/INT8/INT4              | SM 7.0   |
 
 (**) FP4 E2M1 is a Blackwell SM 10.0+ hardware format; emulated via nibble packing on Ada.
@@ -52,16 +53,16 @@ Results from `cuda-precision-bench` (open_gororoba, 2026-03-15). 30 timing steps
 
 | Rank | Tier            | Layout  | MLUPS  | BW_GBS | BW_PCT | VRAM_MB | Notes                            |
 |------|-----------------|---------|--------|--------|--------|---------|----------------------------------|
-| 1    | INT8 SoA        | i-SoA   | 5643   | 259.6  | 51.5%  | 76      | Pareto-optimal production tier   |
-| 2    | FP8_e4m3 SoA    | i-SoA   | 5408   | 248.8  | 49.4%  | 76      | SM 8.9+; best FP8 variant        |
-| 3    | FP8_e5m2 SoA    | i-SoA   | 5280   | 242.9  | 48.2%  | 76      | SM 8.9+; wider dynamic range     |
-| 4    | FP16 SoA H2     | i-SoA   | 3802   | 349.7  | 69.4%  | 152     | 2 cells/thread; +9.8% vs FP16SoA |
-| 5    | INT16 SoA       | i-SoA   | 3569   | 328.3  | 65.1%  | 152     | +3% vs FP16 SoA; integer path    |
-| 6    | FP16 SoA        | i-SoA   | 3463   | 318.6  | 63.2%  | 152     | Standard FP16 pull-scheme        |
-| 7    | BF16 SoA        | i-SoA   | 3204   | 294.7  | 58.5%  | 152     | SM 8.0+; 7.5% below FP16 SoA    |
+| 1    | INT8 SoA        | SoA     | 5643   | 259.6  | 51.5%  | 76      | Pareto-optimal production tier   |
+| 2    | FP8_e4m3 SoA    | SoA     | 5408   | 248.8  | 49.4%  | 76      | SM 8.9+; best FP8 variant        |
+| 3    | FP8_e5m2 SoA    | SoA     | 5280   | 242.9  | 48.2%  | 76      | SM 8.9+; wider dynamic range     |
+| 4    | FP16 SoA H2     | SoA     | 3802   | 349.7  | 69.4%  | 152     | 2 cells/thread; +9.8% vs FP16SoA |
+| 5    | INT16 SoA       | SoA     | 3569   | 328.3  | 65.1%  | 152     | +3% vs FP16 SoA; integer path    |
+| 6    | FP16 SoA        | SoA     | 3463   | 318.6  | 63.2%  | 152     | Standard FP16 pull-scheme        |
+| 7    | BF16 SoA        | SoA     | 3204   | 294.7  | 58.5%  | 152     | SM 8.0+; 7.5% below FP16 SoA    |
 | 8    | FP32 coarsened  | AoS     | 2107   | 387.8  | 76.9%  | 304     | Best FP32 single-kernel          |
 | 9    | FP32 aa (A-A)   | AoS     | 2062   | 379.3  | 75.3%  | 304     | Halves VRAM vs ping-pong         |
-| 10   | FP32 SoA CS     | i-SoA   | 2027   | 372.9  | 74.0%  | 304     | __stcs: <3% gain at 128^3        |
+| 10   | FP32 SoA CS     | SoA     | 2027   | 372.9  | 74.0%  | 304     | __stcs: <3% gain at 128^3        |
 | 11   | FP32 standard   | AoS     | 1984   | 365.0  | 72.4%  | 304     | Baseline reference               |
 | 12   | INT16 AoS       | AoS     | 1904   | 182.8  | 36.3%  | 160     | Equal to FP16 AoS (scatter limit)|
 | 13   | FP16 AoS        | AoS     | 1912   | 183.5  | 36.4%  | 160     | AoS scatter-write limit          |
@@ -70,12 +71,12 @@ Results from `cuda-precision-bench` (open_gororoba, 2026-03-15). 30 timing steps
 | 16   | INT8 AoS        | AoS     | 2541   | 122.0  | 24.2%  | 80      | dp4a momentum accel              |
 | 17   | BF16 AoS        | AoS     | 1278   | 117.6  | 23.3%  | 152     | AoS + BF16 scalar latency        |
 | 18   | FP64 AoS        | AoS     | 461    | 169.5  | 33.6%  | 608     | Compute-bound (not BW-bound)     |
-| 19   | FP64 SoA        | i-SoA   | 406    | 149.6  | 29.7%  | 608     | FP64 SoA slower: compute-bound  |
-| 20   | DD FP128        | i-SoA   | 58     | 42.5   | 8.4%   | 152*    | 64^3 only; research tier         |
+| 19   | FP64 SoA        | SoA     | 406    | 149.6  | 29.7%  | 608     | FP64 SoA slower: compute-bound  |
+| 20   | DD FP128        | SoA     | 58     | 42.5   | 8.4%   | 152*    | 64^3 only; research tier         |
 
 (*) DD VRAM at 64^3 = 152 MB; at 128^3 would require ~1215 MB (capped at 64^3 in benchmark).
 
-### Bandwidth ceiling reference (non-physics)
+### Peak bandwidth reference (non-physics)
 
 | Tier        | MLUPS  | BW_GBS | BW_PCT | VRAM_MB | Notes                          |
 |-------------|--------|--------|--------|---------|--------------------------------|
@@ -123,6 +124,125 @@ FP64:
   Compute-bound on Ada gaming SKU (64:1 ratio); SoA does NOT help (406 vs 461 MLUPS AoS)
   Use FP64 for validation only; FP32 for production
 ```
+
+---
+
+## FP32 Production SoA Kernels (kernels_soa.cu)
+
+FP32 SoA production kernels ported from open_gororoba. All kernels use the
+i-major SoA layout (`f[dir * N + cell]`) with FP32 storage and arithmetic.
+Standalone file, no external headers.
+
+### Kernel Entry Points
+
+| Kernel                              | Collision | Streaming           | Coarsening | Notes                                              |
+|-------------------------------------|-----------|---------------------|------------|----------------------------------------------------|
+| `lbm_step_soa_fused`               | BGK       | Push                | None       | Baseline SoA kernel                                |
+| `lbm_step_soa_mrt_fused`           | MRT       | Push                | None       | d'Humieres 5-rate MRT (722 FMA/cell)               |
+| `lbm_step_soa_pull`                | BGK       | Pull                | None       | Coalesced writes, scattered reads                  |
+| `lbm_step_soa_mrt_pull`            | MRT       | Pull                | None       | MRT + pull streaming                               |
+| `lbm_step_soa_tiled`               | BGK       | Tiled pull (8x8x4)  | None       | Shared-memory halo; 45.6 KB smem/block             |
+| `lbm_step_soa_mrt_tiled`           | MRT       | Tiled pull (8x8x4)  | None       | MRT + tiled pull                                   |
+| `lbm_step_soa_coarsened`           | BGK       | Push                | float2     | 2 cells/thread; ILP via independent chains          |
+| `lbm_step_soa_mrt_coarsened`       | MRT       | Push                | float2     | MRT + float2 coarsening (1444 FMA/thread)          |
+| `lbm_step_soa_coarsened_float4`    | BGK       | Push                | float4     | 4 cells/thread; 128-bit bus saturation              |
+| `lbm_step_soa_aa`                  | BGK       | A-A (single buffer) | None       | Halves VRAM; parity-driven direction swap           |
+| `lbm_step_soa_mrt_aa`              | MRT       | A-A (single buffer) | None       | MRT + A-A streaming                                |
+| `lbm_step_soa_batch_kernel`        | BGK       | Push                | None       | 4D batch: multiple galaxies per launch              |
+| `initialize_uniform_soa_kernel`    | --        | --                  | --         | Uniform rho/u init                                 |
+| `initialize_custom_soa_kernel`     | --        | --                  | --         | Per-cell AoS input -> SoA storage                  |
+| `initialize_custom_soa_batch_kernel` | --      | --                  | --         | Batch init (multiple galaxies)                     |
+| `compute_smagorinsky_tau_kernel`   | --        | --                  | --         | LES Smagorinsky tau from velocity gradients        |
+| `compute_smagorinsky_tau_tiled`    | --        | --                  | --         | Tiled Smagorinsky (smem halo, 7.2 KB/block)       |
+| `reduce_max_speed_f32`             | --        | --                  | --         | GPU max-speed reduction for Mach telemetry         |
+
+### Features
+
+- **MRT collision**: d'Humieres (2002) orthogonal basis, 5 distinct relaxation
+  rates (s_nu, s_e, s_eps, s_q, s_ghost). Ghost moment damping (s_ghost=1.0)
+  extends Mach stability from ~0.3 (BGK) to ~1.5.
+- **Tiled pull-scheme (8x8x4)**: Shared-memory halo loads replace 19 scattered
+  global reads with 19 LDS reads (~20 cycles vs ~200 cycles L2 miss).
+  45.6 KB smem/block fits within Ada's 48 KB default partition.
+- **A-A streaming**: Single-buffer in-place scheme with parity-driven direction
+  remapping. Halves VRAM (76 MB saved at 128^3, 608 MB at 256^3). Enables
+  256^3 on 12 GB GPUs.
+- **Thread coarsening**: float2 (2 cells/thread) and float4 (4 cells/thread)
+  vectorized loads. ILP from independent collision chains hides MUFU.RCP latency.
+- **Smagorinsky LES**: Per-cell turbulent viscosity via strain rate tensor.
+  Tiled variant uses 8x8x4 shared-memory halo for velocity gradients.
+- **Batch kernel**: 4D dispatch for multiple galaxies in a single launch.
+  CUDA Graph compatible (fixed grid geometry across steps).
+- **Guo forcing**: Unconditional force path on all step kernels; compiler culls
+  zero-force branch.
+
+### Kernel Variant Decision Table
+
+```
+grid <= 32^3  -> coarsened or mrt_coarsened (instruction-bound, not BW-bound)
+grid = 64^3   -> mrt_tiled or coarsened (L2 hot; tiled benefits from smem)
+grid = 128^3  -> aa or coarsened (aa halves VRAM; coarsened: +2% MLUPS)
+grid >= 256^3 -> aa (A-A halves ping-pong VRAM; same MLUPS as standard)
+```
+
+### Reference Claims
+
+- **C-1388**: CPU LBM compute-bound at 128^3 (GPU required for production)
+- **C-1389**: Tiled pull-scheme is an anti-pattern on Ada Lovelace at 128^3
+  (L2 bandwidth sufficient; smem overhead > halo benefit)
+- **C-1390**: A-A streaming at 79.7% peak memory bandwidth (RTX 4070 Ti)
+
+---
+
+## GPU Box-Counting Fractal Dimension (kernels_box_counting.cu)
+
+GPU box-counting kernels for computing fractal dimension of density fields.
+One thread per box at each scale; warp-level ballot reduction aggregates
+occupancy with 32x fewer atomics than naive per-thread atomicAdd.
+
+### Kernel Entry Points
+
+| Kernel                | Purpose                                              |
+|-----------------------|------------------------------------------------------|
+| `box_count_at_scale`  | Count occupied boxes at a given scale (early-exit)   |
+| `zero_u32`            | Zero a single u32 counter                            |
+| `reduce_minmax_f32`   | Two-pass min/max reduction (eliminates 8 MB readback)|
+| `build_histogram_f32` | 256-bin shared-memory histogram (1 KB host transfer) |
+| `zero_histogram`      | Zero a 256-bin histogram                             |
+
+### Algorithm
+
+1. Host dispatches `box_count_at_scale` once per scale (log2 box sizes 1..N/2).
+2. Each thread scans cells within its box, early-exits on first occupied cell.
+3. `__activemask()` -> `__ballot_sync()` -> `__popc()` -> lane-0 `atomicAdd`:
+   warp-level reduction cuts atomic contention 32x.
+4. GPU Otsu threshold: `reduce_minmax_f32` + `build_histogram_f32` eliminate
+   the 8 MB PCIe readback; only 1 KB histogram is copied to host.
+
+---
+
+## Sparse Brick Map Kernels (sparse/)
+
+Sparse A-A D3Q19 LBM for high-sparsity domains (e.g., 1024^3 in 12 GB VRAM).
+Uses a Brick Map (indirect table) to allocate only active 8x8x8 bricks.
+
+### sparse/kernels_sparse_lbm.cu
+
+| Kernel                | Purpose                                              |
+|-----------------------|------------------------------------------------------|
+| `lbm_step_sparse_aa`  | Sparse A-A fused collision + streaming (512 thr/blk)|
+
+- A-A single-buffer pattern with parity-driven direction swap.
+- Brick-local addressing via indirect table lookup.
+- Bounce-back at solid (inactive) brick boundaries.
+
+### sparse/kernels_sparse_map.cu
+
+| Kernel                       | Purpose                                         |
+|------------------------------|-------------------------------------------------|
+| `generate_occupancy_bitmask` | Sweep geometry mask -> packed occupancy bits     |
+| `expand_bitmask_to_counts`   | Unpack bitmask to per-brick 0/1 array            |
+| `build_indirect_table`       | Exclusive-scan offsets -> indirect table + IDs   |
 
 ---
 
@@ -316,3 +436,22 @@ Note: FP16 SoA H2 / INT4 / FP4 init kernels use 1 thread/cell (not 2 cells/threa
 - **INT16**: Better than INT8 for moderate-Re (DIST_SCALE=16384, LSB=6.1e-5 vs 0.016).
   Useful when INT8 saturation causes instability but FP32 bandwidth is excessive.
 - **FP64 / DD**: Compute-bound on Ada gaming (64:1 FP64 ratio). Validation/research only.
+
+---
+
+## Infrastructure Headers
+
+| Header | Purpose |
+|--------|---------|
+| `include/lbm_kernels.h` | Kernel variant enum, metadata table, VRAM/bandwidth helpers |
+| `include/lbm_kernel_selector.h` | Auto-selects optimal kernel for grid size and precision requirement (C-1392 decision table) |
+| `include/lbm_managed_memory.h` | CUDA Unified Memory config and PCIe overhead estimation for 1024^3+ grids |
+| `include/lbm_metrics.h` | Performance measurement utilities |
+
+## SASS-Informed Optimization
+
+The SASS reverse engineering measurements in `src/sass_re/` feed directly
+into kernel optimization decisions. See
+[`docs/sass/SASS_KERNEL_OPTIMIZATION_GUIDE.md`](../../docs/sass/SASS_KERNEL_OPTIMIZATION_GUIDE.md)
+for the full analysis connecting measured instruction latencies to LBM
+kernel design choices.
