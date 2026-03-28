@@ -1,0 +1,31 @@
+ptxas info    : 0 bytes gmem
+ptxas info    : Compiling entry function '_Z24probe_tc_throughput_fp16P6__halfPKS_S2_PVx' for 'sm_89'
+ptxas info    : Function properties for _Z24probe_tc_throughput_fp16P6__halfPKS_S2_PVx
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 26 registers, used 0 barriers, 384 bytes cmem[0]
+ptxas info    : Compile time = 3.035 ms
+ptxas info    : Compiling entry function '_Z20probe_tc_alu_overlapP6__halfPfPKS_S3_PKf' for 'sm_89'
+ptxas info    : Function properties for _Z20probe_tc_alu_overlapP6__halfPfPKS_S3_PKf
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 26 registers, used 0 barriers, 392 bytes cmem[0]
+ptxas info    : Compile time = 15.596 ms
+ptxas info    : Compiling entry function '_Z16probe_tc_depth_8P6__halfPKS_S2_' for 'sm_89'
+ptxas info    : Function properties for _Z16probe_tc_depth_8P6__halfPKS_S2_
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 78 registers, used 0 barriers, 376 bytes cmem[0]
+ptxas info    : Compile time = 91.342 ms
+ptxas info    : Compiling entry function '_Z16probe_tc_depth_4P6__halfPKS_S2_' for 'sm_89'
+ptxas info    : Function properties for _Z16probe_tc_depth_4P6__halfPKS_S2_
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 50 registers, used 0 barriers, 376 bytes cmem[0]
+ptxas info    : Compile time = 43.032 ms
+ptxas info    : Compiling entry function '_Z16probe_tc_depth_2P6__halfPKS_S2_' for 'sm_89'
+ptxas info    : Function properties for _Z16probe_tc_depth_2P6__halfPKS_S2_
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 34 registers, used 0 barriers, 376 bytes cmem[0]
+ptxas info    : Compile time = 16.580 ms
+ptxas info    : Compiling entry function '_Z16probe_tc_depth_1P6__halfPKS_S2_' for 'sm_89'
+ptxas info    : Function properties for _Z16probe_tc_depth_1P6__halfPKS_S2_
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 26 registers, used 0 barriers, 376 bytes cmem[0]
+ptxas info    : Compile time = 9.428 ms

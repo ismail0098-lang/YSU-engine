@@ -1,0 +1,41 @@
+ptxas info    : 0 bytes gmem
+ptxas info    : Compiling entry function '_Z16probe_tc_bf16_x1PfPK13__nv_bfloat16S2_' for 'sm_89'
+ptxas info    : Function properties for _Z16probe_tc_bf16_x1PfPK13__nv_bfloat16S2_
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 26 registers, used 0 barriers, 376 bytes cmem[0]
+ptxas info    : Compile time = 3.848 ms
+ptxas info    : Compiling entry function '_Z16probe_tc_int8_x4PiPKaS1_' for 'sm_89'
+ptxas info    : Function properties for _Z16probe_tc_int8_x4PiPKaS1_
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 46 registers, used 0 barriers, 376 bytes cmem[0]
+ptxas info    : Compile time = 8.634 ms
+ptxas info    : Compiling entry function '_Z16probe_tc_int8_x1PiPKaS1_' for 'sm_89'
+ptxas info    : Function properties for _Z16probe_tc_int8_x1PiPKaS1_
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 22 registers, used 0 barriers, 376 bytes cmem[0]
+ptxas info    : Compile time = 2.425 ms
+ptxas info    : Compiling entry function '_Z16probe_tc_tf32_x4PfPKfS1_' for 'sm_89'
+ptxas info    : Function properties for _Z16probe_tc_tf32_x4PfPKfS1_
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 54 registers, used 0 barriers, 376 bytes cmem[0]
+ptxas info    : Compile time = 12.475 ms
+ptxas info    : Compiling entry function '_Z16probe_tc_tf32_x1PfPKfS1_' for 'sm_89'
+ptxas info    : Function properties for _Z16probe_tc_tf32_x1PfPKfS1_
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 30 registers, used 0 barriers, 376 bytes cmem[0]
+ptxas info    : Compile time = 3.583 ms
+ptxas info    : Compiling entry function '_Z16probe_tc_fp16_x4P6__halfPKS_S2_' for 'sm_89'
+ptxas info    : Function properties for _Z16probe_tc_fp16_x4P6__halfPKS_S2_
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 54 registers, used 0 barriers, 376 bytes cmem[0]
+ptxas info    : Compile time = 9.680 ms
+ptxas info    : Compiling entry function '_Z16probe_tc_fp16_x2P6__halfPKS_S2_' for 'sm_89'
+ptxas info    : Function properties for _Z16probe_tc_fp16_x2P6__halfPKS_S2_
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 34 registers, used 0 barriers, 376 bytes cmem[0]
+ptxas info    : Compile time = 5.140 ms
+ptxas info    : Compiling entry function '_Z16probe_tc_fp16_x1P6__halfPKS_S2_' for 'sm_89'
+ptxas info    : Function properties for _Z16probe_tc_fp16_x1P6__halfPKS_S2_
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 26 registers, used 0 barriers, 376 bytes cmem[0]
+ptxas info    : Compile time = 2.979 ms

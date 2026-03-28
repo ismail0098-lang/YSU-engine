@@ -1,0 +1,21 @@
+ptxas info    : 0 bytes gmem
+ptxas info    : Compiling entry function 'probe_halo_exchange' for 'sm_89'
+ptxas info    : Function properties for probe_halo_exchange
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 19 registers, used 1 barriers, 2400 bytes smem, 380 bytes cmem[0]
+ptxas info    : Compile time = 2.347 ms
+ptxas info    : Compiling entry function 'probe_double_buffer_tile' for 'sm_89'
+ptxas info    : Function properties for probe_double_buffer_tile
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 26 registers, used 1 barriers, 1024 bytes smem, 372 bytes cmem[0]
+ptxas info    : Compile time = 4.035 ms
+ptxas info    : Compiling entry function 'probe_multi_warp_tile' for 'sm_89'
+ptxas info    : Function properties for probe_multi_warp_tile
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 14 registers, used 1 barriers, 512 bytes smem, 372 bytes cmem[0]
+ptxas info    : Compile time = 1.038 ms
+ptxas info    : Compiling entry function 'probe_single_warp_tile' for 'sm_89'
+ptxas info    : Function properties for probe_single_warp_tile
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 14 registers, used 0 barriers, 128 bytes smem, 372 bytes cmem[0]
+ptxas info    : Compile time = 0.816 ms

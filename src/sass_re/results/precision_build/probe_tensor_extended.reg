@@ -1,0 +1,26 @@
+ptxas info    : 0 bytes gmem
+ptxas info    : Compiling entry function 'probe_hmma_tf32_chain' for 'sm_89'
+ptxas info    : Function properties for probe_hmma_tf32_chain
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 30 registers, used 0 barriers, 384 bytes cmem[0]
+ptxas info    : Compile time = 3.503 ms
+ptxas info    : Compiling entry function '_Z15probe_imma_int4PiPKvS1_PKi' for 'sm_89'
+ptxas info    : Function properties for _Z15probe_imma_int4PiPKvS1_PKi
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 16 registers, used 0 barriers, 384 bytes cmem[0]
+ptxas info    : Compile time = 1.112 ms
+ptxas info    : Compiling entry function 'probe_imma_int8' for 'sm_89'
+ptxas info    : Function properties for probe_imma_int8
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 26 registers, used 0 barriers, 384 bytes cmem[0]
+ptxas info    : Compile time = 1.397 ms
+ptxas info    : Compiling entry function 'probe_hmma_bf16' for 'sm_89'
+ptxas info    : Function properties for probe_hmma_bf16
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 30 registers, used 0 barriers, 384 bytes cmem[0]
+ptxas info    : Compile time = 1.437 ms
+ptxas info    : Compiling entry function 'probe_hmma_tf32' for 'sm_89'
+ptxas info    : Function properties for probe_hmma_tf32
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 34 registers, used 0 barriers, 384 bytes cmem[0]
+ptxas info    : Compile time = 1.649 ms

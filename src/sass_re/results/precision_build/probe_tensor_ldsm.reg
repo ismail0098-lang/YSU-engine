@@ -1,0 +1,16 @@
+ptxas info    : 0 bytes gmem
+ptxas info    : Compiling entry function 'probe_hmma_tiled_loop' for 'sm_89'
+ptxas info    : Function properties for probe_hmma_tiled_loop
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 63 registers, used 1 barriers, 1024 bytes smem, 380 bytes cmem[0]
+ptxas info    : Compile time = 8.336 ms
+ptxas info    : Compiling entry function 'probe_hmma_via_smem' for 'sm_89'
+ptxas info    : Function properties for probe_hmma_via_smem
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 42 registers, used 1 barriers, 1024 bytes smem, 376 bytes cmem[0], 8 bytes cmem[2]
+ptxas info    : Compile time = 6.350 ms
+ptxas info    : Compiling entry function 'probe_hmma_fp16_accum' for 'sm_89'
+ptxas info    : Function properties for probe_hmma_fp16_accum
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 24 registers, used 0 barriers, 384 bytes cmem[0]
+ptxas info    : Compile time = 1.539 ms
