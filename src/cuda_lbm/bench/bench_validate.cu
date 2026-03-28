@@ -18,7 +18,7 @@ static float get_tolerance(LbmKernelVariant v) {
     case LBM_INT8_AOS: case LBM_INT8_SOA:
         return 1e-2f;
     case LBM_FP16_AOS: case LBM_FP16_SOA: case LBM_FP16_SOA_HALF2:
-    case LBM_BF16_AOS: case LBM_BF16_SOA:
+    case LBM_BF16_AOS: case LBM_BF16_SOA: case LBM_BF16_SOA_BF162:
     case LBM_INT16_AOS: case LBM_INT16_SOA:
         return 1e-3f;
     case LBM_FP64_AOS: case LBM_FP64_SOA: case LBM_DD_SOA:
