@@ -13,7 +13,7 @@ FIG_PLAN_PATH = ROOT / "PAPER_FIGURE_TABLE_PLAN.md"
 ASSETS_PATH = ROOT / "PAPER_ASSETS_SM89.md"
 SECTION_COVERAGE_PATH = ROOT / "PAPER_SECTION_COVERAGE.md"
 
-CLAIM_RE = re.compile(r"^\|\s*(C\d{2})\s*\|", re.MULTILINE)
+CLAIM_RE = re.compile(r"^\|+\s*(C\d{2})\s*\|", re.MULTILINE)
 REF_CLAIM_RE = re.compile(r"`(C\d{2})`")
 MD_LINK_RE = re.compile(r"\[([^\]]+)\]\(([^)]+)\)")
 

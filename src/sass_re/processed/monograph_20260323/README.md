@@ -32,13 +32,8 @@ Files:
 - `SHA256SUMS`
   - checksum manifest for processed tables, split figure files, and the built PDF
 
-Primary producer:
-
-- [generate_monograph_assets.py](scripts/generate_monograph_assets.py)
-
 Primary consumers:
 
-- [MONOGRAPH_SM89_SYNTHESIS.md](MONOGRAPH_SM89_SYNTHESIS.md)
-- [sm89_monograph.tex](tex/sm89_monograph.tex)
-- [sm89_monograph.pdf](tex/build/sm89_monograph.pdf)
-- [SHA256SUMS](processed/monograph_20260323/SHA256SUMS)
+- [MONOGRAPH_SM89_SYNTHESIS.md](../../MONOGRAPH_SM89_SYNTHESIS.md)
+- [sm89_monograph.tex](../../tex/sm89_monograph.tex)
+- [SHA256SUMS](SHA256SUMS)

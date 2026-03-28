@@ -6,7 +6,12 @@ TEX_DIR="$ROOT/tex"
 OUT_DIR="$TEX_DIR/build"
 LOG_FILE="${TMPDIR:-/tmp}/sm89_monograph_pdflatex.log"
 
-python3 "$ROOT/scripts/generate_monograph_assets.py"
+GEN_ASSETS="$ROOT/scripts/generate_monograph_assets.py"
+if [ -f "$GEN_ASSETS" ]; then
+    python3 "$GEN_ASSETS"
+else
+    echo "note: $GEN_ASSETS not found; using existing processed data" >&2
+fi
 
 mkdir -p "$OUT_DIR"
 

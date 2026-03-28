@@ -38,7 +38,7 @@ def main() -> int:
     text = DRAFT.read_text(encoding="utf-8")
     text_for_forbidden_check = text.split("## Bounded-Language Reminder", 1)[0]
     claim_text = CLAIMS.read_text(encoding="utf-8")
-    claim_ids = set(re.findall(r"^\|\s*(C\d{2})\s*\|", claim_text, flags=re.MULTILINE))
+    claim_ids = set(re.findall(r"^\|+\s*(C\d{2})\s*\|", claim_text, flags=re.MULTILINE))
     errors: list[str] = []
 
     for heading in REQUIRED_HEADINGS:
@@ -48,7 +48,7 @@ def main() -> int:
     for target in REQUIRED_ASSET_TARGETS:
         if target not in text:
             errors.append(f"missing asset reference: {target}")
-        elif not pathlib.Path(target).exists():
+        elif not (ROOT / target).exists():
             errors.append(f"asset does not exist: {target}")
 
     for cid in REF_CLAIM_RE.findall(text):
