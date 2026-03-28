@@ -1,0 +1,139 @@
+version = 1
+
+[metadata]
+name = "sass_re_auto_explorer"
+description = "Search-space registry for the Python auto-explorer."
+
+[[runtime_candidates]]
+name = "uniform_blockred_sys64_store"
+description = "Fuse the uniform-helper front-end with the proven block-red + 64-bit SYS store branch."
+derive_from = "probe_combo_blockred_warp_atomg64sys_ops_store_profile_safe.cu"
+priority = 1.00
+features = ["async_cache", "uniform", "blockred", "warp", "sys64", "store_sys"]
+realized_by = ["combo_uniform_blockred_warp_atomg64sys_ops_store_profile_safe_tranche_"]
+
+[[runtime_candidates]]
+name = "divergent_store_sys64"
+description = "Add direct SYS load/store to the already safe divergent fused branch."
+derive_from = "probe_combo_divergent_blockred_warp_atomg64sys_ops_profile_safe.cu"
+priority = 0.98
+features = ["async_cache", "blockred", "warp", "divergent", "sys64", "store_sys"]
+realized_by = ["combo_divergent_blockred_warp_atomg64sys_ops_store_profile_safe_tranche_20260322_171218"]
+
+[[runtime_candidates]]
+name = "uniform_divergent_sys64"
+description = "Keep the uniform helper chain alive while introducing optimized reconvergence and the dense SYS atomic matrix."
+derive_from = "probe_combo_uniform_redsys_async_profile_safe.cu"
+priority = 0.95
+features = ["async_cache", "uniform", "warp", "divergent", "sys64"]
+realized_by = [
+  "combo_uniform_divergent_atomg64sys_profile_safe_tranche_20260322_170855",
+  "combo_uniform_divergent_atomg64sys_profile_safe_tranche_dlcm_cg_20260322_173400",
+]
+
+[[runtime_candidates]]
+name = "uniform_blockred_sys64_depth"
+description = "Deepen the fused uniform + block-red + SYS64 branch to test whether membar grows faster than long-scoreboard."
+derive_from = "probe_combo_blockred_warp_atomg64sys_ops_profile_depth_safe.cu"
+priority = 0.92
+features = ["async_cache", "uniform", "blockred", "warp", "sys64", "depth"]
+realized_by = [
+  "combo_uniform_blockred_warp_atomg64sys_ops_profile_depth_safe_tranche_20260322_172135",
+  "combo_uniform_blockred_warp_atomg64sys_ops_profile_depth_safe_tranche_dlcm_cg_20260322_174100",
+]
+
+[[runtime_candidates]]
+name = "uniform_blockred_sys64_store_dlcm_cg"
+description = "Repeat the fused uniform + block-red + SYS64 store branch under dlcm=cg to test whether the stronger L2 effect survives the heavier family."
+derive_from = "probe_combo_blockred_warp_atomg64sys_ops_store_profile_safe.cu"
+priority = 0.90
+features = ["async_cache", "uniform", "blockred", "warp", "sys64", "store_sys", "dlcm_cg"]
+realized_by = ["combo_uniform_blockred_warp_atomg64sys_ops_store_profile_safe_tranche_dlcm_cg_20260322_145200"]
+
+[[runtime_candidates]]
+name = "narrow_atomg_sys64_depth"
+description = "Deepen the narrow SYS64 atomic matrix branch without the wider warp/block-red body."
+derive_from = "probe_combo_atomg64sys_ops_profile_safe.cu"
+priority = 0.88
+features = ["async_cache", "sys64", "depth"]
+realized_by = ["combo_atomg64sys_ops_profile_depth_safe_tranche_20260322_151200"]
+
+[[runtime_candidates]]
+name = "narrow_atomg_sys64_dlcm_cg"
+description = "Run the narrow SYS64 atomic matrix branch under dlcm=cg to measure policy sensitivity in the mem-barrier dominated regime."
+derive_from = "probe_combo_atomg64sys_ops_profile_safe.cu"
+priority = 0.86
+features = ["async_cache", "sys64", "dlcm_cg"]
+realized_by = ["combo_atomg64sys_ops_profile_safe_tranche_dlcm_cg_20260322_151200"]
+
+[[runtime_candidates]]
+name = "divergent_store_sys64_dlcm_cg"
+description = "Combine divergence/reconvergence, direct SYS store, and dlcm=cg inside the same safe branch."
+derive_from = "probe_combo_divergent_blockred_warp_atomg64sys_ops_profile_safe.cu"
+priority = 0.84
+features = ["async_cache", "blockred", "warp", "divergent", "sys64", "store_sys", "dlcm_cg"]
+realized_by = ["combo_divergent_blockred_warp_atomg64sys_ops_store_profile_safe_tranche_20260322_171344"]
+
+[[runtime_candidates]]
+name = "uniform_divergent_store_sys64"
+description = "Most aggressive fused runtime branch: uniform helpers, divergence, block-red, warp helpers, and direct SYS load/store."
+derive_from = "probe_combo_blockred_warp_atomg64sys_ops_store_profile_safe.cu"
+priority = 1.05
+features = ["async_cache", "uniform", "blockred", "warp", "divergent", "sys64", "store_sys"]
+realized_by = [
+  "combo_uniform_divergent_blockred_warp_atomg64sys_ops_store_profile_safe_tranche_20260322_172130",
+  "combo_uniform_divergent_blockred_warp_atomg64sys_ops_store_profile_safe_tranche_dlcm_cg_20260322_172203",
+]
+
+[[runtime_candidates]]
+name = "uniform_divergent_sys64_depth"
+description = "Deepen the lighter uniform + divergent + SYS64 midpoint branch without adding block-red or direct SYS store."
+derive_from = "probe_combo_uniform_divergent_atomg64sys_profile_safe.cu"
+priority = 0.99
+features = ["async_cache", "uniform", "warp", "divergent", "sys64", "depth"]
+realized_by = ["combo_uniform_divergent_atomg64sys_profile_depth_safe_tranche_20260322_181208"]
+
+[[runtime_candidates]]
+name = "uniform_divergent_blockred_sys64_depth"
+description = "Deepen the aggressive uniform + divergent + block-red + SYS64 branch without direct SYS store."
+derive_from = "probe_combo_uniform_divergent_blockred_warp_atomg64sys_ops_profile_safe.cu"
+priority = 1.02
+features = ["async_cache", "uniform", "blockred", "warp", "divergent", "sys64", "depth"]
+realized_by = ["combo_uniform_divergent_blockred_warp_atomg64sys_ops_profile_depth_safe_tranche_20260322_185002"]
+
+[[runtime_candidates]]
+name = "uniform_divergent_blockred_sys64_store_depth"
+description = "Deepen the fully fused uniform + divergent + block-red + SYS64 + direct SYS store branch."
+derive_from = "probe_combo_uniform_divergent_blockred_warp_atomg64sys_ops_store_profile_safe.cu"
+priority = 1.06
+features = ["async_cache", "uniform", "blockred", "warp", "divergent", "sys64", "store_sys", "depth"]
+realized_by = ["combo_uniform_divergent_blockred_warp_atomg64sys_ops_store_profile_depth_safe_tranche_20260322_184634"]
+
+[[runtime_candidates]]
+name = "uniform_divergent_blockred_sys64_depth_dlcm_cg"
+description = "Run the deeper uniform + divergent + block-red + SYS64 branch under dlcm=cg without direct SYS store."
+derive_from = "probe_combo_uniform_divergent_blockred_warp_atomg64sys_ops_profile_safe.cu"
+priority = 0.94
+features = ["async_cache", "uniform", "blockred", "warp", "divergent", "sys64", "depth", "dlcm_cg"]
+realized_by = ["combo_uniform_divergent_blockred_warp_atomg64sys_ops_profile_depth_safe_tranche_20260322_185120"]
+
+[[symbolic_candidates]]
+name = "p2r_b1_literal_bank_retry"
+description = "Retry the byte-one predicate pack boundary with a same-carrier seven-predicate bank and an exact 0x7f mask."
+derive_from = "probe_p2r_two_stage_bank_exact.cu"
+priority = 1.00
+features = ["p2r_boundary", "byte1"]
+
+[[symbolic_candidates]]
+name = "p2r_b2_literal_bank_retry"
+description = "Retry the byte-two predicate pack boundary with a same-carrier second-bank rewrite."
+derive_from = "probe_p2r_two_stage_bank_exact.cu"
+priority = 0.98
+features = ["p2r_boundary", "byte2"]
+
+[[symbolic_candidates]]
+name = "p2r_b3_literal_bank_retry"
+description = "Retry the byte-three predicate pack boundary with the most literal same-carrier byte-three rewrite."
+derive_from = "probe_p2r_two_stage_bank_exact.cu"
+priority = 0.96
+features = ["p2r_boundary", "byte3"]

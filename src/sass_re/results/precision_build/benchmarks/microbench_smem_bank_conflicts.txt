@@ -1,0 +1,21 @@
+=== Shared Memory Bank Conflict Characterization ===
+SM 8.9 | NVIDIA GeForce RTX 4070 Ti | Shared: 48 KB | 32 banks
+
+Pattern                   Cycles/load     Conflict
+------------------------ ------------ ------------
+Stride 1 (conflict-free)        53.00         none
+Stride 2 (2-way)                55.00          1.0x
+Stride 4 (4-way)                59.00          1.1x
+Stride 8 (8-way)                67.00          1.3x
+Stride 16 (16-way)              83.00          1.6x
+Stride 32 (32-way)             115.00          2.2x
+Broadcast (all same)            27.01          0.5x
+
+--- XOR swizzle patterns ---
+XOR 1 (neighbor swap)           27.01          0.5x
+XOR 16 (half-warp swap)         27.01          0.5x
+
+--- Expected ---
+Stride 1 (base): ~28 cy (LDS latency from SASS RE)
+N-way conflict: ~N * base_latency (serialized bank access)
+Broadcast: ~base_latency (hardware multicast, no conflict)

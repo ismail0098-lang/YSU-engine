@@ -1,0 +1,31 @@
+ptxas info    : 0 bytes gmem
+ptxas info    : Compiling entry function 'probe_imnmx' for 'sm_89'
+ptxas info    : Function properties for probe_imnmx
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 8 registers, used 0 barriers, 376 bytes cmem[0]
+ptxas info    : Compile time = 1.163 ms
+ptxas info    : Compiling entry function 'probe_imad_wide' for 'sm_89'
+ptxas info    : Function properties for probe_imad_wide
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 14 registers, used 0 barriers, 376 bytes cmem[0]
+ptxas info    : Compile time = 0.728 ms
+ptxas info    : Compiling entry function 'probe_lea' for 'sm_89'
+ptxas info    : Function properties for probe_lea
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 12 registers, used 0 barriers, 372 bytes cmem[0]
+ptxas info    : Compile time = 0.702 ms
+ptxas info    : Compiling entry function 'probe_isetp' for 'sm_89'
+ptxas info    : Function properties for probe_isetp
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 11 registers, used 0 barriers, 376 bytes cmem[0]
+ptxas info    : Compile time = 0.928 ms
+ptxas info    : Compiling entry function 'probe_imad' for 'sm_89'
+ptxas info    : Function properties for probe_imad
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 12 registers, used 0 barriers, 384 bytes cmem[0]
+ptxas info    : Compile time = 0.750 ms
+ptxas info    : Compiling entry function 'probe_iadd3' for 'sm_89'
+ptxas info    : Function properties for probe_iadd3
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 14 registers, used 0 barriers, 384 bytes cmem[0]
+ptxas info    : Compile time = 0.564 ms

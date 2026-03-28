@@ -1,0 +1,10 @@
+=== Remaining Latency Measurements ===
+SM 8.9 | NVIDIA GeForce RTX 4070 Ti
+
+Instruction               Latency (cyc)
+------------------------ --------------
+INT64 ADD                          2.54
+INT64 MUL                         17.53
+FABS+FNEG (pair)                   0.00
+FADD.SAT                           4.50
+LDGSTS (async copy/iter)         363.78

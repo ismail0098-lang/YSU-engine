@@ -1,0 +1,18 @@
+=== Occupancy Scaling: Latency Hiding Effectiveness ===
+SM 8.9 | NVIDIA GeForce RTX 4070 Ti | 60 SMs
+
+Grid: 128^3 (2097152 cells) | 10 steps per measurement
+Kernel: FP32 BGK, 19 loads + 57 FMA + 19 stores per cell
+
+Configuration                    Blocks        MLUPS     Warps/SM
+---------------------------- ---------- ------------ ------------
+__launch_bounds__(128, 1)            60    2560000.0            4
+__launch_bounds__(128, 4)           240    1137777.7           16
+__launch_bounds__(128, 8)           480     417959.2           32
+Full grid (oversubscribed)        16384      21030.7          max
+
+--- Analysis ---
+If 4 warps/SM is enough to hide LDG latency (~92cy / 4.5cy FFMA = 20 warps needed),
+then __launch_bounds__(128,1) should be SLOWER than (128,4).
+If memory bandwidth is the bottleneck (128^3 = GDDR6X-bound),
+all configs should converge to the same MLUPS (BW-limited).

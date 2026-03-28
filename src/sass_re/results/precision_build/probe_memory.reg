@@ -1,0 +1,36 @@
+ptxas info    : 0 bytes gmem
+ptxas info    : Compiling entry function 'probe_fences' for 'sm_89'
+ptxas info    : Function properties for probe_fences
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 10 registers, used 1 barriers, 4 bytes smem, 376 bytes cmem[0]
+ptxas info    : Compile time = 1.656 ms
+ptxas info    : Compiling entry function 'probe_shared_atomics' for 'sm_89'
+ptxas info    : Function properties for probe_shared_atomics
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 8 registers, used 1 barriers, 32 bytes smem, 360 bytes cmem[0]
+ptxas info    : Compile time = 1.041 ms
+ptxas info    : Compiling entry function 'probe_atomics' for 'sm_89'
+ptxas info    : Function properties for probe_atomics
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 18 registers, used 0 barriers, 384 bytes cmem[0]
+ptxas info    : Compile time = 1.046 ms
+ptxas info    : Compiling entry function 'probe_bank_conflicts' for 'sm_89'
+ptxas info    : Function properties for probe_bank_conflicts
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 18 registers, used 1 barriers, 4096 bytes smem, 368 bytes cmem[0]
+ptxas info    : Compile time = 2.046 ms
+ptxas info    : Compiling entry function 'probe_shared' for 'sm_89'
+ptxas info    : Function properties for probe_shared
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 16 registers, used 1 barriers, 1024 bytes smem, 368 bytes cmem[0]
+ptxas info    : Compile time = 0.877 ms
+ptxas info    : Compiling entry function 'probe_stg' for 'sm_89'
+ptxas info    : Function properties for probe_stg
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 18 registers, used 0 barriers, 384 bytes cmem[0]
+ptxas info    : Compile time = 0.615 ms
+ptxas info    : Compiling entry function 'probe_ldg' for 'sm_89'
+ptxas info    : Function properties for probe_ldg
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 20 registers, used 0 barriers, 384 bytes cmem[0]
+ptxas info    : Compile time = 0.772 ms

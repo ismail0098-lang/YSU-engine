@@ -1,0 +1,13 @@
+=== Fill All N/A Latencies ===
+SM 8.9 | NVIDIA GeForce RTX 4070 Ti
+
+Format                              cy/op     Previous
+---------------------------- ------------ ------------
+FP8 E5M2 round-trip                 18.52          N/A
+FP4 E2M1 round-trip                135.38          N/A
+NF4 round-trip                     169.94          N/A
+DD FP128 MUL                       323.20          N/A
+Posit<8,0> decode                  167.21          N/A
+INT128 ADD (asm chain)              13.11          N/A
+
+Reference: FP8 E4M3 r/t=18.54cy, DD ADD=500.28cy, INT64 ADD=2.59cy

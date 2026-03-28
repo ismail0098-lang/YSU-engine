@@ -1,0 +1,38 @@
+ptxas /tmp/tmpxft_00113581_00000000-6_probe_conversions.ptx, line 234; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113581_00000000-6_probe_conversions.ptx, line 236; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113581_00000000-6_probe_conversions.ptx, line 236; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113581_00000000-6_probe_conversions.ptx, line 238; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113581_00000000-6_probe_conversions.ptx, line 238; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113581_00000000-6_probe_conversions.ptx, line 240; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113581_00000000-6_probe_conversions.ptx, line 242; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113581_00000000-6_probe_conversions.ptx, line 244; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113581_00000000-6_probe_conversions.ptx, line 245; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113581_00000000-6_probe_conversions.ptx, line 245; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113581_00000000-6_probe_conversions.ptx, line 246; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113581_00000000-6_probe_conversions.ptx, line 248; warning : Program is doing double precision computations.
+ptxas info    : 0 bytes gmem
+ptxas info    : Compiling entry function 'probe_i2i' for 'sm_89'
+ptxas info    : Function properties for probe_i2i
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 12 registers, used 0 barriers, 376 bytes cmem[0]
+ptxas info    : Compile time = 1.397 ms
+ptxas info    : Compiling entry function 'probe_f2f_fp64' for 'sm_89'
+ptxas info    : Function properties for probe_f2f_fp64
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 16 registers, used 0 barriers, 376 bytes cmem[0]
+ptxas info    : Compile time = 0.873 ms
+ptxas info    : Compiling entry function 'probe_f2f_fp16' for 'sm_89'
+ptxas info    : Function properties for probe_f2f_fp16
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 14 registers, used 0 barriers, 368 bytes cmem[0]
+ptxas info    : Compile time = 0.928 ms
+ptxas info    : Compiling entry function 'probe_i2f' for 'sm_89'
+ptxas info    : Function properties for probe_i2f
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 12 registers, used 0 barriers, 368 bytes cmem[0]
+ptxas info    : Compile time = 0.562 ms
+ptxas info    : Compiling entry function 'probe_f2i' for 'sm_89'
+ptxas info    : Function properties for probe_f2i
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 13 registers, used 0 barriers, 368 bytes cmem[0]
+ptxas info    : Compile time = 0.584 ms

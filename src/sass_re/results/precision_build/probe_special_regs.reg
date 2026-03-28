@@ -1,0 +1,11 @@
+ptxas info    : 0 bytes gmem
+ptxas info    : Compiling entry function 'probe_clock_precision' for 'sm_89'
+ptxas info    : Function properties for probe_clock_precision
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 14 registers, used 1 barriers, 360 bytes cmem[0]
+ptxas info    : Compile time = 1.681 ms
+ptxas info    : Compiling entry function 'probe_special_regs' for 'sm_89'
+ptxas info    : Function properties for probe_special_regs
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 12 registers, used 0 barriers, 360 bytes cmem[0]
+ptxas info    : Compile time = 0.820 ms

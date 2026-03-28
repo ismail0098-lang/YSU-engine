@@ -1,0 +1,17 @@
+=== Tensor Core Latency: ALL Precisions ===
+SM 8.9 | NVIDIA GeForce RTX 4070 Ti | 256-deep dependent chains
+
+Format                              cy/WMMA SASS instr     FMA/WMMA
+-------------------------------- ---------- ---------- ------------
+FP16 -> FP32 (HMMA.16816)             66.25     1 HMMA          256
+FP16 -> FP16 (HMMA.16816.F16)         42.11     1 HMMA          256
+BF16 -> FP32 (HMMA.16816.BF16)        66.30     1 HMMA          256
+TF32 -> FP32 (HMMA.1684x2)            66.66     2 HMMA          256
+INT8 -> INT32 (IMMA.16816.S8)         34.04     1 IMMA          256
+INT4 -> INT32 (IMMA.8832.S4)          28.04     1 IMMA          256
+UINT4 -> INT32 (IMMA.8832.U4)         28.03     1 IMMA          256
+
+Notes:
+  TF32 WMMA 16x16x8 decomposes to 2x HMMA.1684 (K=4 each).
+  INT4/UINT4 WMMA 8x8x32 uses different shape than 16x16x16.
+  All dependent chains: accumulator feeds back as input.

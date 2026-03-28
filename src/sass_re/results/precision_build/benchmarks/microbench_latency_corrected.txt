@@ -1,0 +1,15 @@
+=== Corrected Latency Measurements ===
+SM 8.9 | NVIDIA GeForce RTX 4070 Ti
+
+Instruction                  Corrected cy  Previous cy
+---------------------------- ------------ ------------
+IABS (neg+abs chain)                 0.26 0.53 (artifact)
+POPC (popc+or chain)                11.76 23.52 (2x insts)
+FLO (flo+or chain)                  11.76 23.52 (2x insts)
+DMNMX (min+max chain)               76.05 114.63 (9x insts)
+BREV (pure asm chain)               17.50        17.49
+FFMA IEEE (baseline)                 4.51         4.53
+FFMA FTZ (flush-to-zero)             4.51          N/A
+
+Note: IABS/POPC/FLO report cy per op pair (2 ops per iteration).
+Divide by 2 for single-instruction latency if ops are independent.

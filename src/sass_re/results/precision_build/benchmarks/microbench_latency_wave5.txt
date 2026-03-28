@@ -1,0 +1,21 @@
+==============================================
+  SASS Wave 5 Latency Benchmark
+  SM 8.9  |  NVIDIA GeForce RTX 4070 Ti
+  Clock 2625 MHz  |  60 SMs  |  Chain 512
+==============================================
+
+Running ...
+
+Instruction           Latency (cyc)       Pipeline
+-------------------- -------------- --------------
+BREV                          17.50       SFU/FP64
+POPC                          23.53       SFU/FP64
+FLO(bfind)                    23.53       SFU/FP64
+BFE                            8.53    Multi-cycle
+BFI                            4.52       INT/FP32
+FSEL                           8.52    Multi-cycle
+IABS                           0.52     INT (fast)
+DMNMX                        114.64   Memory/Fence
+MEMBAR.GPU                   205.26      Scheduler
+MEMBAR.SYS                  2584.03      Scheduler
+YIELD(nanosleep0)           2662.57      Scheduler

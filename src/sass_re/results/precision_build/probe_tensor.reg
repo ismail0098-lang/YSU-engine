@@ -1,0 +1,11 @@
+ptxas info    : 0 bytes gmem
+ptxas info    : Compiling entry function 'probe_hmma_chain' for 'sm_89'
+ptxas info    : Function properties for probe_hmma_chain
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 38 registers, used 0 barriers, 384 bytes cmem[0]
+ptxas info    : Compile time = 3.971 ms
+ptxas info    : Compiling entry function 'probe_hmma_fp16' for 'sm_89'
+ptxas info    : Function properties for probe_hmma_fp16
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 30 registers, used 0 barriers, 384 bytes cmem[0]
+ptxas info    : Compile time = 1.807 ms

@@ -148,7 +148,8 @@ probe_vote(int *out, const int *a) {
 #if __CUDA_ARCH__ >= 700
     // MATCH: true if all active threads have the same value
     // (Volta+ feature — uses MATCH instruction)
-    unsigned match = __match_all_sync(0xFFFFFFFF, x, NULL);  // MATCH.ALL
+    int match_pred = 0;
+    unsigned match = __match_all_sync(0xFFFFFFFF, x, &match_pred);  // MATCH.ALL
 #else
     unsigned match = 0;  // MATCH not available on SM < 7.0
 #endif

@@ -1,0 +1,26 @@
+ptxas info    : 0 bytes gmem
+ptxas info    : Compiling entry function 'probe_mufu_sqrt' for 'sm_89'
+ptxas info    : Function properties for probe_mufu_sqrt
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 11 registers, used 0 barriers, 368 bytes cmem[0]
+ptxas info    : Compile time = 7.086 ms
+ptxas info    : Compiling entry function 'probe_mufu_ex2_lg2' for 'sm_89'
+ptxas info    : Function properties for probe_mufu_ex2_lg2
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 10 registers, used 0 barriers, 368 bytes cmem[0]
+ptxas info    : Compile time = 1.938 ms
+ptxas info    : Compiling entry function 'probe_mufu_sincos' for 'sm_89'
+ptxas info    : Function properties for probe_mufu_sincos
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 14 registers, used 0 barriers, 368 bytes cmem[0]
+ptxas info    : Compile time = 1.022 ms
+ptxas info    : Compiling entry function 'probe_mufu_rsq' for 'sm_89'
+ptxas info    : Function properties for probe_mufu_rsq
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 14 registers, used 0 barriers, 368 bytes cmem[0]
+ptxas info    : Compile time = 6.563 ms
+ptxas info    : Compiling entry function 'probe_mufu_rcp' for 'sm_89'
+ptxas info    : Function properties for probe_mufu_rcp
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 13 registers, used 0 barriers, 368 bytes cmem[0]
+ptxas info    : Compile time = 6.155 ms

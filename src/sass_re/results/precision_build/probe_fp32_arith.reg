@@ -1,0 +1,31 @@
+ptxas info    : 0 bytes gmem
+ptxas info    : Compiling entry function 'probe_fadd_independent' for 'sm_89'
+ptxas info    : Function properties for probe_fadd_independent
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 20 registers, used 0 barriers, 376 bytes cmem[0]
+ptxas info    : Compile time = 1.528 ms
+ptxas info    : Compiling entry function 'probe_fabs_fneg' for 'sm_89'
+ptxas info    : Function properties for probe_fabs_fneg
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 12 registers, used 0 barriers, 376 bytes cmem[0]
+ptxas info    : Compile time = 0.679 ms
+ptxas info    : Compiling entry function 'probe_fmnmx' for 'sm_89'
+ptxas info    : Function properties for probe_fmnmx
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 12 registers, used 0 barriers, 376 bytes cmem[0]
+ptxas info    : Compile time = 0.691 ms
+ptxas info    : Compiling entry function 'probe_ffma' for 'sm_89'
+ptxas info    : Function properties for probe_ffma
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 14 registers, used 0 barriers, 384 bytes cmem[0]
+ptxas info    : Compile time = 0.751 ms
+ptxas info    : Compiling entry function 'probe_fmul' for 'sm_89'
+ptxas info    : Function properties for probe_fmul
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 10 registers, used 0 barriers, 376 bytes cmem[0]
+ptxas info    : Compile time = 0.667 ms
+ptxas info    : Compiling entry function 'probe_fadd' for 'sm_89'
+ptxas info    : Function properties for probe_fadd
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 10 registers, used 0 barriers, 376 bytes cmem[0]
+ptxas info    : Compile time = 0.653 ms

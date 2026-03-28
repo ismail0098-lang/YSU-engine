@@ -1,0 +1,10 @@
+=== Expanded Throughput Benchmark ===
+SM 8.9 | NVIDIA GeForce RTX 4070 Ti | 60 SMs | 2625 MHz
+
+Instruction              ops/clk/SM    peak theor.
+-------------------- -------------- --------------
+HADD2 (2xFP16)                265.6            256
+IDP.4A (4xINT8)               210.0            256
+HFMA2.BF16                    283.7            256
+DADD                            1.7              4
+DFMA                            1.7              4

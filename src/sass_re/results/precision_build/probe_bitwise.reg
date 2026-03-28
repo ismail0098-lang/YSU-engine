@@ -1,0 +1,26 @@
+ptxas info    : 0 bytes gmem
+ptxas info    : Compiling entry function 'probe_flo_popc' for 'sm_89'
+ptxas info    : Function properties for probe_flo_popc
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 12 registers, used 0 barriers, 368 bytes cmem[0]
+ptxas info    : Compile time = 1.340 ms
+ptxas info    : Compiling entry function 'probe_bfi_bfe' for 'sm_89'
+ptxas info    : Function properties for probe_bfi_bfe
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 14 registers, used 0 barriers, 376 bytes cmem[0]
+ptxas info    : Compile time = 0.730 ms
+ptxas info    : Compiling entry function 'probe_prmt' for 'sm_89'
+ptxas info    : Function properties for probe_prmt
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 14 registers, used 0 barriers, 376 bytes cmem[0]
+ptxas info    : Compile time = 0.949 ms
+ptxas info    : Compiling entry function 'probe_shf' for 'sm_89'
+ptxas info    : Function properties for probe_shf
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 14 registers, used 0 barriers, 376 bytes cmem[0]
+ptxas info    : Compile time = 0.747 ms
+ptxas info    : Compiling entry function 'probe_lop3' for 'sm_89'
+ptxas info    : Function properties for probe_lop3
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 14 registers, used 0 barriers, 384 bytes cmem[0]
+ptxas info    : Compile time = 0.625 ms

@@ -1,0 +1,25 @@
+=== SASS Instruction Throughput Benchmark ===
+GPU: NVIDIA GeForce RTX 4070 Ti (SM 8.9)
+Clock: 2625 MHz
+SMs: 60
+Max threads/SM: 1536
+Threads/block: 1024, Blocks: 1
+Ops/thread: 1024
+
+Running benchmarks (SM-saturating: 60 blocks)...
+
+Instruction                    ops/clk/SM        expected
+------------------------- --------------- ---------------
+FADD                                187.4             128
+FFMA                                 85.6             128
+MUFU (RCP)                           10.1              16
+IADD3                               205.3          64-128
+LOP3                                209.1          64-128
+FP32+INT32 concurrent               208.1 >128 if concurrent
+
+Notes:
+  - 'ops/clk/SM' = instruction throughput per SM per clock cycle.
+  - Ada SM has 128 FP32 CUDA cores -> peak 128 FP32 ops/clk/SM.
+  - MUFU (SFU) has 16 units/SM -> peak 16 ops/clk/SM.
+  - If FP32+INT32 > 128, the GPU executes them on separate datapaths.
+  - Values below peak indicate register pressure or scheduling limits.

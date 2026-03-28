@@ -38,3 +38,24 @@ Thumbs.db
 temp_*/
 *.bak
 *.orig
+
+# Generated SASS RE sweep artifacts
+src/sass_re/results/runs/
+src/sass_re/results/plan_impl_*/
+src/sass_re/results/ncu_full_*/
+src/sass_re/results/flag_sweep/
+src/sass_re/results/full_profile/
+
+# Compiled benchmark binaries (rebuild from source)
+src/sass_re/results/precision_build/benchmarks/microbench_*
+!src/sass_re/results/precision_build/benchmarks/microbench_*.txt
+
+# CUDA compiled intermediates
+*.cubin
+*.ptx
+*.fatbin
+
+# Profiler binary reports
+*.ncu-rep
+*.nsys-rep
+*.sqlite

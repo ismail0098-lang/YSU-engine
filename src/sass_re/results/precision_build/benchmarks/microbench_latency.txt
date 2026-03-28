@@ -1,0 +1,33 @@
+==============================================
+  SASS Instruction Latency Benchmark v4
+  SM 8.9  |  NVIDIA GeForce RTX 4070 Ti
+  Clock 2625 MHz  |  60 SMs  |  Chain 512
+==============================================
+
+Running ...
+
+Instruction           Latency (cyc)
+-------------------- --------------
+FADD                           4.52
+FMUL                           4.52
+FFMA                           4.52
+IADD3                          2.50
+IMAD                           4.51
+MUFU.RCP                      41.53
+MUFU.RSQ                      39.53
+MUFU.SIN                      23.50
+MUFU.EX2                      39.53
+MUFU.LG2                      39.53
+LOP3                           4.51
+SHF                            4.50
+PRMT                           4.50
+F2I+I2F                       12.03
+SHFL.BFLY                     24.96
+LDG chase                    122.93
+LDS chase                     28.03
+
+--- Expected (Ada / SM 8.x) ---
+FP32 arith  : ~4 cyc    INT32 arith  : ~4-5 cyc
+MUFU (SFU)  : ~4-8 cyc  Bitwise      : ~1-4 cyc
+SHFL        : ~2-4 cyc  F2I/I2F      : ~4-6 cyc
+LDS (L0)    : ~20-28    LDG (L1 hit) : ~33-36

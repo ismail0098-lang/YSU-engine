@@ -1,0 +1,25 @@
+==============================================
+  SASS Expanded Latency Benchmark
+  SM 8.9  |  NVIDIA GeForce RTX 4070 Ti
+  Clock 2625 MHz  |  60 SMs  |  Chain 512
+==============================================
+
+Running ...
+
+Instruction           Latency (cyc)
+-------------------- --------------
+DADD                          48.47
+DFMA                          54.47
+DMUL                          48.47
+MUFU.RCP64H                   17.53
+HADD2                          4.51
+HFMA2                          4.51
+HFMA2.BF16                     4.01
+IDP.4A                         4.50
+NANOSLEEP(0)                2684.47
+
+--- Context ---
+FP64 gaming SKU: 64:1 ratio vs FP32. Expect DADD/DFMA >> FADD/FFMA.
+HADD2/HFMA2: packed half2, expect ~same as FADD (dual-issue on FP16 pipe).
+IDP.4A: INT8 dot product, expect ~4-5 cyc (INT32 datapath).
+NANOSLEEP(0): yield-only, expect scheduler overhead (~few cyc).

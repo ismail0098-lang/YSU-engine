@@ -1,0 +1,26 @@
+ptxas info    : 0 bytes gmem
+ptxas info    : Compiling entry function 'probe_enc_immediates' for 'sm_89'
+ptxas info    : Function properties for probe_enc_immediates
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 22 registers, used 0 barriers, 368 bytes cmem[0]
+ptxas info    : Compile time = 1.397 ms
+ptxas info    : Compiling entry function 'probe_enc_rounding' for 'sm_89'
+ptxas info    : Function properties for probe_enc_rounding
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 18 registers, used 0 barriers, 368 bytes cmem[0]
+ptxas info    : Compile time = 0.697 ms
+ptxas info    : Compiling entry function 'probe_enc_predicates' for 'sm_89'
+ptxas info    : Function properties for probe_enc_predicates
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 10 registers, used 0 barriers, 368 bytes cmem[0]
+ptxas info    : Compile time = 1.008 ms
+ptxas info    : Compiling entry function 'probe_enc_lop3_lut' for 'sm_89'
+ptxas info    : Function properties for probe_enc_lop3_lut
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 24 registers, used 0 barriers, 368 bytes cmem[0]
+ptxas info    : Compile time = 0.785 ms
+ptxas info    : Compiling entry function 'probe_enc_dest_regs' for 'sm_89'
+ptxas info    : Function properties for probe_enc_dest_regs
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 8 registers, used 0 barriers, 360 bytes cmem[0]
+ptxas info    : Compile time = 0.672 ms

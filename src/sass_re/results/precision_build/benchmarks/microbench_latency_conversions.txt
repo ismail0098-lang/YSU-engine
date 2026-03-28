@@ -1,0 +1,11 @@
+=== Conversion Latency Benchmark ===
+SM 8.9 | NVIDIA GeForce RTX 4070 Ti
+
+Conversion                Latency (cyc)
+------------------------ --------------
+FP32<->FP16 round-trip            10.52
+FP32<->BF16 round-trip             8.53
+FP32<->FP8_E4M3 r/t               18.52
+FP32<->FP64 round-trip             0.00
+INT32<->FP32 round-trip           23.51
+LDC chain (const mem)             70.56
