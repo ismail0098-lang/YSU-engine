@@ -1,0 +1,21 @@
+ptxas info    : 0 bytes gmem, 1252 bytes cmem[3]
+ptxas info    : Compiling entry function 'probe_const_chain' for 'sm_89'
+ptxas info    : Function properties for probe_const_chain
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 12 registers, used 0 barriers, 360 bytes cmem[0]
+ptxas info    : Compile time = 1.671 ms
+ptxas info    : Compiling entry function 'probe_const_lbm_equilibrium' for 'sm_89'
+ptxas info    : Function properties for probe_const_lbm_equilibrium
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 40 registers, used 0 barriers, 396 bytes cmem[0]
+ptxas info    : Compile time = 5.001 ms
+ptxas info    : Compiling entry function 'probe_const_divergent' for 'sm_89'
+ptxas info    : Function properties for probe_const_divergent
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 8 registers, used 0 barriers, 364 bytes cmem[0]
+ptxas info    : Compile time = 0.732 ms
+ptxas info    : Compiling entry function 'probe_const_broadcast' for 'sm_89'
+ptxas info    : Function properties for probe_const_broadcast
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 8 registers, used 0 barriers, 364 bytes cmem[0]
+ptxas info    : Compile time = 0.804 ms

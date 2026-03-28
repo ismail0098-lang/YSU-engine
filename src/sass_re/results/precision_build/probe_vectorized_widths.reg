@@ -1,0 +1,103 @@
+ptxas /tmp/tmpxft_00113a40_00000000-6_probe_vectorized_widths.ptx, line 133; warning : Program is doing double precision computations.
+ptxas /tmp/tmpxft_00113a40_00000000-6_probe_vectorized_widths.ptx, line 135; warning : Program is doing double precision computations.
+ptxas info    : 0 bytes gmem
+ptxas info    : Compiling entry function 'probe_ldg_i64x2' for 'sm_89'
+ptxas info    : Function properties for probe_ldg_i64x2
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 12 registers, used 0 barriers, 368 bytes cmem[0]
+ptxas info    : Compile time = 1.209 ms
+ptxas info    : Compiling entry function 'probe_ldg_i64x1' for 'sm_89'
+ptxas info    : Function properties for probe_ldg_i64x1
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 8 registers, used 0 barriers, 368 bytes cmem[0]
+ptxas info    : Compile time = 0.581 ms
+ptxas info    : Compiling entry function 'probe_ldg_i32x4' for 'sm_89'
+ptxas info    : Function properties for probe_ldg_i32x4
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 12 registers, used 0 barriers, 368 bytes cmem[0]
+ptxas info    : Compile time = 0.504 ms
+ptxas info    : Compiling entry function 'probe_ldg_i32x2' for 'sm_89'
+ptxas info    : Function properties for probe_ldg_i32x2
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 8 registers, used 0 barriers, 368 bytes cmem[0]
+ptxas info    : Compile time = 0.590 ms
+ptxas info    : Compiling entry function 'probe_ldg_i32x1' for 'sm_89'
+ptxas info    : Function properties for probe_ldg_i32x1
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 8 registers, used 0 barriers, 368 bytes cmem[0]
+ptxas info    : Compile time = 0.462 ms
+ptxas info    : Compiling entry function 'probe_ldg_i16x4' for 'sm_89'
+ptxas info    : Function properties for probe_ldg_i16x4
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 10 registers, used 0 barriers, 368 bytes cmem[0]
+ptxas info    : Compile time = 0.472 ms
+ptxas info    : Compiling entry function 'probe_ldg_i16x2' for 'sm_89'
+ptxas info    : Function properties for probe_ldg_i16x2
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 10 registers, used 0 barriers, 368 bytes cmem[0]
+ptxas info    : Compile time = 0.455 ms
+ptxas info    : Compiling entry function 'probe_ldg_i16x1' for 'sm_89'
+ptxas info    : Function properties for probe_ldg_i16x1
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 8 registers, used 0 barriers, 368 bytes cmem[0]
+ptxas info    : Compile time = 0.466 ms
+ptxas info    : Compiling entry function 'probe_ldg_i8x4' for 'sm_89'
+ptxas info    : Function properties for probe_ldg_i8x4
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 10 registers, used 0 barriers, 368 bytes cmem[0]
+ptxas info    : Compile time = 0.450 ms
+ptxas info    : Compiling entry function 'probe_ldg_i8x1' for 'sm_89'
+ptxas info    : Function properties for probe_ldg_i8x1
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 8 registers, used 0 barriers, 368 bytes cmem[0]
+ptxas info    : Compile time = 0.541 ms
+ptxas info    : Compiling entry function 'probe_ldg_bf16x2' for 'sm_89'
+ptxas info    : Function properties for probe_ldg_bf16x2
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 16 registers, used 0 barriers, 368 bytes cmem[0]
+ptxas info    : Compile time = 0.640 ms
+ptxas info    : Compiling entry function 'probe_ldg_bf16x1' for 'sm_89'
+ptxas info    : Function properties for probe_ldg_bf16x1
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 8 registers, used 0 barriers, 368 bytes cmem[0]
+ptxas info    : Compile time = 0.480 ms
+ptxas info    : Compiling entry function 'probe_ldg_f16x4' for 'sm_89'
+ptxas info    : Function properties for probe_ldg_f16x4
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 10 registers, used 0 barriers, 368 bytes cmem[0]
+ptxas info    : Compile time = 0.476 ms
+ptxas info    : Compiling entry function 'probe_ldg_f16x2' for 'sm_89'
+ptxas info    : Function properties for probe_ldg_f16x2
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 10 registers, used 0 barriers, 368 bytes cmem[0]
+ptxas info    : Compile time = 0.458 ms
+ptxas info    : Compiling entry function 'probe_ldg_f16x1' for 'sm_89'
+ptxas info    : Function properties for probe_ldg_f16x1
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 8 registers, used 0 barriers, 368 bytes cmem[0]
+ptxas info    : Compile time = 0.459 ms
+ptxas info    : Compiling entry function 'probe_ldg_f64x2' for 'sm_89'
+ptxas info    : Function properties for probe_ldg_f64x2
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 12 registers, used 0 barriers, 368 bytes cmem[0]
+ptxas info    : Compile time = 0.489 ms
+ptxas info    : Compiling entry function 'probe_ldg_f64x1' for 'sm_89'
+ptxas info    : Function properties for probe_ldg_f64x1
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 8 registers, used 0 barriers, 368 bytes cmem[0]
+ptxas info    : Compile time = 0.460 ms
+ptxas info    : Compiling entry function 'probe_ldg_f32x4' for 'sm_89'
+ptxas info    : Function properties for probe_ldg_f32x4
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 12 registers, used 0 barriers, 368 bytes cmem[0]
+ptxas info    : Compile time = 0.488 ms
+ptxas info    : Compiling entry function 'probe_ldg_f32x2' for 'sm_89'
+ptxas info    : Function properties for probe_ldg_f32x2
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 10 registers, used 0 barriers, 368 bytes cmem[0]
+ptxas info    : Compile time = 0.470 ms
+ptxas info    : Compiling entry function 'probe_ldg_f32x1' for 'sm_89'
+ptxas info    : Function properties for probe_ldg_f32x1
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 8 registers, used 0 barriers, 368 bytes cmem[0]
+ptxas info    : Compile time = 0.464 ms

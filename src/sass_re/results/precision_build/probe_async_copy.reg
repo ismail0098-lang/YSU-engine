@@ -1,0 +1,16 @@
+ptxas info    : 1 bytes gmem, 8 bytes cmem[4]
+ptxas info    : Compiling entry function 'probe_cp_async_pipeline' for 'sm_89'
+ptxas info    : Function properties for probe_cp_async_pipeline
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 24 registers, used 1 barriers, 1024 bytes smem, 372 bytes cmem[0]
+ptxas info    : Compile time = 3.826 ms
+ptxas info    : Compiling entry function 'probe_cp_async_vec4' for 'sm_89'
+ptxas info    : Function properties for probe_cp_async_vec4
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 14 registers, used 1 barriers, 2048 bytes smem, 372 bytes cmem[0]
+ptxas info    : Compile time = 0.843 ms
+ptxas info    : Compiling entry function 'probe_cp_async_basic' for 'sm_89'
+ptxas info    : Function properties for probe_cp_async_basic
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 12 registers, used 1 barriers, 512 bytes smem, 372 bytes cmem[0]
+ptxas info    : Compile time = 0.708 ms

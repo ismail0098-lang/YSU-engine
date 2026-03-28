@@ -1,0 +1,21 @@
+ptxas info    : 0 bytes gmem
+ptxas info    : Compiling entry function 'probe_cache_policy_vectorized' for 'sm_89'
+ptxas info    : Function properties for probe_cache_policy_vectorized
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 14 registers, used 0 barriers, 376 bytes cmem[0]
+ptxas info    : Compile time = 1.430 ms
+ptxas info    : Compiling entry function 'probe_pingpong_cache_separation' for 'sm_89'
+ptxas info    : Function properties for probe_pingpong_cache_separation
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 10 registers, used 0 barriers, 372 bytes cmem[0]
+ptxas info    : Compile time = 0.767 ms
+ptxas info    : Compiling entry function 'probe_readonly_load' for 'sm_89'
+ptxas info    : Function properties for probe_readonly_load
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 12 registers, used 0 barriers, 376 bytes cmem[0]
+ptxas info    : Compile time = 0.655 ms
+ptxas info    : Compiling entry function 'probe_streaming_store' for 'sm_89'
+ptxas info    : Function properties for probe_streaming_store
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 10 registers, used 0 barriers, 376 bytes cmem[0]
+ptxas info    : Compile time = 0.518 ms

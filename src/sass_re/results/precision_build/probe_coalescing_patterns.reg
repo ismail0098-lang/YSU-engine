@@ -1,0 +1,16 @@
+ptxas info    : 0 bytes gmem
+ptxas info    : Compiling entry function '_Z15k_strided_writePfii' for 'sm_89'
+ptxas info    : Function properties for _Z15k_strided_writePfii
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 12 registers, used 0 barriers, 368 bytes cmem[0]
+ptxas info    : Compile time = 1.775 ms
+ptxas info    : Compiling entry function '_Z17k_coalesced_writePfi' for 'sm_89'
+ptxas info    : Function properties for _Z17k_coalesced_writePfi
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 8 registers, used 0 barriers, 364 bytes cmem[0]
+ptxas info    : Compile time = 0.687 ms
+ptxas info    : Compiling entry function '_Z13k_random_readPfPKfi' for 'sm_89'
+ptxas info    : Function properties for _Z13k_random_readPfPKfi
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 16 registers, used 0 barriers, 372 bytes cmem[0]
+ptxas info    : Compile time = 1.407 ms
