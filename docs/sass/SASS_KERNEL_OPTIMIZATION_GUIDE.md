@@ -7,7 +7,7 @@ concrete optimization decisions in `src/cuda_lbm/` kernels.
 
 ## Latency Budget Per LBM Cell
 
-From `src/sass_re/RESULTS.md` (RTX 4070 Ti, SM 8.9, ncu-validated):
+From `src/sass_re/SM89_LATENCY_THROUGHPUT_MEASUREMENTS.md` (RTX 4070 Ti, SM 8.9, ncu-validated):
 
 | Instruction | Latency (cy) | Throughput (ops/clk/SM) | LBM role |
 |-------------|-------------|------------------------|----------|
@@ -243,7 +243,7 @@ performance table in `src/cuda_lbm/README.md`:
 
 ## Cross-References
 
-- SASS measurements: `src/sass_re/RESULTS.md`
+- SASS measurements: `src/sass_re/SM89_LATENCY_THROUGHPUT_MEASUREMENTS.md`
 - SM 8.9 architecture: `docs/sass/SM89_ARCHITECTURE_REFERENCE.md`
 - Instant-NGP optimizations: `src/sass_re/instant_ngp/docs/TECHNICAL_REFERENCE.md`
 - Kernel performance table: `src/cuda_lbm/README.md`

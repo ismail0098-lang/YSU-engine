@@ -2,7 +2,7 @@
 
 Hardware reference for CUDA LBM kernel optimization on Ada Lovelace (SM 8.9).
 Synthesized from NVIDIA whitepapers, first-party SASS RE measurements
-(`src/sass_re/RESULTS.md`), and measured kernel benchmarks (`src/cuda_lbm/README.md`).
+(`src/sass_re/SM89_LATENCY_THROUGHPUT_MEASUREMENTS.md`), and measured kernel benchmarks (`src/cuda_lbm/README.md`).
 
 ---
 
@@ -144,7 +144,7 @@ cache with no eviction pressure.
 
 ## 4. Measured Instruction Latencies (SASS RE)
 
-First-party measurements from `src/sass_re/RESULTS.md` on RTX 4070 Ti Super
+First-party measurements from `src/sass_re/SM89_LATENCY_THROUGHPUT_MEASUREMENTS.md` on RTX 4070 Ti Super
 (SM 8.9, CUDA 13.1). Dependent-chain methodology, 512-deep chains.
 
 ### Arithmetic Latencies
@@ -438,7 +438,7 @@ RTX 4070 Ti Super L2 = 48 MB.
 
 - NVIDIA Ada Lovelace GPU Architecture Whitepaper (2022)
 - `docs/sass/NVIDIA_SASS_ADA_LOVELACE_REFERENCE.md` -- Full SASS ISA reference
-- `src/sass_re/RESULTS.md` -- First-party instruction latency/throughput measurements
+- `src/sass_re/SM89_LATENCY_THROUGHPUT_MEASUREMENTS.md` -- First-party instruction latency/throughput measurements
 - `src/cuda_lbm/README.md` -- Measured kernel performance tables
 - `src/cuda_lbm/kernels_tensor_core.cu` -- Tensor Core WMMA proxy measurements
 - NVIDIA CUDA C++ Programming Guide, Appendix H: Compute Capabilities

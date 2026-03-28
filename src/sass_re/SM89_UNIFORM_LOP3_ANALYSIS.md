@@ -73,10 +73,9 @@ Two cubin-side substitution experiments now define the boundary:
 
 ## Runtime Status
 
-A guarded runtime matrix was added via:
-
-- `runners/uplop3_cubin_driver_runner.cpp`
-- `scripts/validate_uplop3_cubin_pattern_matrix.sh`
+A guarded runtime matrix was added via a dedicated cubin driver runner
+and a shell script that validates the UPLOP3 cubin pattern matrix (both
+provided by the probe domain PRs).
 
 The first runtime attempt at
 `results/runs/uplop3_cubin_pattern_matrix_20260323_002300/summary.txt` was
@@ -186,8 +185,8 @@ The exact live-occurrence ranking is now:
 
 Repo hygiene also improved along the way:
 
-- PMD proper on the supported HTML surface is now clean after removing the
-  last inline styles from `src/editor/ysu_scene_editor.html`
+- PMD proper on the supported HTML surface is now clean after reducing
+  inline styles in `src/editor/ysu_scene_editor.html`
 - PMD CPD on the cubin runner/script tranche is clean after factoring shared
   driver boilerplate into `runners/cubin_driver_common.h`
 

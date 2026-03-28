@@ -829,5 +829,5 @@ Warp-vote note:
 **Total: 470 unique SASS mnemonics across 25 categories.**
 
 All latencies measured on RTX 4070 Ti (SM 8.9, 2625 MHz, 60 SMs).
-See `RESULTS.md` for measurement methodology, ncu cross-validation,
+See `SM89_LATENCY_THROUGHPUT_MEASUREMENTS.md` for measurement methodology, ncu cross-validation,
 and corrected values.

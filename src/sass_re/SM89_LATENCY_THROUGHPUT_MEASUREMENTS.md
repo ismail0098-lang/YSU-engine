@@ -2567,7 +2567,7 @@ Register pressure constraints expose unsigned uniform integer set-predicate
 variants (UISETP.GE.U32.AND, UISETP.GT.AND) in the uniform register datapath.
 
 **Grand total: 443 unique SASS mnemonics** across all flag combinations,
-262 probe kernels, and 15+ microbenchmarks. See `SM89_SASS_INSTRUCTION_REFERENCE.md`
+262 probe kernels, and 15+ microbenchmarks. See `SM89_INSTRUCTION_CATALOG.md`
 for the complete catalog with CUDA/PTX intrinsic mappings.
 
 ### CRITICAL: --use_fast_math breaks throughput benchmarks

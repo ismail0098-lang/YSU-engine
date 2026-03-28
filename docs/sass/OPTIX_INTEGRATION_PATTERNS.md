@@ -82,7 +82,7 @@ not every LBM step. For static domains, build once at initialization.
 
 ## Cross-References
 
-- OptiX source patterns: `~/Github/open_gororoba/crates/gororoba_optix/src/lib.rs`
-- OptiX tracer kernel: `~/Github/open_gororoba/crates/lbm_3d_cuda/src/optix_tracer.cu`
+- OptiX source patterns: gororoba_optix crate (external open_gororoba project)
+- OptiX tracer kernel: lbm_3d_cuda crate (external open_gororoba project)
 - Sparse brick map: `src/cuda_lbm/sparse/kernels_sparse_map.cu`
-- SASS RE: `src/sass_re/RESULTS.md` (for FFMA/LDG latencies in hit programs)
+- SASS RE: `src/sass_re/SM89_LATENCY_THROUGHPUT_MEASUREMENTS.md` (for FFMA/LDG latencies in hit programs)
