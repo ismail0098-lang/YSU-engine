@@ -152,8 +152,8 @@ Systematic flag sweeps across the corpus:
 - `-Xptxas -dlcm=cg` as the strongest load-policy lane
 
 Specialized runner infrastructure for probes that could not use the
-generic launcher: barrier arrive/wait, cooperative launch, depbar
-explicit, tiling hierarchical.
+generic launcher: barrier arrive/wait, cooperative launch, explicit
+dependency barrier (depbar), and hierarchical tiling.
 
 ### Phase 3: Combo frontier (~382 to ~448 mnemonics)
 
