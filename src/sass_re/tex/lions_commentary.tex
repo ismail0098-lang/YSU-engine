@@ -1,0 +1,369 @@
+% Lions-Style Commentary on SM89 SASS Instructions
+%
+% Following John Lions' "Commentary on UNIX 6th Edition" (1977):
+% numbered paragraphs, each explaining one aspect of the machine,
+% cross-referenced to source (probe files) and raw data (SASS disassembly).
+%
+% Each paragraph number (\paragraph) corresponds to a row in the
+% multidimensional table (Table~\ref{tab:multidim}).
+
+\section{A Commentary on the SM89 Instruction Set}
+
+\noindent\textit{%
+What follows is a guided reading of the Ada Lovelace SM89 instruction set,
+in the style of Lions' Commentary on UNIX.  Each numbered paragraph explains
+one instruction class, what it reveals about the microarchitecture, and how
+we measured it.  The reader should have Table~\ref{tab:multidim} and the
+pipeline diagram (Figure~\ref{fig:pipeline}) open alongside.}
+
+\bigskip
+
+%----------------------------------------------------------------------
+\subsection{Integer Arithmetic Pipeline}
+\label{par:int32}
+
+\paragraph{2.1}
+\texttt{IADD3} is the fundamental three-input integer addition.  Its measured
+latency of 2.51 cycles and throughput of 68.2 ops/clk/SM tell us two things.
+First, the INT32 pipeline is the fastest execution unit on SM89 -- faster than
+the FP32 FMA pipe by nearly 2x in latency.  Second, the three-input form is
+native to the hardware, not a fused pair of two-input adds; the compiler uses
+\texttt{IADD3} with the third operand set to zero when only two inputs are
+needed, confirming that this is the canonical integer add.
+
+\textit{Source:} \texttt{probes/probe\_int\_arith.cu}, measurement chain depth 512.
+
+\paragraph{2.2}
+\texttt{IMAD} (integer multiply-add) shares the 4.54-cycle latency of
+\texttt{FFMA}, suggesting the INT32 multiplier may share datapath resources
+with the FP32 FMA unit, or at minimum occupies the same pipeline depth.  The
+compiler uses \texttt{IMAD.IADD} as a synonym for \texttt{IADD3} in certain
+contexts, and \texttt{IMAD.X} for carry-propagating multiword arithmetic.
+The \texttt{.IADD} and \texttt{.X} suffixes are not separate instructions but
+modifier bits in the same opcode encoding.
+
+\textit{Source:} \texttt{probes/probe\_int\_arith.cu}, encoding analysis in
+\texttt{results/20260306\_190541/ENCODING\_ANALYSIS.md}.
+
+%----------------------------------------------------------------------
+\subsection{Floating-Point Arithmetic Pipeline}
+\label{par:fp32}
+
+\paragraph{3.1}
+\texttt{FFMA} at 4.54 cycles is the workhorse of GPU compute.  Every matrix
+multiplication, convolution, and most shader computations reduce to long
+chains of FFMA instructions.  The measured throughput of 44.6 ops/clk/SM,
+combined with the 128 CUDA cores per SM on Ada, implies that each core can
+sustain slightly more than one FFMA every 4 clocks -- consistent with the
+4-cycle pipeline depth.  The MLP forward kernel in \texttt{instant\_ngp/}
+demonstrates that 8-wide ILP across independent accumulators is needed to
+saturate this pipeline; the compiler's default 1-wide chain leaves 7/8 of
+the pipeline idle.
+
+\textit{Source:} \texttt{microbench/microbench\_latency.cu} (chain depth 512),
+cross-validated with ncu \texttt{smsp\_\_cycles\_elapsed} and
+\texttt{sm\_\_throughput.avg.pct\_of\_peak\_sustained\_elapsed}.
+
+\paragraph{3.2}
+\texttt{FMNMX} (float min/max) shares the FMA pipeline at identical latency.
+This is significant for activation functions: a ReLU implemented as
+\texttt{FMNMX Rd, Ra, RZ, !PT} (take max of value and zero) costs exactly
+one pipeline slot, the same as an FFMA.  The hand-optimized \texttt{mlp\_forward}
+kernel exploits this by replacing a branch-based ReLU with a single FMNMX,
+eliminating a branch and a comparison.
+
+%----------------------------------------------------------------------
+\subsection{Half-Precision and BF16 Pipeline}
+\label{par:fp16}
+
+\paragraph{4.1}
+\texttt{HFMA2} at 4.01 cycles is the lowest-latency FMA operation measured
+on SM89 -- faster than both FP32 \texttt{FFMA} and INT32 \texttt{IMAD}.
+The \texttt{2} suffix indicates SIMD-2 operation: two FP16 values packed
+into a single 32-bit register, processed in a single cycle.  This means
+the effective throughput for FP16 is 2x the FP32 throughput at lower latency.
+BF16 (\texttt{bf162}) operations achieve identical latency, confirming that
+the BF16 datapath shares the FP16 SIMD pipeline with no additional penalty.
+
+\textit{Source:} ncu SM\_cyc measurements across \texttt{microbench\_throughput.cu}
+variants, cross-validated with \texttt{k\_hfma2\_bf16} showing the lowest
+\texttt{SM\_cyc} of all measured kernels.
+
+%----------------------------------------------------------------------
+\subsection{FP64 Pipeline}
+\label{par:fp64}
+
+\paragraph{5.1}
+\texttt{DFMA} at 54.48 cycles reveals the Ada gaming SKU's deliberate FP64
+throttling.  The 1:64 FP64:FP32 throughput ratio (confirmed by
+\texttt{sm\_\_throughput} measurements) means FP64 operations are
+\emph{compute-bound} even on bandwidth-bound workloads -- the only precision
+tier where this is true for scalar LBM kernels.  This has a direct
+architectural implication: FP64 and double-double (DD) kernels cannot benefit
+from the same memory optimization strategies that accelerate FP32/INT8 kernels.
+The DD kernel's 2.85x slowdown vs FP32 is not a memory bottleneck but a raw
+ALU throughput wall.
+
+\textit{Source:} \texttt{probes/probe\_fp64\_arithmetic.cu},
+\texttt{microbench/microbench\_latency\_corrected.cu}.
+
+%----------------------------------------------------------------------
+\subsection{Special Function Unit (SFU / MUFU)}
+\label{par:sfu}
+
+\paragraph{6.1}
+The SFU executes transcendental approximations (\texttt{MUFU.EX2},
+\texttt{MUFU.RCP}, \texttt{MUFU.RSQ}, \texttt{MUFU.SIN}, \texttt{MUFU.COS},
+\texttt{MUFU.LG2}).  The wide latency spread -- 17.56 cycles for
+\texttt{MUFU.EX2} vs 41.55 cycles for \texttt{MUFU.RCP} -- reveals that
+these are not a single unit but a pipeline with operation-dependent depth.
+Reciprocal (\texttt{RCP}) requires more Newton-Raphson iterations internally
+than exp2 (\texttt{EX2}), which is a direct table lookup with interpolation.
+
+\paragraph{6.2}
+A critical finding for kernel optimization: \texttt{MUFU.RCP64H} (the FP64
+reciprocal seed) shares the same ncu \texttt{SM\_cyc} profile as the BREV
+tiling kernel, placing it in the SFU pipeline rather than the FP64 ALU.
+This means FP64 division can partially overlap with FP32 computation if
+the reciprocal seed is issued to the SFU while the FP64 ALU handles
+multiply-accumulate.
+
+\textit{Source:} \texttt{probes/probe\_mufu.cu},
+\texttt{probes/probe\_transcendentals.cu}.
+
+%----------------------------------------------------------------------
+\subsection{Tensor Core Operations}
+\label{par:tensor}
+
+\paragraph{7.1}
+\texttt{HMMA.1688.F32.TF32} at 66.19 measured cycles is the first published
+tensor core latency for Ada Lovelace consumer hardware.  The \texttt{1688}
+encoding specifies the M16-N8-K8 tile shape.  Unlike ALU operations that
+execute per-thread, tensor core operations are warp-cooperative: all 32
+threads in a warp contribute fragments to a single matrix multiply-accumulate.
+The high absolute latency is offset by the massive data parallelism: each
+invocation processes 16x8x8 = 1024 multiply-accumulate operations.
+
+\textit{Source:} \texttt{probes/probe\_tensor\_all\_widths.cu},
+\texttt{microbench/microbench\_latency\_tensor\_all.cu}.
+
+%----------------------------------------------------------------------
+\subsection{Bitwise and Logic Operations}
+\label{par:bitwise}
+
+\paragraph{8.1}
+\texttt{LOP3.LUT} is the universal 3-input logic operation.  Rather than
+separate AND/OR/XOR/NAND instructions, SM89 encodes an 8-bit truth table
+in the instruction word itself.  Any Boolean function of three 32-bit inputs
+can be computed in a single 2.51-cycle operation.  This is architecturally
+elegant: the compiler emits \texttt{LOP3.LUT 0xc0} for AND, \texttt{0xfc}
+for OR, \texttt{0x3c} for XOR, and arbitrary combinations for complex
+predicates.  The uniform variant \texttt{ULOP3.LUT} operates on uniform
+registers with the same truth-table encoding.
+
+\paragraph{8.2}
+\texttt{POPC} (population count / bit count) at 11.77 cycles per dependent
+pair is notably slower than other integer operations.  This confirms it is
+a multi-cycle integer operation, not an SFU operation as some documentation
+suggests.  The per-pair measurement artifact (0.26cy/pair for zero-latency
+operations like \texttt{IABS}) was carefully subtracted.
+
+\textit{Source:} \texttt{probes/probe\_bitwise.cu},
+\texttt{probes/probe\_bit\_manipulation.cu}.
+
+%----------------------------------------------------------------------
+\subsection{Type Conversion}
+\label{par:cvt}
+
+\paragraph{9.1}
+Conversion instructions (\texttt{F2F}, \texttt{I2F}, \texttt{F2I},
+\texttt{I2I}) uniformly measure at 4.54 cycles, identical to FP32 FMA.
+This places them in the FMA pipeline, not a separate conversion unit.
+A surprising finding: \texttt{FABS} and \texttt{FNEG} measure as
+\emph{free} -- zero additional latency when chained with arithmetic.
+These are pipeline modifiers (sign-bit manipulation in the register
+read port), not independent operations.  Similarly, \texttt{.SAT}
+(saturation clamp to [0,1]) is free when used as an FFMA modifier.
+
+\textit{Source:} \texttt{microbench/microbench\_latency\_conversions.cu},
+\texttt{probes/probe\_conversions.cu}.
+
+%----------------------------------------------------------------------
+\subsection{Global Memory Subsystem}
+\label{par:memory}
+
+\paragraph{10.1}
+\texttt{LDG} (global load) at 92.29 cycles via pointer-chasing measures
+the full L1 miss + L2 hit latency path.  This is the dominant cost in
+bandwidth-bound kernels.  The vectorized forms (\texttt{LDG.E.64},
+\texttt{LDG.E.128}) do not reduce latency but increase bandwidth per
+instruction, which is why vectorized loads are critical for memory-bound
+code.  The \texttt{.CONSTANT} modifier routes loads through the constant
+cache (LDC path) which has different latency characteristics.
+
+\paragraph{10.2}
+The cache policy modifiers (\texttt{.L1}, \texttt{.L2},
+\texttt{.STRONG.GPU}, \texttt{.STRONG.SYS}) create qualitatively different
+execution regimes.  The controlled cache-policy experiments showed that
+\texttt{-dlcm=cg} (forcing \texttt{STRONG.GPU}) changes emitted load
+spellings but does not materially change cycle counts or stall
+distributions once the SYS64 fused body exists.  Cache policy is a
+secondary refinement, not a primary driver.
+
+\textit{Source:} \texttt{probes/probe\_memory.cu},
+\texttt{probes/data\_movement/}, \texttt{probes/cache\_control/}.
+
+%----------------------------------------------------------------------
+\subsection{Shared Memory Subsystem}
+\label{par:smem}
+
+\paragraph{11.1}
+\texttt{LDS} (shared memory load) at 28.03 cycles via pointer-chasing
+measures on-chip SRAM latency.  This is 3.3x faster than global memory,
+confirming the critical importance of shared memory tiling for
+bandwidth-bound kernels.  Bank conflicts add latency multiplicatively --
+the \texttt{microbench\_smem\_bank\_conflicts} kernel quantifies this at
+up to 32x for fully serialized 32-way conflicts.
+
+\textit{Source:} \texttt{probes/probe\_memory.cu},
+\texttt{microbench/microbench\_smem\_bank\_conflicts.cu}.
+
+%----------------------------------------------------------------------
+\subsection{Asynchronous Copy Pipeline}
+\label{par:async}
+
+\paragraph{12.1}
+\texttt{LDGSTS} (load-global-store-shared) is the async copy instruction
+that bypasses the register file.  It is the backbone of the modern CUDA
+pipeline: data moves from global memory directly to shared memory while
+the SM continues executing arithmetic.  The associated \texttt{LDGDEPBAR}
+and \texttt{DEPBAR.LE} instructions form the dependency tracking system
+that tells the warp scheduler when the async copy has completed.
+
+This trio (\texttt{LDGSTS + LDGDEPBAR + DEPBAR.LE}) is the ``anchor''
+that the combo frontier research identified as the central enabling
+structure for modern GPU kernel design.
+
+\textit{Source:} \texttt{probes/data\_movement/probe\_cp\_async\_zfill.cu},
+\texttt{probes/probe\_async\_copy.cu}.
+
+%----------------------------------------------------------------------
+\subsection{Atomic Operations}
+\label{par:atomic}
+
+\paragraph{13.1}
+The atomic instruction family spans three scopes: \texttt{ATOMS} (shared
+memory), \texttt{ATOM}/\texttt{ATOMG} (global memory), and system-scope
+variants (\texttt{ATOMG.E.*.STRONG.SYS}).  The scope transition from
+\texttt{.GPU} to \texttt{.SYS} introduces \texttt{MEMBAR} as a major
+stall source, pushing the kernel into a qualitatively different scheduling
+regime.  This was the most important architectural finding from the combo
+frontier experiments.
+
+\textit{Source:} \texttt{probes/atomic\_sweep/},
+\texttt{probes/shared\_atomics/}, \texttt{probes/edge\_atomics/}.
+
+%----------------------------------------------------------------------
+\subsection{Synchronization and Barriers}
+\label{par:sync}
+
+\paragraph{14.1}
+\texttt{MEMBAR.GPU} at 205 cycles and \texttt{MEMBAR.SYS} at 2583 cycles
+are the most expensive operations measured.  The 12.6x ratio between GPU
+and SYS scope reveals the PCIe round-trip cost of system-scope memory
+ordering.  For kernels that require cross-GPU coherence (multi-GPU
+workloads), this cost dominates all other instruction latencies by an
+order of magnitude.
+
+\paragraph{14.2}
+\texttt{BSSY} and \texttt{BSYNC} (structured synchronization) appear in
+optimized code; \texttt{WARPSYNC} appears only in debug (\texttt{-G})
+builds.  Both implement \texttt{\_\_syncwarp()} semantics, but the
+compiler's optimization level determines which SASS form is selected.
+This is a form-selection decision, not an ISA-level distinction.
+
+\textit{Source:} \texttt{probes/barrier\_sync2/},
+\texttt{probes/probe\_convergence\_barriers.cu}.
+
+%----------------------------------------------------------------------
+\subsection{Warp-Level Operations}
+\label{par:warp}
+
+\paragraph{15.1}
+\texttt{SHFL.BFLY} (warp shuffle, butterfly pattern) at 24.96 cycles
+enables register-to-register communication between threads in a warp
+without shared memory.  The shuffle family (\texttt{.IDX}, \texttt{.UP},
+\texttt{.DOWN}, \texttt{.BFLY}) provides the primitives for warp-level
+reductions, scans, and neighbor communication.  The volume rendering
+kernel in \texttt{instant\_ngp/} uses \texttt{SHFL} for warp-level
+neighbor sharing of accumulated opacity, avoiding shared memory entirely.
+
+\textit{Source:} \texttt{probes/probe\_memory.cu} (SHFL section),
+\texttt{probes/simd\_video/}.
+
+%----------------------------------------------------------------------
+\subsection{Special Registers and Scheduling}
+\label{par:special}
+
+\paragraph{16.1}
+\texttt{S2R} (special register read) provides access to hardware state:
+thread indices (\texttt{SR\_TID.*}), clock counters (\texttt{SR\_CLOCKLO}),
+warp identifiers, and SM topology.  \texttt{CS2R} reads 64-bit cycle
+counters.  These are the foundation of all microbenchmark timing:
+the latency measurements throughout this monograph are derived from
+\texttt{CS2R SR\_CLOCKLO} bracketing of dependent instruction chains.
+
+\texttt{NANOSLEEP} is a cooperative scheduling hint that yields the warp's
+time slice.  It has no direct performance benefit but allows the warp
+scheduler to issue other warps during spin-wait loops, improving overall
+SM utilization.
+
+\textit{Source:} \texttt{probes/probe\_special\_regs.cu},
+\texttt{probes/probe\_nanosleep\_scheduling.cu}.
+
+%----------------------------------------------------------------------
+\subsection{Uniform Register Operations}
+\label{par:uniform}
+
+\paragraph{17.1}
+The uniform instruction family (\texttt{ULDC}, \texttt{UIADD3},
+\texttt{ULOP3}, \texttt{USHF}, \texttt{UISETP}) operates on a separate
+register file of warp-uniform values.  Getting \texttt{UISETP} to appear
+in SASS requires that compare operands remain in uniform registers through
+scheduling, not merely that they are warp-uniform in source semantics.
+The compiler aggressively rewrites the uniform compare chain when the
+surrounding code becomes complex, falling back to per-thread \texttt{ISETP}.
+
+\paragraph{17.2}
+\texttt{UPLOP3.LUT} is the frontier instruction discovered through
+cubin-side structural analysis.  It requires a specific structural path
+(\texttt{PLOP3 -> UPLOP3}), not the intuitively expected
+\texttt{ULOP3 -> UPLOP3}.  This structural law, proven by differential
+fuzzing and compute-sanitizer validation, demonstrates that the uniform
+and predicate subsystems have asymmetric coupling in the SM89 backend.
+
+\textit{Source:} \texttt{probes/probe\_uniform\_datapath.cu},
+\texttt{probes/probe\_uplop3\_uniform\_predicates.cu},
+detailed analysis in \texttt{SM89\_UNIFORM\_LOP3\_ANALYSIS.md}.
+
+%----------------------------------------------------------------------
+\subsection{Predicate Register Operations}
+\label{par:predicate}
+
+\paragraph{18.1}
+\texttt{P2R} (predicate-to-register) and \texttt{R2P}
+(register-to-predicate) transfer values between the 7 predicate registers
+(P0--P6) and the general-purpose register file.  The byte-qualified forms
+\texttt{P2R.B1}, \texttt{P2R.B2}, \texttt{P2R.B3} pack predicate bits into
+specific byte lanes of a GPR.  These forms are valid on SM89 (confirmed by
+cubin substitution) but are never selected by any tested compiler frontend
+(nvcc, clang, Triton) or ptxas version (CUDA 11.8, 12.6, 13.1).
+
+This is the clearest example of the form-selection gap: the ISA supports
+the instruction, the hardware executes it, but the compiler's cost model
+consistently prefers alternative lowerings.  The P2R.B* frontier remains
+the most significant open question in the SM89 characterization.
+
+\textit{Source:} \texttt{probes/probe\_p2r\_*.cu},
+\texttt{probes/probe\_predicate\_*.cu},
+detailed analysis in \texttt{SM89\_PREDICATE\_REGISTER\_ANALYSIS.md}.

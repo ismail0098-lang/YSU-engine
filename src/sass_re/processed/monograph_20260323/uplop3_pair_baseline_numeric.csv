@@ -1,0 +1,9 @@
+family,variant,same,diff,total,diff_ratio
+uniform_pair_baseline,baseline,0,0,0,0.000000
+uniform_pair_baseline,occ1,7,17,24,0.708333
+uniform_pair_baseline,occ1_occ5,7,17,24,0.708333
+uniform_pair_baseline,occ1_occ2_occ5,13,11,24,0.458333
+cutlass_pair_baseline,baseline,0,0,0,0.000000
+cutlass_pair_baseline,occ4,0,24,24,1.000000
+cutlass_pair_baseline,occ4_occ5,8,16,24,0.666667
+cutlass_pair_baseline,occ2_occ4_occ5,9,15,24,0.625000

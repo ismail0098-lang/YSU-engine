@@ -6,16 +6,47 @@
 
 ---
 
+Current claim ledger:
+[PAPER_CLAIMS_MATRIX.md](PAPER_CLAIMS_MATRIX.md)
+
+Current figure/table coverage plan:
+[PAPER_FIGURE_TABLE_PLAN.md](PAPER_FIGURE_TABLE_PLAN.md)
+
+Current instantiated SM89 paper assets:
+[PAPER_ASSETS_SM89.md](PAPER_ASSETS_SM89.md)
+
+Current standalone Ada-only manuscript fragment:
+[PAPER_DRAFT_SM89.md](PAPER_DRAFT_SM89.md)
+
+Current monograph-level synthesis and LaTeX/PGFPlots package:
+[MONOGRAPH_SM89_SYNTHESIS.md](MONOGRAPH_SM89_SYNTHESIS.md)
+[sm89_monograph.tex](tex/sm89_monograph.tex)
+[sm89_monograph.pdf](tex/build/sm89_monograph.pdf)
+
+Current section coverage map:
+[PAPER_SECTION_COVERAGE.md](PAPER_SECTION_COVERAGE.md)
+
 ## Abstract
 
-We present a first-party empirical comparison of NVIDIA's GPU microarchitecture across
-two generations separated by six years: Pascal (GTX 1050 Ti, SM 6.1, 2016) and
-Ada Lovelace (RTX 4070 Ti Super, SM 8.9, 2022). Using custom CUDA microbenchmarks
-and systematic SASS (Streaming ASSembler) disassembly, we measure instruction latencies,
-throughputs, and analyze binary encoding evolution for both architectures. Our toolkit is
-open-source and fully reproducible. Key findings include [to be filled after 1050 Ti runs]:
-instruction set additions/removals, latency improvements, encoding format changes, and
-scheduler behavior differences revealed through control word analysis.
+We present an open and reproducible SASS reverse-engineering workflow for
+current NVIDIA consumer GPUs, with a bounded Ada Lovelace result set already
+closed on SM89 and a broader Pascal-vs-Ada comparison scaffolded but not yet
+fully populated. Using custom CUDA probes, systematic disassembly, cubin-side
+patch validation, runtime differential fuzzing, and tandem `compute-sanitizer`,
+`ncu`, and `nsys` passes, we map both broad instruction inventory coverage and
+two narrower opcode frontiers: byte-qualified `P2R.B*` and `UPLOP3.LUT`.
+
+The current Ada-only findings are threefold. First, the stable optimized SM89
+inventory reaches `379` canonical raw mnemonics, with a lane-specific maximum
+of `382`. Second, direct local source/IR still does not emit
+`P2R.B1/B2/B3`, but local cubin-side substitution proves that all three are
+valid and runnable on the same target, making the remaining gap a form-
+selection problem rather than an opcode-existence problem. Third,
+`PLOP3 -> UPLOP3` is structurally valid while `ULOP3 -> UPLOP3` is not, and
+local `UPLOP3` substitutions partition into inert and semantically live
+runtime classes. We frame these results as bounded Ada-only claims that are
+already paper-safe, while leaving stronger cross-architecture conclusions for
+future Pascal-side measurement.
 
 ---
 
@@ -151,6 +182,14 @@ Nine minimal CUDA kernels, each isolating a specific instruction class:
 
 ## 4. Results: ISA Comparison
 
+Current Ada-only claim coverage already available:
+- inventory: `C01`, `C02`
+- `P2R` frontier status: `C04`-`C08`
+- `UPLOP3` structural and runtime status: `C09`-`C17`
+
+Current Ada-only assets available:
+- Table A1 in [PAPER_ASSETS_SM89.md](PAPER_ASSETS_SM89.md)
+
 ### 4.1 Instruction Set Changes
 
 [Table: Instructions unique to each architecture]
@@ -227,6 +266,14 @@ Expect similar per-SM throughput; verify with measurements.
 
 ## 7. Results: Binary Encoding
 
+Current Ada-only frontier claims that can be inserted here now:
+- `P2R` bounded-negative/source-vs-cubin claims: `C04`-`C08`
+- `UPLOP3` structural boundary claims: `C09`-`C11`
+
+Current Ada-only assets available:
+- Table A2 in [PAPER_ASSETS_SM89.md](PAPER_ASSETS_SM89.md)
+- Table A3 in [PAPER_ASSETS_SM89.md](PAPER_ASSETS_SM89.md)
+
 ### 7.1 Instruction Word Format
 
 - **Pascal (SM 6.1)**: 64-bit instructions, grouped in bundles of 3 + 1 control word.
@@ -249,9 +296,47 @@ opcode) reveals which bit ranges encode register fields.
 Pascal's compact 21-bit control word (per instruction, packed 3 at a time) vs.
 Ada's 64-bit per-instruction control word. What does the extra space encode?
 
+### 7.4 Ada-only frontier status (draft)
+
+On current local SM89, the `P2R` and `UPLOP3` frontiers are now bounded in a
+way that is strong enough for declarative paper use, even though neither
+frontier is source-level closed in the same way. Table A2 captures the `P2R`
+state: direct local source and frontend/IR search still do not emit
+`P2R.B1/B2/B3`, despite extensive CUDA-source mutation, PTX search, clang and
+Triton frontend variation, and tested `ptxas 11.8/12.6/13.1` sweeps. At the
+same time, the local compiler does reproduce the surrounding neighborhood,
+including plain `P2R ... 0x7f` and `P2R ... 0x0f`. This combination is the
+important result. The failure is no longer best interpreted as a missing opcode
+or missing neighborhood. It is better described as a source/IR-level
+form-selection problem. Cubin-side substitution then closes the opcode-validity
+question directly by materializing and running `P2R.B1`, `P2R.B2`, and
+`P2R.B3` on the same local SM89 target.
+
+Table A3 captures the parallel `UPLOP3` boundary. Direct local source/IR still
+does not emit `UPLOP3.LUT`, but cubin-side substitution now exposes a sharp
+structural rule: `ULOP3 -> UPLOP3` is invalid, whereas `PLOP3 -> UPLOP3` is
+structurally valid. That result matters because it does more than prove a
+decode spelling. The valid `PLOP3 -> UPLOP3` substitutions launch and execute
+in multiple local contexts, and they separate into inert and
+stable-but-different runtime classes. In other words, the local `UPLOP3`
+frontier has already crossed from structural decode validation into semantic
+classification. Figure A2 and Table A4 make this shift explicit: some patched
+sites behave like true live local anchors, while others remain semantically
+neutral even though they decode and run.
+
 ---
 
 ## 8. Discussion
+
+Current Ada-only synthesis claims that fit here now:
+- live `UPLOP3` site hierarchy: `C12`-`C14`
+- tool effectiveness and workflow claims: `C15`-`C16`
+- frontier ranking and next-step framing: `C17`-`C18`
+
+Current Ada-only assets available:
+- Figure A2 in [PAPER_ASSETS_SM89.md](PAPER_ASSETS_SM89.md)
+- Table A4 in [PAPER_ASSETS_SM89.md](PAPER_ASSETS_SM89.md)
+- Table A5 in [PAPER_ASSETS_SM89.md](PAPER_ASSETS_SM89.md)
 
 ### 8.1 ISA Design Philosophy Evolution
 
@@ -283,9 +368,49 @@ The instruction encoding is a window into the hardware's internal organization:
 - ptxas may apply transformations not visible at the PTX level
 - Single-warp latency measurements don't capture pipeline overlap effects
 
+### 8.5 Ada-only frontier synthesis (draft)
+
+The current SM89 frontier is best understood as two different bounded stories
+with two different levels of closure. For `P2R`, the key contribution is a
+negative source-level result paired with a positive opcode-validity result.
+Direct local source/IR still does not select `P2R.B*`, but local cubin-side
+substitution proves that the byte-qualified opcodes are valid and runnable on
+the same machine. That changes the question from "does SM89 support these
+forms?" to "what compiler-internal condition selects them?" This is why the
+remaining `P2R` problem is best framed as a form-selection problem, not an
+opcode-existence problem.
+
+For `UPLOP3`, the frontier is further along. The repo now has a structurally
+valid cubin-side path, runtime-safe execution, and a ranked semantic map of
+live sites. Figure A2 and Table A4 show that the live set is not homogeneous.
+`uniform_occ1` and `cutlass_occ5` are the strongest current anchors.
+`uniform_occ2` behaves like a secondary anchor. `uniform_occ5` behaves more
+like a sensitizer, and `cutlass_occ4` behaves more like an amplifier than a
+primary anchor. This is a stronger statement than merely saying that patched
+`UPLOP3` sites can differ from baseline; it means the frontier already has a
+usable causal vocabulary.
+
+The pair-baseline framing makes that causal vocabulary more concrete. On the
+uniform branch, `occ2_occ5` is comparatively stable, and `uniform_occ1` is the
+main extra widener over that stable pair. On the CUTLASS branch, `occ2_occ5`
+again behaves like the stable anchor pair, while `cutlass_occ4` is the main
+visible widener. Richer CUTLASS combinations often preserve visible output
+prefixes while still perturbing aggregate sums, which is why they cannot be
+understood from disassembly alone. Differential fuzzing was the decisive tool
+for separating those behaviors. Table A5 summarizes the resulting workflow:
+differential fuzzing is the primary semantic discriminator,
+`compute-sanitizer` is the safety gate, `ncu` is a perf-side sanity check, and
+`nsys` is a lower-yield but still useful trace sidecar.
+
 ---
 
 ## 9. Reproducibility
+
+For current Ada-only frontier claims, the bounded evidence source of truth is:
+- [PAPER_CLAIMS_MATRIX.md](PAPER_CLAIMS_MATRIX.md)
+- [PAPER_FIGURE_TABLE_PLAN.md](PAPER_FIGURE_TABLE_PLAN.md)
+- [PAPER_ASSETS_SM89.md](PAPER_ASSETS_SM89.md)
+- [PAPER_SECTION_COVERAGE.md](PAPER_SECTION_COVERAGE.md)
 
 All code, scripts, and raw data are available at:
 **https://github.com/ismail0098-lang/YSU-engine** (`src/sass_re/`)
@@ -312,13 +437,25 @@ python scripts/compare_architectures.py results/Ada_RTX4070TiS_* results/Pascal_
 
 ## 10. Conclusion
 
-We presented the first open-source, side-by-side empirical comparison of NVIDIA GPU
-microarchitecture at the SASS instruction level, spanning six years of evolution from
-Pascal (SM 6.1) to Ada Lovelace (SM 8.9). Our measurements quantify improvements in
-instruction latency, throughput, and ISA expressiveness, while our encoding analysis
-reveals how the binary format evolved to support wider scheduling and more powerful
-instructions. The complete toolkit is published for the community to extend to additional
-GPU generations.
+This repo now supports a bounded but genuinely substantive Ada-only paper story.
+On SM89, the broad inventory question is largely closed, while the remaining
+interesting work has narrowed to form-selection and semantic-validation
+frontiers rather than generic opcode discovery. The `P2R` program established a
+clean negative source/IR result and a positive cubin-side opcode-validity
+result on the same target, which sharply localizes the remaining open problem.
+The `UPLOP3` program went further by establishing a structurally valid cubin-
+side path, runtime-safe execution, and a ranked set of semantically live local
+sites with distinct causal roles.
+
+Methodologically, the work also clarifies which tools matter at each stage.
+Source mutation, PTX/front-end variation, and `ptxas` version sweeps are useful
+for bounding negative space. Cubin-side substitution resolves opcode-validity
+questions. Differential fuzzing is the strongest semantic discriminator once a
+patched form is runnable, with `compute-sanitizer` acting as the safety gate
+and `ncu`/`nsys` serving as secondary performance and trace sidecars. The
+current paper is therefore best read as an Ada-only evidence-backed frontier
+study embedded in a larger Pascal-vs-Ada comparison scaffold that remains ready
+for future cross-architecture completion.
 
 ---
 

@@ -1,0 +1,20 @@
+metric,label_value,numeric_value
+Recursive probe files,349,349
+Non-skip manifest entries,344,344
+Compile-enabled probe files in current manifest,343,343
+Compile-enabled probe files in first full refresh,341,341
+Compile-enabled probe files in postfix refresh,343,343
+Microbenchmarks,15,15
+Canonical optimized mnemonic frontier,379,379
+Strongest discovery-lane frontier,382 (--maxrregcount=32),382
+Checked-in SM89 catalog rows,470,470
+Total SASS instructions disassembled,"26,000+",26000
+Latency measurements,70+ (ncu cross-validated),70
+Throughput measurements,10+,10
+Tensor core precisions measured,7 (all available on Ada),7
+Exotic formats characterized,"16 (NF4, MX, FXP, Posit, BCD, DD, QD, bignum)",16
+Novel discoveries,30+,30
+`ncu` hardware counter validations,"331 profiled in postfix run, 3 failed, 14 skipped",331
+Production kernels created,"4 (BF16 bf162, INT8 MRT A-A, inv_tau, REDUX box count)",4
+Zero-cost modifiers confirmed,"5 (FTZ, SAT, FABS, FNEG, denormals)",5
+Remaining unreproduced direct-local source/IR cluster,"4 mnemonics (P2R.B1/B2/B3, UPLOP3.LUT)",4

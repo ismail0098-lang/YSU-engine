@@ -1,0 +1,118 @@
+% Multidimensional SM89 instruction comparison table
+% Dimensions: Instruction Class | Representative | Latency | Throughput | Pipeline | ILP Potential
+%
+% Lions Commentary style: each row is annotated with a paragraph number
+% that cross-references the commentary section of the monograph.
+
+\begin{table}[htbp]
+\centering
+\caption{SM89 Instruction Characterization Matrix (RTX 4070 Ti Super)}
+\label{tab:multidim}
+\small
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{@{}
+  >{\color{fg}}l
+  >{\color{fg}\ttfamily\small}l
+  >{\color{fg}}r
+  >{\color{fg}}r
+  >{\color{fg}}l
+  >{\color{fg}}l
+  >{\color{fg}}c
+@{}}
+\toprule
+\textcolor{muted}{\textsf{Class}} &
+\textcolor{muted}{\textsf{Representative}} &
+\textcolor{muted}{\textsf{Lat (cy)}} &
+\textcolor{muted}{\textsf{Tput (ops/clk)}} &
+\textcolor{muted}{\textsf{Pipeline}} &
+\textcolor{muted}{\textsf{Bottleneck}} &
+\textcolor{muted}{\textsf{\S}} \\
+\midrule
+%--- ALU Integer ---
+\rowcolor{panel}
+\textcolor{accentA}{INT32 Arith} & IADD3      &  2.51 & 68.2 & INT32        & \textcolor{accentC}{compute} & \ref{par:int32} \\
+\rowcolor{panel}
+                                 & IMAD       &  4.54 & 44.6 & INT32        & \textcolor{accentC}{compute} & \\
+\rowcolor{panel}
+                                 & IMNMX      &  2.51 & 68.2 & INT32        & \textcolor{accentC}{compute} & \\
+%--- ALU Float ---
+\textcolor{accentA}{FP32 Arith}  & FADD       &  4.53 &      & FP32/FMA     & \textcolor{accentC}{compute} & \ref{par:fp32} \\
+                                 & FFMA       &  4.54 & 44.6 & FP32/FMA     & \textcolor{accentC}{compute} & \\
+                                 & FMNMX      &  4.54 &      & FP32/FMA     & \textcolor{accentC}{compute} & \\
+%--- FP16/BF16 ---
+\rowcolor{panel}
+\textcolor{accentA}{FP16/BF16}   & HFMA2      &  4.01 &      & FP16 (2x)    & \textcolor{accentC}{compute} & \ref{par:fp16} \\
+\rowcolor{panel}
+                                 & HADD2      &  4.54 &      & FP16 (2x)    & \textcolor{accentC}{compute} & \\
+%--- FP64 ---
+\textcolor{accentD}{FP64 Arith}  & DFMA       & 54.48 &  0.7 & FP64 (1:64)  & \textcolor{accentD}{ratio}   & \ref{par:fp64} \\
+                                 & DADD       & 54.00 &      & FP64 (1:64)  & \textcolor{accentD}{ratio}   & \\
+%--- SFU ---
+\rowcolor{panel}
+\textcolor{accentB}{SFU/MUFU}    & MUFU.EX2   & 17.56 &  9.9 & SFU          & \textcolor{accentB}{SFU}     & \ref{par:sfu} \\
+\rowcolor{panel}
+                                 & MUFU.RCP   & 41.55 &      & SFU          & \textcolor{accentB}{SFU}     & \\
+\rowcolor{panel}
+                                 & MUFU.RSQ   & 18.00 &      & SFU          & \textcolor{accentB}{SFU}     & \\
+%--- Tensor ---
+\textcolor{accentC}{Tensor Core} & HMMA.1688  & 66.19 &      & TC           & \textcolor{accentC}{compute} & \ref{par:tensor} \\
+%--- Bitwise ---
+\rowcolor{panel}
+\textcolor{accentA}{Bitwise}     & LOP3.LUT   &  2.51 & 68.2 & INT32        & \textcolor{accentC}{compute} & \ref{par:bitwise} \\
+\rowcolor{panel}
+                                 & SHF        &  2.51 &      & INT32        & \textcolor{accentC}{compute} & \\
+\rowcolor{panel}
+                                 & PRMT       &  2.51 &      & INT32        & \textcolor{accentC}{compute} & \\
+\rowcolor{panel}
+                                 & POPC       & 11.77 &      & INT32 (multi)& \textcolor{accentB}{multi}   & \\
+%--- Conversion ---
+\textcolor{accentA}{Conversion}  & F2F        &  4.54 &      & CVT          & \textcolor{accentC}{compute} & \ref{par:cvt} \\
+                                 & I2F        &  4.54 &      & CVT          & \textcolor{accentC}{compute} & \\
+%--- Memory ---
+\rowcolor{panel}
+\textcolor{accentC}{Global Mem}  & LDG (chase)& 92.29 &      & LSU          & \textcolor{accentD}{memory}  & \ref{par:memory} \\
+\rowcolor{panel}
+                                 & STG        &      &      & LSU          & \textcolor{accentD}{memory}  & \\
+\textcolor{accentC}{Shared Mem}  & LDS (chase)& 28.03 &      & LSU          & \textcolor{accentD}{memory}  & \ref{par:smem} \\
+                                 & STS        &      &      & LSU          & \textcolor{accentD}{memory}  & \\
+\rowcolor{panel}
+\textcolor{accentC}{Async Copy}  & LDGSTS     &      &      & LSU (async)  & \textcolor{accentD}{memory}  & \ref{par:async} \\
+%--- Atomics ---
+\textcolor{accentD}{Atomics}     & ATOM (smem)&      &      & LSU+ALU      & \textcolor{accentD}{memory}  & \ref{par:atomic} \\
+                                 & ATOMG (sys)&      &      & LSU+ALU+MC   & \textcolor{accentD}{memory}  & \\
+%--- Sync ---
+\rowcolor{panel}
+\textcolor{accentD}{Sync}        & BAR.SYNC   &      &      & Scoreboard   & \textcolor{accentD}{sync}    & \ref{par:sync} \\
+\rowcolor{panel}
+                                 & MEMBAR.GPU &205.25 &      & MC           & \textcolor{accentD}{memory}  & \\
+\rowcolor{panel}
+                                 & MEMBAR.SYS &2583   &      & MC+PCIe      & \textcolor{accentD}{system}  & \\
+%--- Warp ---
+\textcolor{accentB}{Warp}        & SHFL.BFLY  & 24.96 &      & Warp sched   & \textcolor{accentB}{warp}    & \ref{par:warp} \\
+%--- Special ---
+\rowcolor{panel}
+\textcolor{muted}{Special}       & S2R        &      &      & SR read      & \textcolor{accentC}{compute} & \ref{par:special} \\
+\rowcolor{panel}
+                                 & NANOSLEEP  &      &      & Scheduler    & \textcolor{muted}{N/A}      & \\
+%--- Uniform ---
+\textcolor{accentB}{Uniform}     & ULDC       &      &      & Uniform pipe & \textcolor{accentC}{compute} & \ref{par:uniform} \\
+                                 & UIADD3     &      &      & Uniform pipe & \textcolor{accentC}{compute} & \\
+                                 & UPLOP3.LUT &      &      & Uniform pipe & \textcolor{accentC}{compute} & \\
+%--- Predicate ---
+\rowcolor{panel}
+\textcolor{accentB}{Predicate}   & P2R        &      &      & Pred bank    & \textcolor{accentC}{compute} & \ref{par:predicate} \\
+\rowcolor{panel}
+                                 & R2P        &      &      & Pred bank    & \textcolor{accentC}{compute} & \\
+\bottomrule
+\end{tabular}
+
+\medskip
+\footnotesize\color{muted}
+\textit{Legend:}
+\textcolor{accentC}{$\blacksquare$}~compute-bound \quad
+\textcolor{accentD}{$\blacksquare$}~memory/sync-bound \quad
+\textcolor{accentB}{$\blacksquare$}~SFU/warp-bound \quad
+Latencies from 512-deep dependent chains on RTX 4070 Ti Super.
+Throughput in operations per clock per SM where measured.
+\textsf{\S} = commentary paragraph reference.
+\end{table}

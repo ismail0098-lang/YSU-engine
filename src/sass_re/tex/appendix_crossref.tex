@@ -1,0 +1,111 @@
+% Cross-Reference Index: Measurements to Probe Sources
+%
+% Lions Commentary style: every claim in the monograph is traceable
+% to a specific probe, compilation, and measurement artifact.
+
+\section{Cross-Reference Index}
+\label{sec:crossref}
+
+\noindent\textit{%
+Every measurement claim in this monograph can be independently reproduced
+by compiling the listed probe with the listed flags, disassembling with
+\texttt{cuobjdump -sass}, and running the listed microbenchmark.  This
+index maps claims to artifacts, following the principle that no measurement
+should be trusted without a reproducible path.}
+
+\bigskip
+
+\begin{table}[htbp]
+\centering
+\caption{Measurement Cross-Reference: Latency Claims}
+\label{tab:crossref:latency}
+\small
+\renewcommand{\arraystretch}{1.1}
+\begin{tabular}{@{}
+  >{\color{fg}\ttfamily\small}l
+  >{\color{fg}}r
+  >{\color{fg}\ttfamily\scriptsize}l
+  >{\color{fg}\ttfamily\scriptsize}l
+  >{\color{fg}\scriptsize}l
+@{}}
+\toprule
+\textcolor{muted}{\textsf{Mnemonic}} &
+\textcolor{muted}{\textsf{Lat (cy)}} &
+\textcolor{muted}{\textsf{Probe Source}} &
+\textcolor{muted}{\textsf{Benchmark}} &
+\textcolor{muted}{\textsf{Flags}} \\
+\midrule
+IADD3      &  2.51 & probe\_int\_arith.cu      & microbench\_latency.cu & -O3 --restrict \\
+IMAD       &  4.54 & probe\_int\_arith.cu      & microbench\_latency.cu & -O3 --restrict \\
+FADD       &  4.53 & probe\_fp32\_arith.cu     & microbench\_latency.cu & -O3 --restrict \\
+FFMA       &  4.54 & probe\_fp32\_arith.cu     & microbench\_latency.cu & -O3 --restrict \\
+HFMA2      &  4.01 & probe\_fp16\_half2.cu     & microbench\_throughput.cu & -O3 --fast\_math \\
+DFMA       & 54.48 & probe\_fp64\_arithmetic.cu & microbench\_latency\_corrected.cu & -O3 \\
+MUFU.EX2   & 17.56 & probe\_mufu.cu           & microbench\_latency.cu & -O3 --restrict \\
+MUFU.RCP   & 41.55 & probe\_mufu.cu           & microbench\_latency.cu & -O3 --restrict \\
+HMMA.1688  & 66.19 & probe\_tensor\_all\_widths.cu & microbench\_latency\_tensor\_all.cu & -O3 \\
+LOP3.LUT   &  2.51 & probe\_bitwise.cu        & microbench\_latency.cu & -O3 --restrict \\
+POPC       & 11.77 & probe\_bit\_manipulation.cu & microbench\_int\_bitops.cu & -O3 \\
+LDG        & 92.29 & probe\_memory.cu          & microbench\_latency.cu & -O3 --restrict \\
+LDS        & 28.03 & probe\_memory.cu          & microbench\_latency.cu & -O3 --restrict \\
+SHFL.BFLY  & 24.96 & probe\_memory.cu          & microbench\_latency.cu & -O3 --restrict \\
+MEMBAR.GPU &205.25 & probe\_membar\_sc\_vc.cu  & microbench\_remaining.cu & -O3 \\
+MEMBAR.SYS &2583   & probe\_membar\_sc\_vc.cu  & microbench\_remaining.cu & -O3 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\caption{Cross-Reference: Architectural Claims to Evidence}
+\label{tab:crossref:arch}
+\small
+\renewcommand{\arraystretch}{1.1}
+\begin{tabular}{@{}
+  >{\color{fg}\small}p{5.5cm}
+  >{\color{fg}\ttfamily\scriptsize}p{4.5cm}
+  >{\color{fg}\scriptsize}p{4cm}
+@{}}
+\toprule
+\textcolor{muted}{\textsf{Claim}} &
+\textcolor{muted}{\textsf{Evidence Source}} &
+\textcolor{muted}{\textsf{Verification Method}} \\
+\midrule
+FABS/FNEG are free (zero latency) &
+microbench\_latency\_corrected.cu &
+Dependent chain: FADD+FABS vs FADD alone \\
+\addlinespace
+.SAT modifier is free &
+microbench\_latency\_corrected.cu &
+FFMA.SAT vs FFMA chain comparison \\
+\addlinespace
+INT8 SoA is Pareto-optimal for LBM &
+cuda\_lbm/bench/bench\_main.cu &
+5643 MLUPS at 76 MB vs all other tiers \\
+\addlinespace
+SoA beats AoS by 1.81--2.22x &
+cuda\_lbm/bench/bench\_harness.cu &
+Controlled 128\^{}3 grid comparison \\
+\addlinespace
+FP64 kernels are compute-bound &
+probe\_fp64\_arithmetic.cu, ncu &
+sm\_\_throughput $>$ 90\% peak \\
+\addlinespace
+P2R.B* valid but not compiler-selected &
+probe\_p2r\_*.cu, cubin patches &
+cuobjdump decode + runtime differential \\
+\addlinespace
+PLOP3$\to$UPLOP3 valid; ULOP3$\to$UPLOP3 invalid &
+probe\_uplop3\_*.cu, cubin patches &
+Decode table + compute-sanitizer \\
+\addlinespace
+Async backbone enables combo coexistence &
+probe\_combo\_*.cu (43 variants) &
+ncu stall distribution analysis \\
+\addlinespace
+SYS scope introduces MEMBAR regime &
+combo family stall profiles &
+Controlled bridge experiments \\
+\bottomrule
+\end{tabular}
+\end{table}

@@ -1,0 +1,28 @@
+\begin{tikzpicture}
+\begin{axis}[
+    width=\textwidth,
+    height=7cm,
+    ybar,
+    bar width=10pt,
+    symbolic x coords={canonical_frontier,discovery_lane,catalog_rows},
+    xtick=data,
+    xticklabel style={rotate=15,anchor=east,text=fg,font=\small},
+    xticklabels={canonical frontier,discovery lane,catalog rows},
+    ylabel={Count},
+    ylabel style={text=fg},
+    ymajorgrids=true,
+    grid style={draw=muted!35},
+    axis line style={draw=muted},
+    tick style={draw=muted},
+    yticklabel style={text=fg},
+    enlarge x limits=0.25,
+    nodes near coords,
+    every node near coord/.append style={text=fg,font=\small},
+]
+\addplot[fill=accentA,draw=accentA] table[
+    col sep=comma,
+    x=metric_key,
+    y=count,
+] {../processed/monograph_20260323/inventory_plot.csv};
+\end{axis}
+\end{tikzpicture}

@@ -1,0 +1,16 @@
+context,site,class
+uniform_loop,uplop3_08,inert
+uniform_loop,uplop3_80,inert
+sliding_window_pt,uplop3_08,inert
+sliding_window_pt,uplop3_80,inert
+sliding_window_mixed,uplop3_2a_p0,inert
+sliding_window_mixed,uplop3_2a_p1,inert
+sliding_window_mixed,uplop3_a8_1,inert
+sliding_window_mixed,uplop3_a8_2,inert
+cooperative_launch,uplop3_08,stable_but_different
+cooperative_launch,uplop3_80,inert
+tensor_ldsm,uplop3_08,inert
+tensor_ldsm,uplop3_80,inert
+uniform_predicates,uplop3_80,stable_but_different
+uniform_predicates,uplop3_a8,inert
+uniform_predicates,uplop3_fe,stable_but_different

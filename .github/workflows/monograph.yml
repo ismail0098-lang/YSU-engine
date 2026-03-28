@@ -1,0 +1,126 @@
+name: Build SM89 Monograph PDF
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/sass_re/tex/**'
+      - 'src/sass_re/processed/**'
+      - '.github/workflows/monograph.yml'
+  pull_request:
+    paths:
+      - 'src/sass_re/tex/**'
+      - 'src/sass_re/processed/**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-pdf:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install TeX Live
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            texlive-latex-base \
+            texlive-latex-recommended \
+            texlive-latex-extra \
+            texlive-fonts-recommended \
+            texlive-science \
+            texlive-pictures \
+            lmodern
+
+      - name: Build monograph PDF
+        working-directory: src/sass_re/tex
+        run: |
+          mkdir -p build
+          # Three passes for cross-references and table of contents
+          pdflatex -interaction=nonstopmode -output-directory=build sm89_monograph.tex
+          pdflatex -interaction=nonstopmode -output-directory=build sm89_monograph.tex
+          pdflatex -interaction=nonstopmode -output-directory=build sm89_monograph.tex
+
+      - name: Verify zero warnings and errors
+        working-directory: src/sass_re/tex
+        run: |
+          warnings=$(grep -c 'LaTeX Warning' build/sm89_monograph.log || true)
+          errors=$(grep -c '^! ' build/sm89_monograph.log || true)
+          echo "Warnings: $warnings"
+          echo "Errors: $errors"
+          if [ "$errors" -gt 0 ]; then
+            echo "::error::LaTeX produced $errors error(s)"
+            grep '^! ' build/sm89_monograph.log
+            exit 1
+          fi
+          if [ "$warnings" -gt 0 ]; then
+            echo "::warning::LaTeX produced $warnings warning(s)"
+            grep 'LaTeX Warning' build/sm89_monograph.log
+          fi
+
+      - name: Upload PDF artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: SM89_Lions_Commentary
+          path: src/sass_re/tex/build/sm89_monograph.pdf
+          retention-days: 90
+
+      - name: Attach PDF to release
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          tag="${GITHUB_REF#refs/tags/}"
+          cp src/sass_re/tex/build/sm89_monograph.pdf \
+             "SM89_Lions_Commentary_${tag}.pdf"
+          gh release upload "$tag" "SM89_Lions_Commentary_${tag}.pdf" \
+             --clobber
+
+  # Future: HTML conversion for GitHub Pages
+  # Uncomment when ready to deploy to gh-pages branch.
+  #
+  # Pandoc converts TeX to HTML with MathJax for math rendering.
+  # LaTeXML provides higher-fidelity TeX-to-HTML (preserves TikZ as SVG)
+  # but requires a heavier install. Both are documented here for reference.
+  #
+  # convert-html:
+  #   runs-on: ubuntu-latest
+  #   needs: build-pdf
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #
+  #     - name: Install pandoc
+  #       run: sudo apt-get install -y pandoc
+  #
+  #     - name: Convert to HTML via pandoc
+  #       working-directory: src/sass_re/tex
+  #       run: |
+  #         pandoc sm89_monograph.tex \
+  #           --standalone \
+  #           --mathjax \
+  #           --metadata title="SM89 Lions-Style Commentary" \
+  #           -o build/index.html
+  #
+  #     # Alternative: LaTeXML for higher-fidelity conversion
+  #     # - name: Install LaTeXML
+  #     #   run: |
+  #     #     sudo apt-get install -y latexml
+  #     #
+  #     # - name: Convert to HTML via LaTeXML
+  #     #   working-directory: src/sass_re/tex
+  #     #   run: |
+  #     #     latexml sm89_monograph.tex \
+  #     #       --destination=build/sm89_monograph.xml
+  #     #     latexmlpost build/sm89_monograph.xml \
+  #     #       --destination=build/index.html \
+  #     #       --format=html5 \
+  #     #       --javascript='https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js'
+  #
+  #     - name: Deploy to GitHub Pages
+  #       uses: peaceiris/actions-gh-pages@v4
+  #       with:
+  #         github_token: ${{ secrets.GITHUB_TOKEN }}
+  #         publish_dir: src/sass_re/tex/build
+  #         destination_dir: monograph

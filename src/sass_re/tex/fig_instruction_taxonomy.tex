@@ -1,0 +1,179 @@
+% fig_instruction_taxonomy.tex -- SM89 instruction-set taxonomy tree
+% Requires: \usepackage[edges]{forest}  (add to preamble of sm89_monograph.tex)
+% Expects the monograph color definitions: bg, fg, muted, accentA-D, panel.
+%
+% Pipeline color mapping:
+%   accentA (#58A6FF blue)   -- ALU integer/float/conversion pipelines
+%   accentB (#F2CC60 yellow) -- SFU / special-function pipeline
+%   accentC (#7EE787 green)  -- memory / load-store pipeline
+%   accentD (#FF7B72 red)    -- synchronization / control-flow pipeline
+%
+% Designed for landscape orientation.  The including document should use
+% \usepackage{pdflscape} and wrap the \input in a landscape environment,
+% or compile with a landscape geometry.
+
+\begin{figure}[p]
+\centering
+\makebox[\textwidth][c]{%
+\scalebox{0.92}{%
+\begin{forest}
+  forked edges,
+  for tree={
+    grow'=0,
+    fork sep=6mm,
+    parent anchor=east,
+    child anchor=west,
+    anchor=west,
+    edge={draw=muted!70, thick},
+    l sep=12mm,
+    s sep=3.2mm,
+    inner xsep=4pt,
+    inner ysep=2.5pt,
+    font=\sffamily\small,
+    text=fg,
+    rounded corners=2pt,
+  },
+  where level=0{%
+    font=\sffamily\bfseries\large,
+    fill=panel,
+    draw=muted,
+    rounded corners=3pt,
+    inner xsep=8pt,
+    inner ysep=5pt,
+    anchor=center,
+  }{},
+  where level=1{%
+    font=\sffamily\bfseries\small,
+    inner xsep=5pt,
+    inner ysep=3pt,
+    text=bg,
+  }{},
+  where level=2{%
+    font=\sffamily\footnotesize,
+    text=fg,
+    draw=none,
+    fill=none,
+    inner xsep=2pt,
+    inner ysep=1.5pt,
+    text width=68mm,
+  }{},
+  [{SM89 ISA --- 448 mnemonics}
+    %
+    [ALU Integer, fill=accentA
+      [{\texttt{IADD3}\,{\tiny(2.51\,cy)},
+        \texttt{IMAD}, \texttt{IABS},
+        \texttt{IMNMX}, \texttt{LEA},
+        \texttt{ISETP}, \texttt{SGXT}}]
+    ]
+    %
+    [ALU Float, fill=accentA
+      [{\texttt{FADD},
+        \texttt{FFMA}\,{\tiny(4.54\,cy)},
+        \texttt{FMUL}, \texttt{FMNMX},
+        \texttt{FSETP}, \texttt{FCHK}}]
+    ]
+    %
+    [FP16/BF16, fill=accentA
+      [{\texttt{HADD2}, \texttt{HFMA2},
+        \texttt{HMUL2}, \texttt{HSET2},
+        \texttt{HSETP2}, \texttt{HMNMX2}}]
+    ]
+    %
+    [FP64, fill=accentA
+      [{\texttt{DADD},
+        \texttt{DFMA}\,{\tiny(54.48\,cy)},
+        \texttt{DMUL}, \texttt{DSETP},
+        \texttt{DMNMX}}]
+    ]
+    %
+    [Tensor Core, fill=accentA
+      [{\texttt{HMMA}\,{\tiny(66.19\,cy)},
+        \texttt{IMMA}, \texttt{LDMATRIX},
+        \texttt{QSPC}}]
+    ]
+    %
+    [Bitwise/Logic, fill=accentA
+      [{\texttt{LOP3}, \texttt{BFI},
+        \texttt{BFE}, \texttt{PRMT},
+        \texttt{SHF}, \texttt{SHR},
+        \texttt{SHL}, \texttt{BREV},
+        \texttt{FLO}, \texttt{POPC}}]
+    ]
+    %
+    [Conversion, fill=accentA
+      [{\texttt{F2F}, \texttt{F2I},
+        \texttt{I2F}, \texttt{I2I},
+        \texttt{F2FP}, \texttt{I2FP},
+        \texttt{FRND}}]
+    ]
+    %
+    [Special / SFU, fill=accentB
+      [{\texttt{MUFU.RCP}\,{\tiny(41.55\,cy)},
+        \texttt{MUFU.RSQ}, \texttt{MUFU.SIN},
+        \texttt{MUFU.COS}, \texttt{MUFU.EX2},
+        \texttt{MUFU.LG2}, \texttt{S2R},
+        \texttt{CS2R}, \texttt{NANOSLEEP},
+        \texttt{NOP}}]
+    ]
+    %
+    [Memory, fill=accentC, text=bg
+      [{\texttt{LDG}\,{\tiny(92.29\,cy)},
+        \texttt{STG},
+        \texttt{LDS}\,{\tiny(28.03\,cy)},
+        \texttt{STS}, \texttt{LDC},
+        \texttt{LDL}, \texttt{STL},
+        \texttt{LDGSTS}, \texttt{LDSM}}]
+    ]
+    %
+    [Atomics, fill=accentC, text=bg
+      [{\texttt{ATOM}, \texttt{ATOMS},
+        \texttt{ATOMG}, \texttt{RED},
+        \texttt{REDUX}}]
+    ]
+    %
+    [Synchronization, fill=accentD, text=bg
+      [{\texttt{BAR}, \texttt{DEPBAR},
+        \texttt{MBARRIER},
+        \texttt{MEMBAR.SYS}\,{\tiny(2583\,cy)},
+        \texttt{BSSY}, \texttt{BSYNC},
+        \texttt{YIELD}}]
+    ]
+    %
+    [Control Flow, fill=accentD, text=bg
+      [{\texttt{BRA}, \texttt{BRX},
+        \texttt{EXIT}, \texttt{RET},
+        \texttt{CALL}, \texttt{WARPSYNC},
+        \texttt{BREAK}, \texttt{RPCMOV}}]
+    ]
+    %
+    [Warp, fill=accentD, text=bg
+      [{\texttt{SHFL}\,{\tiny(24.96\,cy)},
+        \texttt{VOTE}, \texttt{MATCH},
+        \texttt{REDUX}}]
+    ]
+    %
+    [Uniform, fill=accentA
+      [{\texttt{ULDC}, \texttt{UIADD3},
+        \texttt{ULOP3}, \texttt{USHF},
+        \texttt{UISETP}, \texttt{UPLOP3},
+        \texttt{R2UR}, \texttt{UBREV},
+        \texttt{UPOPC}}]
+    ]
+    %
+    [Predicate, fill=accentA
+      [{\texttt{P2R}, \texttt{R2P},
+        \texttt{PLOP3}, \texttt{PSETP},
+        \texttt{CSET}}]
+    ]
+  ]
+\end{forest}%
+}% end scalebox
+}% end makebox
+\caption{SM89 instruction-set taxonomy by pipeline family.
+  \textcolor{accentA}{\rule{8pt}{8pt}}~ALU pipeline \quad
+  \textcolor{accentB}{\rule{8pt}{8pt}}~SFU pipeline \quad
+  \textcolor{accentC}{\rule{8pt}{8pt}}~Memory pipeline \quad
+  \textcolor{accentD}{\rule{8pt}{8pt}}~Sync/Control pipeline.
+  Parenthesized values are measured round-trip latencies in cycles.}
+\label{fig:instruction-taxonomy}
+\end{figure}

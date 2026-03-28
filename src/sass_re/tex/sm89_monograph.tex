@@ -1,0 +1,155 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{xcolor}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{colortbl}
+\usepackage{pgfplots}
+\usepackage{pgfplotstable}
+\usepackage{tikz}
+\usepackage[edges]{forest}
+\pgfplotsset{compat=1.18}
+\usepgfplotslibrary{groupplots}
+\usetikzlibrary{positioning,arrows.meta,fit,calc,backgrounds,shapes.geometric}
+
+\definecolor{bg}{HTML}{0F1117}
+\definecolor{fg}{HTML}{E6EDF3}
+\definecolor{muted}{HTML}{8B949E}
+\definecolor{accentA}{HTML}{58A6FF}
+\definecolor{accentB}{HTML}{F2CC60}
+\definecolor{accentC}{HTML}{7EE787}
+\definecolor{accentD}{HTML}{FF7B72}
+\definecolor{panel}{HTML}{161B22}
+\pagecolor{bg}
+\color{fg}
+
+\newtheorem{lemma}{Lemma}
+\newtheorem{theorem}{Theorem}
+\newtheorem{corollary}{Corollary}
+
+\title{A Lions-Style Commentary on the SM89 Instruction Set:\\
+  Empirical SASS Reverse Engineering of Ada Lovelace}
+\author{%
+  Oichkatzelesfrettschen\thanks{151315375+Oichkatzelesfrettschen@users.noreply.github.com}
+  \and
+  ismail0098-lang\thanks{224981482+ismail0098-lang@users.noreply.github.com}
+  \\[4pt]
+  \normalsize\textit{YSU-Engine Project}
+}
+\date{March 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+This monograph presents an empirical characterization of the NVIDIA Ada Lovelace
+SM89 instruction set architecture, structured as a Lions-style source-level
+commentary.  From 448 confirmed SASS mnemonics measured on an RTX 4070 Ti Super,
+we provide: (1) a multidimensional instruction taxonomy with measured latencies
+and throughput; (2) pipeline-stage diagrams showing instruction flow through the
+SM89 execution units; (3) numbered commentary paragraphs in the style of Lions'
+\textit{Commentary on UNIX 6th Edition}, where each measurement is
+cross-referenced to its probe source and raw data; and (4) formal theorems
+characterizing the P2R form-selection gap and UPLOP3 structural laws.
+The processed-data archive serves as the single source of truth.
+\end{abstract}
+
+\tableofcontents
+\clearpage
+
+% ====================================================================
+% Part I: The Instruction Set (Lions-Style Commentary)
+% ====================================================================
+
+\part*{Part I: The Instruction Set}
+
+\section{Instruction Characterization Matrix}
+\input{fig_multidim_table.tex}
+
+\section{Pipeline Architecture}
+\label{fig:pipeline}
+\input{fig_pipeline_stages.tex}
+
+\section{Instruction Taxonomy}
+\input{fig_instruction_taxonomy.tex}
+
+\input{lions_commentary.tex}
+
+\clearpage
+% ====================================================================
+% Part II: Frontier Analysis
+% ====================================================================
+
+\part*{Part II: Frontier Analysis}
+
+\section{Definitions}
+Let $F_T$ denote direct source/IR selection of target opcode family $T$,
+$G_T$ denote local cubin-side opcode validity, and $H_T$ denote semantic
+deviation under a tested pattern family. The core separation is:
+\[
+F_T \neq G_T \neq H_T.
+\]
+
+\section{Inventory Compression}
+\pgfplotstableread[col sep=comma]{../processed/monograph_20260323/inventory_plot.csv}\inventorytable
+\input{fig_inventory_closure.tex}
+
+\section{The P2R Frontier}
+\pgfplotstableread[col sep=comma]{../processed/monograph_20260323/p2r_frontier_plot.csv}\pTwoRTable
+\begin{lemma}
+Reproducing a neighborhood and reproducing a specific selected opcode form are
+not equivalent events.
+\end{lemma}
+
+\begin{theorem}
+On the current SM89 stack, the residual \texttt{P2R.B*} problem is a
+form-selection problem rather than an opcode-existence problem.
+\end{theorem}
+
+\input{fig_p2r_frontier.tex}
+
+\section{The UPLOP3 Frontier}
+\pgfplotstableread[col sep=comma]{../processed/monograph_20260323/uplop3_runtime_class_counts.csv}\runtimeclass
+\pgfplotstableread[col sep=comma]{../processed/monograph_20260323/uplop3_live_site_numeric.csv}\livesites
+\pgfplotstableread[col sep=comma]{../processed/monograph_20260323/uplop3_pair_baseline_numeric.csv}\pairbase
+
+\begin{theorem}
+The structurally valid local cubin-side path for \texttt{UPLOP3.LUT} is
+\texttt{PLOP3 -> UPLOP3}; \texttt{ULOP3 -> UPLOP3} is invalid.
+\end{theorem}
+
+\begin{corollary}
+The local \texttt{UPLOP3} frontier is both structurally stratified and
+semantically stratified.
+\end{corollary}
+
+\input{fig_uplop3_runtime.tex}
+
+\section{Pair-Baseline Divergence}
+\input{fig_pair_baseline.tex}
+
+\section{Methodological Law}
+Differential fuzzing is the primary semantic discriminator, compute-sanitizer
+is the safety gate, and ncu/nsys are secondary observability channels. These
+roles are not interchangeable and should not be collapsed into one scalar
+notion of ``validation''.
+
+\section{Open Gaps}
+The remaining \texttt{P2R} gap is deeper form selection. The remaining
+\texttt{UPLOP3} gap is direct source/IR emission and motif-sensitive widening
+from the strongest live anchors.
+
+\input{appendix_selection_laws.tex}
+
+% ====================================================================
+% Appendix B: Cross-Reference Index
+% ====================================================================
+
+\input{appendix_crossref.tex}
+
+\end{document}

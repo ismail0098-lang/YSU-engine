@@ -1,0 +1,43 @@
+\begin{tikzpicture}
+\begin{axis}[
+    width=\textwidth,
+    height=6cm,
+    xbar,
+    bar width=9pt,
+    symbolic y coords={
+      interpretation,
+      cubin_bstar,
+      frontend_sweeps,
+      plain_p2r_0x0f,
+      plain_p2r_0x7f,
+      source_ir_bstar
+    },
+    ytick=data,
+    yticklabel style={text=fg,font=\small},
+    yticklabels={
+      interpretation,
+      cubin-side P2R.B*,
+      frontend sweeps,
+      plain P2R 0x0f,
+      plain P2R 0x7f,
+      source/IR P2R.B*
+    },
+    xlabel={State score},
+    xlabel style={text=fg},
+    xmin=0,
+    xmax=2.4,
+    grid=major,
+    grid style={draw=muted!35},
+    axis line style={draw=muted},
+    tick style={draw=muted},
+    xticklabel style={text=fg},
+    nodes near coords,
+    every node near coord/.append style={text=fg,font=\small},
+]
+\addplot[fill=accentB,draw=accentB] table[
+    col sep=comma,
+    x=score,
+    y=axis_key
+] {../processed/monograph_20260323/p2r_frontier_plot.csv};
+\end{axis}
+\end{tikzpicture}

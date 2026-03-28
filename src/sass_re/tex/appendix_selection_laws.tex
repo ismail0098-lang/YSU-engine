@@ -1,0 +1,49 @@
+\appendix
+\section{Selection Laws And Bounded Theorems}
+
+\subsection{The \texttt{P2R.B*} Selection Law}
+
+Let $T = \texttt{P2R.B*}$. Define $F_T(s)=1$ when direct local source/IR
+lowering emits $T$, and define $G_T(b)=1$ when cubin-side substitution
+materializes runnable $T$.
+
+\begin{theorem}
+On the current SM89 stack, the observed \texttt{P2R.B*} gap is a form-selection
+gap rather than an opcode-existence gap.
+\end{theorem}
+
+\begin{proof}
+The repository evidence establishes three facts: (i) direct source/IR search
+does not emit \texttt{P2R.B1}, \texttt{P2R.B2}, or \texttt{P2R.B3}; (ii) plain
+\texttt{P2R} neighborhoods are reproduced locally; and (iii) cubin-side
+substitution materializes runnable local \texttt{P2R.B1/B2/B3}. Therefore the
+missing condition lies in opcode-form selection under the tested lowering path,
+not in local opcode invalidity.
+\end{proof}
+
+\subsection{The \texttt{UPLOP3} Structural Law}
+
+\begin{theorem}
+For the tested local cubin contexts, \texttt{ULOP3 -> UPLOP3} is structurally
+invalid while \texttt{PLOP3 -> UPLOP3} is structurally valid.
+\end{theorem}
+
+\begin{proof}
+The invalid substitution class decodes as illegal under local disassembly,
+whereas the predicate-logic substitution class decodes as real
+\texttt{UPLOP3.LUT} and launches successfully in multiple local contexts.
+\end{proof}
+
+\subsection{The \texttt{UPLOP3} Runtime-Class Law}
+
+\begin{theorem}
+The tested local \texttt{UPLOP3} substitutions partition into inert and
+stable-but-different runtime classes.
+\end{theorem}
+
+\begin{proof}
+Differential fuzzing separates contexts whose outputs match baseline across all
+tested patterns from contexts whose outputs diverge on at least one tested
+pattern, while compute-sanitizer remains clean. This yields the inert versus
+stable-but-different partition used throughout the current Ada-only frontier.
+\end{proof}

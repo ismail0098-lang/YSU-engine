@@ -1,0 +1,5 @@
+tool,role,semantic_priority
+Differential fuzzing,primary semantic discriminator,3
+compute-sanitizer,safety gate,1
+ncu,perf sanity check,1
+nsys,trace sidecar,1

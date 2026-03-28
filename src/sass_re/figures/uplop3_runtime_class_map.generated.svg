@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1260" height="840" viewBox="0 0 1260 840">
+  <rect width="1260" height="840" fill="#ffffff"/>
+  <text x="40" y="48" font-family="monospace" font-size="28" fill="#111111">Figure A2. UPLOP3 runtime class map</text>
+  <text x="40" y="78" font-family="monospace" font-size="16" fill="#333333">Generated from runtime-class, live-site ranking, and pair-baseline summary artifacts.</text>
+
+  <rect x="40" y="110" width="370" height="680" rx="10" fill="#f4f7fb" stroke="#8aa1b8" stroke-width="2"/>
+  <text x="60" y="145" font-family="monospace" font-size="22" fill="#18324a">Runtime classes</text>
+  <text x="60" y="176" font-family="monospace" font-size="16" fill="#1f5a1d">Inert sites: 12</text>
+  <text x="60" y="205" font-family="monospace" font-size="16" fill="#734600">Stable-but-different sites: 3</text>
+  <text x="60" y="240" font-family="monospace" font-size="16" fill="#163216">Examples (inert):</text>
+  <text x="80" y="268" font-family="monospace" font-size="14" fill="#163216">uniform_loop/uplop3_08</text>
+  <text x="80" y="290" font-family="monospace" font-size="14" fill="#163216">uniform_loop/uplop3_80</text>
+  <text x="80" y="312" font-family="monospace" font-size="14" fill="#163216">sliding_window_pt/uplop3_08</text>
+  <text x="80" y="334" font-family="monospace" font-size="14" fill="#163216">tensor_ldsm/uplop3_80</text>
+  <text x="60" y="380" font-family="monospace" font-size="16" fill="#4d3000">Examples (stable-but-different):</text>
+  <text x="80" y="408" font-family="monospace" font-size="14" fill="#4d3000">cooperative_launch/uplop3_08</text>
+  <text x="80" y="430" font-family="monospace" font-size="14" fill="#4d3000">uniform_predicates/uplop3_80</text>
+  <text x="80" y="452" font-family="monospace" font-size="14" fill="#4d3000">uniform_predicates/uplop3_fe</text>
+  <text x="60" y="500" font-family="monospace" font-size="16" fill="#18324a">Pair-baseline summary:</text>
+  <text x="80" y="528" font-family="monospace" font-size="14" fill="#18324a">uniform occ1: same 7, diff 17</text>
+  <text x="80" y="550" font-family="monospace" font-size="14" fill="#18324a">uniform occ1_occ2_occ5: same 13, diff 11</text>
+  <text x="80" y="572" font-family="monospace" font-size="14" fill="#18324a">cutlass occ4: same 0, diff 24</text>
+  <text x="80" y="594" font-family="monospace" font-size="14" fill="#18324a">cutlass occ2_occ4_occ5: same 9, diff 15</text>
+
+  <rect x="450" y="110" width="340" height="680" rx="10" fill="#f8f4fb" stroke="#9d84b7" stroke-width="2"/>
+  <text x="470" y="145" font-family="monospace" font-size="22" fill="#3f2558">Live-site hierarchy</text>
+  <text x="470" y="185" font-family="monospace" font-size="18" fill="#631515">1. uniform_occ1 (jaccard 0.375)</text>
+  <text x="470" y="220" font-family="monospace" font-size="18" fill="#6f3a00">2. cutlass_occ5 (jaccard 0.375)</text>
+  <text x="470" y="255" font-family="monospace" font-size="18" fill="#6a5600">3. uniform_occ2 (jaccard 0.300)</text>
+  <text x="470" y="290" font-family="monospace" font-size="18" fill="#173d93">4. cutlass_occ4 (jaccard 0.333333)</text>
+  <text x="470" y="325" font-family="monospace" font-size="18" fill="#145472">5. uniform_occ5 (jaccard 0.300)</text>
+  <text x="470" y="360" font-family="monospace" font-size="18" fill="#444444">6. cooperative_occ1 (jaccard 0.300)</text>
+  <text x="470" y="420" font-family="monospace" font-size="16" fill="#3f2558">Current roles:</text>
+  <text x="490" y="448" font-family="monospace" font-size="14" fill="#3f2558">uniform_occ1, cutlass_occ5 -> anchors</text>
+  <text x="490" y="470" font-family="monospace" font-size="14" fill="#3f2558">uniform_occ2 -> secondary anchor</text>
+  <text x="490" y="492" font-family="monospace" font-size="14" fill="#3f2558">cutlass_occ4 -> amplifier</text>
+  <text x="490" y="514" font-family="monospace" font-size="14" fill="#3f2558">uniform_occ5 -> sensitizer</text>
+
+  <rect x="830" y="110" width="390" height="680" rx="10" fill="#fbf7f3" stroke="#b59c86" stroke-width="2"/>
+  <text x="850" y="145" font-family="monospace" font-size="22" fill="#5a4330">Causal interpretation</text>
+  <text x="850" y="190" font-family="monospace" font-size="16" fill="#5a4330">Uniform pair baseline: occ2_occ5</text>
+  <text x="870" y="220" font-family="monospace" font-size="14" fill="#5a4330">occ1 is the main extra widener</text>
+  <text x="870" y="242" font-family="monospace" font-size="14" fill="#5a4330">triple partially re-stabilizes the pair</text>
+  <text x="850" y="292" font-family="monospace" font-size="16" fill="#5a4330">CUTLASS pair baseline: occ2_occ5</text>
+  <text x="870" y="322" font-family="monospace" font-size="14" fill="#5a4330">occ4 is the main visible widener</text>
+  <text x="870" y="344" font-family="monospace" font-size="14" fill="#5a4330">richer combos often preserve prefix</text>
+  <text x="870" y="366" font-family="monospace" font-size="14" fill="#5a4330">but perturb aggregate sums</text>
+  <text x="850" y="430" font-family="monospace" font-size="16" fill="#5a4330">Method roles</text>
+  <text x="870" y="458" font-family="monospace" font-size="14" fill="#5a4330">differential fuzzing -> semantic ranking</text>
+  <text x="870" y="480" font-family="monospace" font-size="14" fill="#5a4330">compute-sanitizer -> safety gate</text>
+  <text x="870" y="502" font-family="monospace" font-size="14" fill="#5a4330">ncu -> perf sanity check</text>
+  <text x="870" y="524" font-family="monospace" font-size="14" fill="#5a4330">nsys -> trace sidecar</text>
+  <text x="40" y="820" font-family="monospace" font-size="14" fill="#333333">Generated from repo artifacts by scripts/generate_sm89_paper_assets.py</text>
+</svg>

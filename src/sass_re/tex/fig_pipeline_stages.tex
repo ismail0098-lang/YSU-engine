@@ -1,0 +1,275 @@
+% fig_pipeline_stages.tex -- SM89 streaming multiprocessor execution pipeline
+% Requires these in the monograph preamble:
+%   \usetikzlibrary{positioning,arrows.meta,fit,calc,backgrounds}
+
+% --- Pipeline-type accent colors (extend the monograph palette) -----------
+\colorlet{pipeINT}{accentA}            % blue     -- INT32 / ALU
+\colorlet{pipeFP32}{accentB}           % gold     -- FP32 / FMA
+\colorlet{pipeFP16}{accentC}           % green    -- FP16 / BF16
+\colorlet{pipeFP64}{accentD}           % red      -- FP64
+\definecolor{pipeSFU}{HTML}{BC8CFF}    % lavender -- special function
+\definecolor{pipeTCORE}{HTML}{FF9E64}  % orange   -- tensor cores
+\definecolor{pipeLDST}{HTML}{2AC3DE}   % teal     -- load/store
+\definecolor{pipeTEX}{HTML}{E0AF68}    % amber    -- texture units
+\definecolor{pipeATOM}{HTML}{F7768E}   % coral    -- atomics
+\definecolor{pipeMEM}{HTML}{7E8BA0}    % slate    -- memory hierarchy
+\definecolor{pipeSCB}{HTML}{BB9AF7}    % purple   -- scoreboard/depbar
+
+\begin{tikzpicture}[
+    >=Stealth,
+    every node/.style={font=\sffamily\small, text=fg},
+    stage/.style={
+        draw=muted, fill=panel, rounded corners=3pt,
+        minimum height=0.8cm, minimum width=2.0cm,
+        align=center, text=fg, font=\sffamily\small,
+    },
+    execunit/.style={
+        draw=#1!70!fg, fill=#1!20!bg, rounded corners=2pt,
+        minimum height=0.55cm, minimum width=5.4cm,
+        align=center, text=fg, font=\sffamily\scriptsize,
+        inner sep=3pt,
+    },
+    memblock/.style={
+        draw=pipeMEM!70!fg, fill=pipeMEM!18!bg, rounded corners=2pt,
+        minimum height=0.65cm, minimum width=2.3cm,
+        align=center, text=fg, font=\sffamily\scriptsize,
+    },
+    schedbox/.style={
+        draw=accentA!60!fg, fill=accentA!15!bg, rounded corners=2pt,
+        minimum height=0.48cm, minimum width=1.7cm,
+        align=center, text=fg, font=\sffamily\scriptsize,
+    },
+    dispbox/.style={
+        draw=accentB!60!fg, fill=accentB!15!bg, rounded corners=2pt,
+        minimum height=0.48cm, minimum width=1.3cm,
+        align=center, text=fg, font=\sffamily\scriptsize,
+    },
+    groupframe/.style={
+        draw=muted!40, fill=bg, rounded corners=4pt, inner sep=6pt,
+    },
+    lat/.style={font=\sffamily\tiny, text=muted},
+    arr/.style={->, draw=muted!60, semithick},
+    arrfeed/.style={->, draw=pipeSCB!70, semithick, densely dashed},
+    arrmem/.style={->, draw=pipeMEM!70, semithick},
+    legendswatch/.style={
+        minimum width=0.35cm, minimum height=0.25cm,
+        draw=none, rounded corners=1pt, inner sep=0pt,
+    },
+]
+
+% =========================================================================
+%  COORDINATE PLAN  (all Y negative = downward from origin)
+%
+%  Scoreboard label           y =  2.0
+%  Scoreboard arc             y =  1.8
+%  Exec Pipelines title       y ~  0.8  (auto, label=above on frame)
+%  eINT  row                  y =  0.0
+%  eFP32 row                  y = -0.72
+%  eFP16 row                  y = -1.44
+%  eFP64 row                  y = -2.16
+%  eSFU  row                  y = -2.88
+%  eTCORE row                 y = -3.60
+%  eLDST row                  y = -4.32
+%  eTEX  row                  y = -5.04
+%  eATOM row                  y = -5.76
+%  Exec frame bottom          y ~ -6.1
+%  Memory row                 y = -7.4
+%  Mem latency labels         y ~ -7.9
+%  Legend                     y = -8.6
+%
+%  icache     x =  0.0
+%  sched      x =  2.4
+%  dispatch   x ~  4.4
+%  bus        x =  6.2
+%  exec ctr   x =  9.8       (width 5.4cm => left ~7.1, right ~12.5)
+%  regfile    x = 15.0
+% =========================================================================
+
+% ----- Execution pipeline rows ------------------------------------------
+\node[execunit=pipeINT]   at (9.8,  0.00) (eINT)
+    {\textbf{INT32} (ALU) -- IADD3, IMAD, IMNMX, ISETP, LOP3, SHF};
+\node[execunit=pipeFP32]  at (9.8, -0.72) (eFP32)
+    {\textbf{FP32} (FMA) -- FADD, FFMA, FMNMX, FSETP};
+\node[execunit=pipeFP16]  at (9.8, -1.44) (eFP16)
+    {\textbf{FP16/BF16} -- HADD2, HFMA2, HMUL2};
+\node[execunit=pipeFP64]  at (9.8, -2.16) (eFP64)
+    {\textbf{FP64} (1:64 Ada) -- DADD, DFMA};
+\node[execunit=pipeSFU]   at (9.8, -2.88) (eSFU)
+    {\textbf{SFU} -- MUFU.RCP, MUFU.EX2, MUFU.RSQ};
+\node[execunit=pipeTCORE] at (9.8, -3.60) (eTCORE)
+    {\textbf{Tensor Cores} -- HMMA, IMMA};
+\node[execunit=pipeLDST]  at (9.8, -4.32) (eLDST)
+    {\textbf{Load/Store} -- LDG, STG, LDS, STS};
+\node[execunit=pipeTEX]   at (9.8, -5.04) (eTEX)
+    {\textbf{TMU} -- TEX, TLD4};
+\node[execunit=pipeATOM]  at (9.8, -5.76) (eATOM)
+    {\textbf{Atomic} -- ATOM, ATOMS, RED, REDUX};
+
+% Latency labels to the right of each unit
+\node[lat, anchor=west] at ([xshift=4pt]eINT.east)   {2.51\,cy};
+\node[lat, anchor=west] at ([xshift=4pt]eFP32.east)  {4.54\,cy};
+\node[lat, anchor=west] at ([xshift=4pt]eFP16.east)  {4.01--4.54\,cy};
+\node[lat, anchor=west] at ([xshift=4pt]eFP64.east)  {54.48\,cy};
+\node[lat, anchor=west] at ([xshift=4pt]eSFU.east)   {17--42\,cy};
+\node[lat, anchor=west] at ([xshift=4pt]eTCORE.east) {66.19\,cy};
+\node[lat, anchor=west] at ([xshift=4pt]eLDST.east)  {28--92\,cy};
+
+% Exec frame (background layer)
+\begin{scope}[on background layer]
+\node[groupframe, fit=(eINT)(eATOM), inner sep=10pt,
+    label={[font=\sffamily\footnotesize\bfseries, text=fg]%
+           above:Execution Pipelines}]
+    (execframe) {};
+\end{scope}
+
+% ----- Warp Schedulers + Dispatch ----------------------------------------
+% Vertically centered on exec block: midpoint = (0 + -5.76)/2 = -2.88
+\node[schedbox] at (2.4, -1.48) (ws0) {Scheduler 0};
+\node[schedbox] at (2.4, -2.28) (ws1) {Scheduler 1};
+\node[schedbox] at (2.4, -3.08) (ws2) {Scheduler 2};
+\node[schedbox] at (2.4, -3.88) (ws3) {Scheduler 3};
+
+\node[dispbox, right=0.3cm of ws0] (d0) {Dispatch};
+\node[dispbox, right=0.3cm of ws1] (d1) {Dispatch};
+\node[dispbox, right=0.3cm of ws2] (d2) {Dispatch};
+\node[dispbox, right=0.3cm of ws3] (d3) {Dispatch};
+
+\begin{scope}[on background layer]
+\node[groupframe, fit=(ws0)(ws3)(d0)(d3), inner sep=8pt,
+    label={[font=\sffamily\footnotesize\bfseries, text=fg, yshift=-2pt]%
+           above:{Warp Schedulers (4/SM)}}]
+    (schedframe) {};
+\end{scope}
+
+\foreach \i in {0,1,2,3} {
+    \draw[arr, thin] (ws\i) -- (d\i);
+}
+
+% ----- Instruction Cache -------------------------------------------------
+\node[stage, minimum width=1.8cm]
+    at (0, -2.68) (icache) {Instruction\\Cache};
+
+\draw[arr] (icache.east) -- (schedframe.west |- icache.east);
+
+% ----- Dispatch fan-out bus -> Execution ---------------------------------
+\coordinate (busX) at (6.2, -2.68);
+
+\foreach \i in {0,1,2,3} {
+    \draw[arr, thin] (d\i.east) -- (busX |- d\i.east);
+}
+% vertical bus segment
+\draw[draw=muted!50, semithick]
+    (busX |- d0.east) -- (busX |- d3.east);
+% bus -> exec frame
+\draw[arr] (busX) -- (execframe.west |- busX);
+% faint taps to each unit inside the frame
+\foreach \eu in {eINT,eFP32,eFP16,eFP64,eSFU,eTCORE,eLDST,eTEX,eATOM} {
+    \draw[arr, very thin, draw=muted!30]
+        (execframe.west |- \eu.west) -- (\eu.west);
+}
+
+% ----- Register File -----------------------------------------------------
+\node[stage, fill=pipeSCB!18!bg, draw=pipeSCB!60!fg,
+    minimum width=1.8cm, minimum height=2.2cm,
+    font=\sffamily\scriptsize]
+    at (15.0, -2.88) (regfile) {Register\\File\\(256 x 32b\\per thread)};
+
+\draw[arr] (execframe.east |- regfile.west) -- (regfile.west);
+
+% ----- Scoreboard / DEPBAR feedback arc ----------------------------------
+% Route at y=1.8, well above the exec frame top (~y=0.8).
+\coordinate (scbTopR) at (15.0, 1.8);
+\coordinate (scbTopL) at (2.4, 1.8);
+
+\draw[arrfeed]
+    (regfile.north) -- (scbTopR)
+    -- (scbTopL)
+    -- (schedframe.north);
+
+% Label centered on horizontal segment
+\path (scbTopR) -- (scbTopL) node[midway, anchor=south, fill=bg,
+    inner sep=2pt, font=\sffamily\scriptsize, text=pipeSCB]
+    {Scoreboard / DEPBAR feedback};
+
+% ----- Memory Hierarchy --------------------------------------------------
+\node[memblock, minimum width=2.6cm]
+    at (6.6, -7.4) (smem) {Shared Memory\\(SMEM, 100\,KB)};
+
+\node[memblock, minimum width=2.3cm]
+    at (9.6, -7.4) (lcone) {L1 Cache\\(128\,KB)};
+
+\node[memblock, minimum width=2.3cm]
+    at (12.2, -7.4) (lctwo) {L2 Cache\\(48\,MB)};
+
+\node[memblock, minimum width=2.3cm,
+    draw=accentD!50!fg, fill=accentD!15!bg]
+    at (14.8, -7.4) (dram) {DRAM\\(GDDR6X)};
+
+% Latency below each memory block (bright text on dark bg)
+\node[font=\sffamily\tiny, text=fg!80, anchor=north]
+    at ([yshift=-3pt]lcone.south) {${\sim}$28\,cy (LDS)};
+\node[font=\sffamily\tiny, text=fg!80, anchor=north]
+    at ([yshift=-3pt]lctwo.south) {${\sim}$92\,cy (LDG)};
+\node[font=\sffamily\tiny, text=fg!80, anchor=north]
+    at ([yshift=-3pt]dram.south) {$>$200\,cy};
+
+% Load/Store -> SMEM
+\draw[arrmem]
+    ([xshift=-4pt]eLDST.south) -- ++(0,-0.40) -| (smem.north);
+% Load/Store -> L1
+\draw[arrmem]
+    ([xshift=4pt]eLDST.south) -- ++(0,-0.60) -| (lcone.north);
+% SMEM <-> L1
+\draw[arrmem, <->] (smem.east) -- (lcone.west);
+% L1 -> L2
+\draw[arrmem] (lcone.east) -- (lctwo.west);
+% L2 -> DRAM
+\draw[arrmem] (lctwo.east) -- (dram.west);
+
+% TEX -> L1
+\draw[arrmem, thin]
+    (eTEX.south) -- ++(0,-0.75) -| ([xshift=4pt]lcone.north east);
+% Atomics -> L2
+\draw[arrmem, thin]
+    (eATOM.south) -- ++(0,-0.40) -| (lctwo.north);
+
+% SMEM writeback -> register file (routed below memory row)
+\draw[arrmem, densely dashed, thin]
+    ([xshift=8pt]smem.south) -- ++(0,-0.55)
+    -| (regfile.south);
+
+% =========================================================================
+% LEGEND (two compact rows)
+% =========================================================================
+\node[anchor=north west, font=\sffamily\footnotesize\bfseries, text=fg]
+    at (5.0, -8.7) (legtitle) {Pipeline Legend};
+
+% Row 1
+\node[legendswatch, fill=pipeINT,  right=0.2cm of legtitle.east] (sw1) {};
+\node[lat, right=2pt of sw1] (sl1) {INT32};
+\node[legendswatch, fill=pipeFP32, right=8pt of sl1.east]        (sw2) {};
+\node[lat, right=2pt of sw2] (sl2) {FP32};
+\node[legendswatch, fill=pipeFP16, right=8pt of sl2.east]        (sw3) {};
+\node[lat, right=2pt of sw3] (sl3) {FP16/BF16};
+\node[legendswatch, fill=pipeFP64, right=8pt of sl3.east]        (sw4) {};
+\node[lat, right=2pt of sw4] (sl4) {FP64};
+\node[legendswatch, fill=pipeSFU,  right=8pt of sl4.east]        (sw5) {};
+\node[lat, right=2pt of sw5] (sl5) {SFU};
+
+% Row 2
+\node[legendswatch, fill=pipeTCORE, below=4pt of sw1, anchor=north] (sw6) {};
+\node[lat, right=2pt of sw6] (sl6) {Tensor};
+\node[legendswatch, fill=pipeLDST,  right=8pt of sl6.east]          (sw7) {};
+\node[lat, right=2pt of sw7] (sl7) {Ld/St};
+\node[legendswatch, fill=pipeTEX,   right=8pt of sl7.east]          (sw8) {};
+\node[lat, right=2pt of sw8] (sl8) {TMU};
+\node[legendswatch, fill=pipeATOM,  right=8pt of sl8.east]          (sw9) {};
+\node[lat, right=2pt of sw9] (sl9) {Atomic};
+\node[legendswatch, fill=pipeSCB,   right=8pt of sl9.east]          (sw10) {};
+\node[lat, right=2pt of sw10] (sl10) {Scoreboard};
+
+\begin{scope}[on background layer]
+\node[groupframe, fit=(legtitle)(sw6)(sl10)(sl5), inner sep=5pt] {};
+\end{scope}
+
+\end{tikzpicture}

@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760">
+  <rect width="1200" height="760" fill="#ffffff"/>
+  <text x="40" y="48" font-family="monospace" font-size="28" fill="#111111">Figure A2. UPLOP3 runtime class map</text>
+  <text x="40" y="78" font-family="monospace" font-size="16" fill="#333333">Local SM89 cubin-side PLOP3 -> UPLOP3 substitutions: inert vs live classes and current causal roles.</text>
+
+  <rect x="40" y="110" width="330" height="600" rx="10" fill="#f4f7fb" stroke="#8aa1b8" stroke-width="2"/>
+  <text x="60" y="145" font-family="monospace" font-size="22" fill="#18324a">Runtime classes</text>
+  <rect x="60" y="170" width="290" height="210" rx="8" fill="#e9f5ea" stroke="#6ea56d" stroke-width="2"/>
+  <text x="80" y="205" font-family="monospace" font-size="20" fill="#1f5a1d">Inert</text>
+  <text x="80" y="238" font-family="monospace" font-size="16" fill="#163216">uniform_loop 0x80 / 0x8</text>
+  <text x="80" y="264" font-family="monospace" font-size="16" fill="#163216">smem_sliding_window 0x80 / 0x8</text>
+  <text x="80" y="290" font-family="monospace" font-size="16" fill="#163216">hmma_tiled_loop 0x80 / 0x8</text>
+  <text x="80" y="316" font-family="monospace" font-size="16" fill="#163216">many mixed 0xa8 / 0x2a sites</text>
+
+  <rect x="60" y="410" width="290" height="270" rx="8" fill="#fff1dd" stroke="#c58a2c" stroke-width="2"/>
+  <text x="80" y="445" font-family="monospace" font-size="20" fill="#734600">Stable-but-different</text>
+  <text x="80" y="478" font-family="monospace" font-size="16" fill="#4d3000">cooperative occ1</text>
+  <text x="80" y="504" font-family="monospace" font-size="16" fill="#4d3000">uniform occ1</text>
+  <text x="80" y="530" font-family="monospace" font-size="16" fill="#4d3000">uniform occ2</text>
+  <text x="80" y="556" font-family="monospace" font-size="16" fill="#4d3000">uniform occ5</text>
+  <text x="80" y="582" font-family="monospace" font-size="16" fill="#4d3000">cutlass occ4</text>
+  <text x="80" y="608" font-family="monospace" font-size="16" fill="#4d3000">cutlass occ5</text>
+
+  <rect x="430" y="110" width="340" height="600" rx="10" fill="#f8f4fb" stroke="#9d84b7" stroke-width="2"/>
+  <text x="450" y="145" font-family="monospace" font-size="22" fill="#3f2558">Live-site hierarchy</text>
+  <rect x="450" y="175" width="300" height="68" rx="8" fill="#ffe2e2" stroke="#c84f4f" stroke-width="2"/>
+  <text x="470" y="205" font-family="monospace" font-size="18" fill="#631515">1. uniform_occ1</text>
+  <text x="470" y="228" font-family="monospace" font-size="14" fill="#631515">strongest exact library-aligned anchor</text>
+
+  <rect x="450" y="260" width="300" height="68" rx="8" fill="#ffe9da" stroke="#cb7a3a" stroke-width="2"/>
+  <text x="470" y="290" font-family="monospace" font-size="18" fill="#6f3a00">2. cutlass_occ5</text>
+  <text x="470" y="313" font-family="monospace" font-size="14" fill="#6f3a00">strongest CUTLASS-like anchor</text>
+
+  <rect x="450" y="345" width="300" height="68" rx="8" fill="#fff5d8" stroke="#b99a1f" stroke-width="2"/>
+  <text x="470" y="375" font-family="monospace" font-size="18" fill="#6a5600">3. uniform_occ2</text>
+  <text x="470" y="398" font-family="monospace" font-size="14" fill="#6a5600">credible secondary anchor</text>
+
+  <rect x="450" y="430" width="300" height="68" rx="8" fill="#eaf0ff" stroke="#5a80d6" stroke-width="2"/>
+  <text x="470" y="460" font-family="monospace" font-size="18" fill="#173d93">4. cutlass_occ4</text>
+  <text x="470" y="483" font-family="monospace" font-size="14" fill="#173d93">live amplifier / modifier</text>
+
+  <rect x="450" y="515" width="300" height="68" rx="8" fill="#edf8ff" stroke="#4f9cc8" stroke-width="2"/>
+  <text x="470" y="545" font-family="monospace" font-size="18" fill="#145472">5. uniform_occ5</text>
+  <text x="470" y="568" font-family="monospace" font-size="14" fill="#145472">live sensitizer / mediator</text>
+
+  <rect x="450" y="600" width="300" height="68" rx="8" fill="#f1f1f1" stroke="#888888" stroke-width="2"/>
+  <text x="470" y="630" font-family="monospace" font-size="18" fill="#444444">6. cooperative_occ1</text>
+  <text x="470" y="653" font-family="monospace" font-size="14" fill="#444444">lower-priority live site</text>
+
+  <rect x="830" y="110" width="330" height="600" rx="10" fill="#fbf7f3" stroke="#b59c86" stroke-width="2"/>
+  <text x="850" y="145" font-family="monospace" font-size="22" fill="#5a4330">Causal roles</text>
+
+  <rect x="850" y="180" width="290" height="82" rx="8" fill="#fce6e6" stroke="#cc6666" stroke-width="2"/>
+  <text x="870" y="212" font-family="monospace" font-size="18" fill="#6d1f1f">Anchor</text>
+  <text x="870" y="237" font-family="monospace" font-size="14" fill="#6d1f1f">uniform_occ1, cutlass_occ5</text>
+
+  <rect x="850" y="285" width="290" height="82" rx="8" fill="#fef0d2" stroke="#caa34a" stroke-width="2"/>
+  <text x="870" y="317" font-family="monospace" font-size="18" fill="#6f5200">Secondary anchor</text>
+  <text x="870" y="342" font-family="monospace" font-size="14" fill="#6f5200">uniform_occ2</text>
+
+  <rect x="850" y="390" width="290" height="110" rx="8" fill="#e8f6ff" stroke="#68a4c8" stroke-width="2"/>
+  <text x="870" y="422" font-family="monospace" font-size="18" fill="#0f5378">Sensitizer</text>
+  <text x="870" y="447" font-family="monospace" font-size="14" fill="#0f5378">uniform_occ5 shifts the response</text>
+  <text x="870" y="468" font-family="monospace" font-size="14" fill="#0f5378">without acting like the strongest</text>
+  <text x="870" y="489" font-family="monospace" font-size="14" fill="#0f5378">standalone anchor</text>
+
+  <rect x="850" y="523" width="290" height="135" rx="8" fill="#ece6ff" stroke="#8c6fd0" stroke-width="2"/>
+  <text x="870" y="555" font-family="monospace" font-size="18" fill="#4b2c8b">Amplifier</text>
+  <text x="870" y="580" font-family="monospace" font-size="14" fill="#4b2c8b">cutlass_occ4 is the main visible</text>
+  <text x="870" y="601" font-family="monospace" font-size="14" fill="#4b2c8b">widener over the stable CUTLASS</text>
+  <text x="870" y="622" font-family="monospace" font-size="14" fill="#4b2c8b">occ2_occ5 pair baseline</text>
+  <text x="870" y="643" font-family="monospace" font-size="14" fill="#4b2c8b">while richer combos also perturb sum</text>
+
+  <text x="40" y="736" font-family="monospace" font-size="14" fill="#333333">Source: UPLOP3 frontier synthesis, tandem differential fuzzing, pair-baseline analysis.</text>
+</svg>

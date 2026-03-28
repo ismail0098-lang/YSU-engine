@@ -1,0 +1,48 @@
+\begin{tikzpicture}
+\begin{groupplot}[
+    group style={group size=2 by 1, horizontal sep=1.6cm},
+    width=0.47\textwidth,
+    height=6cm,
+    axis line style={draw=muted},
+    tick style={draw=muted},
+    yticklabel style={text=fg},
+    xticklabel style={text=fg},
+    ylabel style={text=fg},
+    xlabel style={text=fg},
+    grid=major,
+    grid style={draw=muted!35},
+]
+\nextgroupplot[
+    ybar,
+    symbolic x coords={inert,stablediff},
+    xtick=data,
+    xticklabels={inert,stable-different},
+    ylabel={Count},
+    nodes near coords,
+    every node near coord/.append style={text=fg,font=\small},
+]
+\addplot[fill=accentC,draw=accentC] table[
+    col sep=comma,
+    x=class_key,
+    y=count
+] {../processed/monograph_20260323/uplop3_runtime_class_plot.csv};
+
+\nextgroupplot[
+    ybar,
+    symbolic x coords={u1,c5,u2,c4,u5,co1},
+    xtick=data,
+    xticklabel style={rotate=20,anchor=east,text=fg,font=\small},
+    xticklabels={uniform\_occ1,cutlass\_occ5,uniform\_occ2,cutlass\_occ4,uniform\_occ5,cooperative\_occ1},
+    ylabel={Best jaccard},
+    ymin=0,
+    ymax=0.45,
+    nodes near coords,
+    every node near coord/.append style={text=fg,font=\small},
+]
+\addplot[fill=accentD,draw=accentD] table[
+    col sep=comma,
+    x=site_key,
+    y=best_jaccard
+] {../processed/monograph_20260323/uplop3_live_site_plot.csv};
+\end{groupplot}
+\end{tikzpicture}

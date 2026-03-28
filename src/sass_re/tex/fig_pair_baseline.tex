@@ -1,0 +1,39 @@
+\begin{tikzpicture}
+\begin{axis}[
+    width=\textwidth,
+    height=7cm,
+    ybar,
+    bar width=9pt,
+    symbolic x coords={
+      u_occ1,
+      u_occ1_occ5,
+      u_occ1_occ2_occ5,
+      c_occ4,
+      c_occ4_occ5,
+      c_occ2_occ4_occ5
+    },
+    xtick=data,
+    xticklabel style={rotate=20,anchor=east,text=fg,font=\small},
+    xticklabels={
+      uniform/occ1,
+      uniform/occ1\_occ5,
+      uniform/occ1\_occ2\_occ5,
+      cutlass/occ4,
+      cutlass/occ4\_occ5,
+      cutlass/occ2\_occ4\_occ5
+    },
+    ylabel={Diff ratio},
+    ymin=0,
+    ymax=1.1,
+    grid=major,
+    grid style={draw=muted!35},
+    nodes near coords,
+    every node near coord/.append style={text=fg,font=\small},
+]
+\addplot[fill=accentA,draw=accentA] table[
+    col sep=comma,
+    x=variant_key,
+    y=diff_ratio
+] {../processed/monograph_20260323/uplop3_pair_baseline_plot.csv};
+\end{axis}
+\end{tikzpicture}
