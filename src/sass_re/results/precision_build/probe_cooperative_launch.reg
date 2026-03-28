@@ -1,0 +1,31 @@
+ptxas info    : 1 bytes gmem, 8 bytes cmem[4]
+ptxas info    : Compiling entry function 'probe_cg_coalesced' for 'sm_89'
+ptxas info    : Function properties for probe_cg_coalesced
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 16 registers, used 0 barriers, 372 bytes cmem[0]
+ptxas info    : Compile time = 3.564 ms
+ptxas info    : Compiling entry function 'probe_cg_grid_sync' for 'sm_89'
+ptxas info    : Function properties for probe_cg_grid_sync
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 16 registers, used 1 barriers, 368 bytes cmem[0]
+ptxas info    : Compile time = 3.839 ms
+ptxas info    : Compiling entry function 'probe_cg_subwarp_partition' for 'sm_89'
+ptxas info    : Function properties for probe_cg_subwarp_partition
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 13 registers, used 0 barriers, 372 bytes cmem[0]
+ptxas info    : Compile time = 2.522 ms
+ptxas info    : Compiling entry function 'probe_cg_warp_partition' for 'sm_89'
+ptxas info    : Function properties for probe_cg_warp_partition
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 16 registers, used 0 barriers, 372 bytes cmem[0]
+ptxas info    : Compile time = 1.431 ms
+ptxas info    : Compiling entry function 'probe_cg_thread_block' for 'sm_89'
+ptxas info    : Function properties for probe_cg_thread_block
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 10 registers, used 1 barriers, 512 bytes smem, 372 bytes cmem[0]
+ptxas info    : Compile time = 0.979 ms
+ptxas info    : Compiling entry function 'probe_block_sync' for 'sm_89'
+ptxas info    : Function properties for probe_block_sync
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 16 registers, used 1 barriers, 512 bytes smem, 372 bytes cmem[0]
+ptxas info    : Compile time = 1.205 ms

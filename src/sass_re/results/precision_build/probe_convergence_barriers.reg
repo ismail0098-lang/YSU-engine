@@ -1,0 +1,31 @@
+ptxas info    : 0 bytes gmem
+ptxas info    : Compiling entry function 'probe_early_return' for 'sm_89'
+ptxas info    : Function properties for probe_early_return
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 8 registers, used 0 barriers, 372 bytes cmem[0]
+ptxas info    : Compile time = 1.623 ms
+ptxas info    : Compiling entry function 'probe_multi_break' for 'sm_89'
+ptxas info    : Function properties for probe_multi_break
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 11 registers, used 0 barriers, 368 bytes cmem[0]
+ptxas info    : Compile time = 2.102 ms
+ptxas info    : Compiling entry function 'probe_switch_bmov' for 'sm_89'
+ptxas info    : Function properties for probe_switch_bmov
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 14 registers, used 0 barriers, 376 bytes cmem[0], 12 bytes cmem[2]
+ptxas info    : Compile time = 1.320 ms
+ptxas info    : Compiling entry function 'probe_loop_break' for 'sm_89'
+ptxas info    : Function properties for probe_loop_break
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 8 registers, used 0 barriers, 372 bytes cmem[0]
+ptxas info    : Compile time = 7.006 ms
+ptxas info    : Compiling entry function 'probe_nested_diverge' for 'sm_89'
+ptxas info    : Function properties for probe_nested_diverge
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 10 registers, used 0 barriers, 368 bytes cmem[0]
+ptxas info    : Compile time = 0.692 ms
+ptxas info    : Compiling entry function 'probe_simple_diverge' for 'sm_89'
+ptxas info    : Function properties for probe_simple_diverge
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 10 registers, used 0 barriers, 368 bytes cmem[0]
+ptxas info    : Compile time = 0.542 ms

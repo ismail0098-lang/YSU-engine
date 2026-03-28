@@ -1,0 +1,48 @@
+#include <cuda_runtime.h>
+#include <stdio.h>
+
+#define SASS_RE_EMBEDDED_RUNNER 1
+#include "../probes/probe_barrier_coop_groups_sync.cu"
+
+static int check_cuda(cudaError_t err, const char *file, int line) {
+    if (err != cudaSuccess) {
+        fprintf(stderr, "CUDA error: %s (%d) at %s:%d\n",
+                cudaGetErrorString(err), (int)err, file, line);
+        return 1;
+    }
+    return 0;
+}
+
+#define CHECK_CUDA(expr) do { if (check_cuda((expr), __FILE__, __LINE__)) return 1; } while (0)
+
+int main(void) {
+    const int elems = 256;
+    float *d_in = nullptr;
+    float *d_out = nullptr;
+    float h_in[elems];
+
+    for (int i = 0; i < elems; ++i)
+        h_in[i] = 1.0f + (float)(i & 15) * 0.125f;
+
+    CHECK_CUDA(cudaMalloc(&d_in, sizeof(h_in)));
+    CHECK_CUDA(cudaMalloc(&d_out, sizeof(h_in)));
+    CHECK_CUDA(cudaMemcpy(d_in, h_in, sizeof(h_in), cudaMemcpyHostToDevice));
+    CHECK_CUDA(cudaMemset(d_out, 0, sizeof(h_in)));
+
+    probe_cg_block_sync<<<1, 256>>>(d_out, d_in);
+    CHECK_CUDA(cudaDeviceSynchronize());
+    probe_cg_tile32_sync<<<1, 256>>>(d_out, d_in);
+    CHECK_CUDA(cudaDeviceSynchronize());
+    probe_cg_tile16_sync<<<1, 256>>>(d_out, d_in);
+    CHECK_CUDA(cudaDeviceSynchronize());
+    probe_cg_tile4_sync<<<1, 256>>>(d_out, d_in);
+    CHECK_CUDA(cudaDeviceSynchronize());
+    probe_cg_coalesced_sync<<<1, 256>>>(d_out, d_in);
+    CHECK_CUDA(cudaDeviceSynchronize());
+
+    printf("barrier_coop_groups_runner_ok=1\n");
+
+    cudaFree(d_out);
+    cudaFree(d_in);
+    return 0;
+}

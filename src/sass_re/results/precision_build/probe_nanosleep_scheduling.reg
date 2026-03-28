@@ -1,0 +1,31 @@
+ptxas info    : 0 bytes gmem
+ptxas info    : Compiling entry function '_Z17k_int_reduce_shflPViPVx' for 'sm_89'
+ptxas info    : Function properties for _Z17k_int_reduce_shflPViPVx
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 16 registers, used 0 barriers, 368 bytes cmem[0]
+ptxas info    : Compile time = 2.482 ms
+ptxas info    : Compiling entry function '_Z18k_int_reduce_reduxPViPVx' for 'sm_89'
+ptxas info    : Function properties for _Z18k_int_reduce_reduxPViPVx
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 14 registers, used 0 barriers, 368 bytes cmem[0]
+ptxas info    : Compile time = 1.323 ms
+ptxas info    : Compiling entry function '_Z19k_float_reduce_shflPVfPVx' for 'sm_89'
+ptxas info    : Function properties for _Z19k_float_reduce_shflPVfPVx
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 15 registers, used 0 barriers, 368 bytes cmem[0]
+ptxas info    : Compile time = 1.844 ms
+ptxas info    : Compiling entry function '_Z16k_nanosleep_1000PViPVx' for 'sm_89'
+ptxas info    : Function properties for _Z16k_nanosleep_1000PViPVx
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 12 registers, used 0 barriers, 368 bytes cmem[0]
+ptxas info    : Compile time = 1.128 ms
+ptxas info    : Compiling entry function '_Z15k_nanosleep_100PViPVx' for 'sm_89'
+ptxas info    : Function properties for _Z15k_nanosleep_100PViPVx
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 12 registers, used 0 barriers, 368 bytes cmem[0]
+ptxas info    : Compile time = 5.220 ms
+ptxas info    : Compiling entry function '_Z13k_nanosleep_0PViPVx' for 'sm_89'
+ptxas info    : Function properties for _Z13k_nanosleep_0PViPVx
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 12 registers, used 0 barriers, 368 bytes cmem[0]
+ptxas info    : Compile time = 5.320 ms
