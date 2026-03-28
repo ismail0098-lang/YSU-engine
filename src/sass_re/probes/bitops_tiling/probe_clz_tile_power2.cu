@@ -7,5 +7,6 @@ clz_next_pow2(unsigned *out, const unsigned *in, int n) {
     unsigned v=in[i];
     if(v<=1){out[i]=1;return;}
     int lz=__clz(v-1);
+    if(lz==0){out[i]=0x80000000u;return;}
     out[i]=1u<<(32-lz);
 }

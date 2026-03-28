@@ -131,7 +131,8 @@ probe_nibble_bulk_unpack(float *f_out, const unsigned char *packed_dist,
         sum_b += fb[d];
     }
     f_out[cell_a] = sum_a;
-    f_out[cell_b] = sum_b;
+    if (cell_b < n_cells)
+        f_out[cell_b] = sum_b;
 }
 
 // PRMT byte permute probe (used in efficient byte-lane selection)

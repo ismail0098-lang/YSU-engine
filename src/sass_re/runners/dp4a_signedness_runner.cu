@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "../probes/atomic_sweep/probe_dp4a_signedness.cu"
+#include "../probes/probe_int8_dp4a.cu"
 
 #define CHECK_CUDA(expr) do { \
     cudaError_t err__ = (expr); \

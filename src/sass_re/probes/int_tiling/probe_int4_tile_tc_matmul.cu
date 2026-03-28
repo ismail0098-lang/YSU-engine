@@ -2,7 +2,7 @@
 #include <mma.h>
 using namespace nvcuda;
 // INT4 tensor core tiled matmul (8x8x32)
-__global__ void __launch_bounds__(32)
+extern "C" __global__ void __launch_bounds__(32)
 int4_tile_tc(int *D, const void *A, const void *B, int K_tiles) {
     using namespace nvcuda::wmma::experimental;
     wmma::fragment<wmma::matrix_a,8,8,32,precision::s4,wmma::row_major> fA;

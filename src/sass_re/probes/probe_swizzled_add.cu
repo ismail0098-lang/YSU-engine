@@ -42,7 +42,6 @@ extern "C" __global__ void __launch_bounds__(32)
 probe_fswzadd_explicit(float *out, const float *in) {
     int i = threadIdx.x;
     float val = in[i];
-    float partner;
 
     // Try to emit FSWZADD via shfl.sync + add in one PTX statement
     // The actual instruction selection depends on ptxas
