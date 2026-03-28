@@ -22,5 +22,10 @@ run_step sys_deep_default bash "$ROOT/scripts/validate_combo_blockred_warp_atomg
 run_step sys_store_default bash "$ROOT/scripts/validate_combo_blockred_warp_atomg64sys_ops_store_profile_safe_tranche.sh"
 PTXAS_EXTRA=-dlcm=cg run_step sys_store_dlcm_cg bash "$ROOT/scripts/validate_combo_blockred_warp_atomg64sys_ops_store_profile_safe_tranche.sh"
 
-python "$ROOT/scripts/summarize_combo_family_ncu_batch.py" "$RUN_DIR"
+SUMMARIZER="$ROOT/scripts/summarize_combo_family_ncu_batch.py"
+if [[ -f "$SUMMARIZER" ]]; then
+  python "$SUMMARIZER" "$RUN_DIR"
+else
+  echo "warning: summarizer not found: $SUMMARIZER" >&2
+fi
 echo "$RUN_DIR"

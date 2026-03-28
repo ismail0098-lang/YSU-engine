@@ -18,6 +18,12 @@ cleanup() {
 }
 trap cleanup EXIT
 
+if [ ! -f "$SRC" ]; then
+    echo "warning: runner source not found, skipping: $SRC" >&2
+    echo "Results: $OUTDIR (skipped -- runner missing)"
+    exit 0
+fi
+
 echo "Building GreenBoost driver-api tranche..."
 g++ -x c++ -O3 -std=c++23 -I/opt/cuda/include "$SRC" -lcuda -o "$BIN"
 

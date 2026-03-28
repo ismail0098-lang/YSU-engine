@@ -57,7 +57,9 @@ for pattern in 0 1 2 3; do
         fi
         echo "- $label:" >> "$SUMMARY"
         echo "  rc=$rc" >> "$SUMMARY"
-        if (( rc == 0 )) && diff -u "$baseline_log" "$log" >/dev/null; then
+        if (( baseline_rc != 0 )); then
+            echo "  relation=baseline_failed" >> "$SUMMARY"
+        elif (( rc == 0 )) && diff -u "$baseline_log" "$log" >/dev/null; then
             echo "  relation=same_as_baseline" >> "$SUMMARY"
         elif (( rc == 0 )); then
             echo "  relation=diff_from_baseline" >> "$SUMMARY"

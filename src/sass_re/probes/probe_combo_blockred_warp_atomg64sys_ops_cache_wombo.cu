@@ -38,9 +38,9 @@ probe_combo_blockred_warp_atomg64sys_ops_cache_wombo(unsigned long long *out,
         combo_blockred_warp_atomg64sys_smem_addr(smem) + ((lane & 15u) << 4);
 
     asm volatile("cp.async.cg.shared.global.L2::128B [%0], [%1], 16, 8;"
-                 :: "r"(saddr), "l"(src_u8 + lane));
+                 :: "r"(saddr), "l"(src_u8 + lane * 16u));
     asm volatile("cp.async.cg.shared.global.L2::128B [%0], [%1], 16;"
-                 :: "r"(saddr + 128), "l"(src_u8 + lane + 32));
+                 :: "r"(saddr + 128), "l"(src_u8 + lane * 16u + 32u));
     asm volatile("cp.async.commit_group;");
     asm volatile("cp.async.wait_group 0;");
 

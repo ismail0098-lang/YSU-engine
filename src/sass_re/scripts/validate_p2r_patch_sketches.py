@@ -29,7 +29,7 @@ def main() -> int:
         checked.append({
             **row,
             "ctrl_delta": f"0x{delta:016x}",
-            "ctrl_lane_ok": delta in (0x2000, 0x3000),
+            "ctrl_lane_ok": delta == expect,
             "ctrl_lane_expected": f"0x{expect:016x}",
         })
 
